@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="sqlsensei.svg" style="background: white;" width=200>
+  <img src="sqlsensei-white.svg"  width=200>
   <h3 align="center">SqlSensei</h3>
 
   <p align="center">

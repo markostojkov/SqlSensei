@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,121 +13,104 @@ namespace SqlSensei.SqlServer
 {
     public class SqlServerJob : SqlServerBase, ISqlSenseiJob
     {
-        public SqlServerJob(ISqlSenseiConfiguration configuration, ISqlSenseiLoggerService loggerService)
+        public SqlServerJob(ISqlSenseiConfiguration configuration, ISqlSenseiLoggerService loggerService) : base(loggerService, configuration)
         {
             Configuration = configuration;
             LoggerService = loggerService;
         }
 
-        private ISqlSenseiConfiguration Configuration { get; }
-        public ISqlSenseiLoggerService LoggerService { get; }
-
         public async Task ExecuteMaintenanceJob()
         {
-            string maintenanceLogCommand;
-
-            using SqlConnection connection = new(Configuration.ConnectionString);
-
-            connection.Open();
-
-            await ExecuteScriptAsync(connection, Configuration.GetMaintenanceScript(), LoggerService);
+            await ExecuteCommandAsyncNoTransaction(Configuration.GetMaintenanceScript());
 
             // Go through all databases in configuration, DELETE older rows, do maintenance and log
             foreach (var databaseName in Configuration.Databases)
             {
                 var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.MaintenanceScriptDropLogsOlderThanDays);
 
-                await ExecuteScriptAsync(
-                    connection,
+                await ExecuteCommandAsync(
                     "DELETE FROM [dbo].[CommandLog] WHERE StartTime < @DeleteDate AND DatabaseName = @DatabaseName",
-                    LoggerService,
                     new SqlParameter("@DeleteDate", deleteRecordsOlderThan),
                     new SqlParameter("@DatabaseName", databaseName));
 
-                maintenanceLogCommand = "SELECT * FROM [dbo].[CommandLog] WHERE DatabaseName = @DatabaseName";
+                var loggingInformation = new List<CommandLog>();
 
-                using var reader = await ExecuteCommandAsync(connection, maintenanceLogCommand, LoggerService, new SqlParameter("@DatabaseName", databaseName));
+                var result = await ExecuteCommandAsync(
+                    "SELECT * FROM [dbo].[CommandLog] WHERE DatabaseName = @DatabaseName",
+                    (reader) =>
+                    {
+                        loggingInformation = CommandLog.GetAll(reader);
+                    },
+                    new SqlParameter("@DatabaseName", databaseName));
 
-                if (reader == null)
+                if (!result)
                 {
                     await LoggerService.Error("ExecuteMaintenanceJob logging information error");
-
                     return;
                 }
 
-                var loggingInformation = CommandLog.GetAll(reader);
-
                 await LoggerService.MaintenanceInformation(loggingInformation, databaseName);
             }
-
-            connection.Close();
         }
 
         public async Task ExecuteMonitoringLogJob()
         {
-            using SqlConnection connection = new(Configuration.ConnectionString);
-
-            connection.Open();
-
-            await ExecuteScriptAsync(connection, Configuration.GetMonitoringLog(), LoggerService);
-
-            connection.Close();
+            await ExecuteCommandAsyncNoTransaction(Configuration.GetMonitoringLog());
         }
 
         public async Task ExecuteMonitoringJob()
         {
-            string monitoringIndexLogCommand;
-
-            using SqlConnection connection = new(Configuration.ConnectionString);
-
-            connection.Open();
-
             foreach (var databaseName in Configuration.Databases)
             {
                 var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.MaintenanceScriptDropLogsOlderThanDays);
 
-                await ExecuteScriptAsync(
-                    connection,
-                    "DELETE FROM [dbo].[IndexMonitoring] WHERE run_datetime < @DeleteDate AND database_name = @DatabaseName",
-                    LoggerService,
+                await ExecuteCommandAsync(
+                    @"IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
+                      BEGIN
+                            DELETE FROM [dbo].[IndexMonitoring] WHERE run_datetime < @DeleteDate AND database_name = @DatabaseName;
+                      END",
                     new SqlParameter("@DeleteDate", deleteRecordsOlderThan),
                     new SqlParameter("@DatabaseName", databaseName));
 
-                monitoringIndexLogCommand = @"
-                    WITH CTE AS (
-                        SELECT
-                            *,
-                            ROW_NUMBER() OVER (PARTITION BY create_tsql ORDER BY ID) AS RowNum
-                        FROM [dbo].[IndexMonitoring])
+                var monitoringIndexLogCommand = @"
+                    IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
+                        BEGIN
+                            WITH CTE AS (
+                                SELECT
+                                    *,
+                                    ROW_NUMBER() OVER (PARTITION BY create_tsql ORDER BY ID) AS RowNum
+                                FROM [dbo].[IndexMonitoring])
 
-                    SELECT *
-                    FROM CTE
-                    WHERE RowNum = 1 AND database_name = @DatabaseName;
+                            SELECT *
+                            FROM CTE
+                            WHERE RowNum = 1 AND database_name = @DatabaseName;
+                        END
                     ";
 
-                using var reader = await ExecuteCommandAsync(connection, monitoringIndexLogCommand, LoggerService, new SqlParameter("@DatabaseName", databaseName));
+                var loggingInformation = new List<IndexLog>();
 
-                if (reader == null)
+                var result = await ExecuteCommandAsync(
+                    monitoringIndexLogCommand,
+                    (reader) =>
+                    {
+                        loggingInformation = IndexLog.GetAll(reader);
+                    },
+                    new SqlParameter("@DatabaseName", databaseName));
+
+                if (!result)
                 {
-                    await LoggerService.Error("ExecuteMaintenanceJob logging information error");
+                    await LoggerService.Error("ExecuteMonitoringJob logging information error");
                     return;
                 }
 
-                var loggingInformation = IndexLog.GetAll(reader);
-
                 await LoggerService.MonitoringInformation(loggingInformation, databaseName);
             }
-
-            connection.Close();
         }
 
         public void InstallMaintenanceAndMonitoringScripts()
         {
             Task.Run(async () =>
             {
-                using SqlConnection connection = new(Configuration.ConnectionString);
-                connection.Open();
-
                 foreach (var scriptName in Configuration.MaintenanceScripts)
                 {
                     var assemblyScriptName = typeof(SqlServerJob).Assembly.GetManifestResourceNames().FirstOrDefault(x => x.Contains(scriptName));
@@ -135,7 +119,7 @@ namespace SqlSensei.SqlServer
                     using var assemblyScriptStreamReader = new StreamReader(assemblyScriptStream);
                     var scriptContent = assemblyScriptStreamReader.ReadToEnd();
 
-                    await ExecuteScriptAsync(connection, scriptContent, LoggerService);
+                    await ExecuteScriptAsyncGoStatements(scriptContent);
                 }
 
                 foreach (var scriptName in Configuration.MonitoringScripts)
@@ -146,10 +130,8 @@ namespace SqlSensei.SqlServer
                     using var assemblyScriptStreamReader = new StreamReader(assemblyScriptStream);
                     var scriptContent = assemblyScriptStreamReader.ReadToEnd();
 
-                    await ExecuteScriptAsync(connection, scriptContent, LoggerService);
+                    await ExecuteScriptAsyncGoStatements(scriptContent);
                 }
-
-                connection.Close();
             });
         }
     }

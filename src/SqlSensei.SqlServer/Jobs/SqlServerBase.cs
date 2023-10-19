@@ -11,11 +11,29 @@ namespace SqlSensei.SqlServer
 {
     public abstract class SqlServerBase
     {
-        protected async Task ExecuteScriptAsync(SqlConnection connection, string scriptContent, ISqlSenseiLoggerService loggerService)
+        protected ISqlSenseiLoggerService LoggerService { get; set; }
+        protected ISqlSenseiConfiguration Configuration { get; set; }
+
+        protected SqlServerBase(ISqlSenseiLoggerService loggerService, ISqlSenseiConfiguration configuration)
         {
+            LoggerService = loggerService;
+            Configuration = configuration;
+        }
+
+        protected SqlServerBase(ISqlSenseiConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        protected async Task ExecuteScriptAsyncGoStatements(string scriptContent)
+        {
+            using SqlConnection connection = new(Configuration.ConnectionString);
+
+            connection.Open();
+
             if (string.IsNullOrWhiteSpace(scriptContent))
             {
-                await loggerService.Error("Script content is empty");
+                await LoggerService.Error("Script content is empty");
                 return;
             }
 
@@ -33,61 +51,88 @@ namespace SqlSensei.SqlServer
             }
             catch (Exception e)
             {
-                await loggerService.Error(e, "Error executing script");
+                await LoggerService.Error(e, "Error executing script");
             }
         }
 
-        protected async Task<SqlDataReader> ExecuteCommandAsync(SqlConnection connection, string sqlCommand, ISqlSenseiLoggerService loggerService)
+        protected async Task<bool> ExecuteCommandAsync(string sql, Action<SqlDataReader> commandAction = null, params SqlParameter[] parameters)
         {
-            if (string.IsNullOrWhiteSpace(sqlCommand))
-            {
-                await loggerService.Error("Script content is empty");
-                return null;
-            }
-
-            try
-            {
-                using SqlCommand command = new(sqlCommand, connection);
-                SqlDataReader reader = await command.ExecuteReaderAsync();
-
-                return reader;
-            }
-            catch (Exception e)
-            {
-                await loggerService.Error(e, "Error executing script");
-
-                return null;
-            }
+            return await ExecuteCommandAsyncPrivate(sql, true, commandAction, parameters);
         }
 
-        protected async Task ExecuteScriptAsync(SqlConnection connection, string sql, ISqlSenseiLoggerService loggerService, params SqlParameter[] parameters)
+        protected async Task<bool> ExecuteCommandAsyncNoTransaction(string sql, Action<SqlDataReader> commandAction = null, params SqlParameter[] parameters)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddRange(parameters);
-
-            try
-            {
-                await command.ExecuteNonQueryAsync();
-            }
-            catch (Exception ex)
-            {
-                await loggerService.Error($"SQL Execution Error: {ex.Message}");
-            }
+            return await ExecuteCommandAsyncPrivate(sql, false, commandAction, parameters);
         }
 
-        protected async Task<SqlDataReader> ExecuteCommandAsync(SqlConnection connection, string sql, ISqlSenseiLoggerService loggerService, params SqlParameter[] parameters)
+        protected async Task ExecuteCommandAsync(string sql, params SqlParameter[] parameters)
         {
-            using var command = new SqlCommand(sql, connection);
-            command.Parameters.AddRange(parameters);
+            await ExecuteCommandAsyncPrivate(sql, true, null, parameters);
+        }
 
-            try
+        protected async Task ExecuteCommandAsyncNoTransaction(string sql, params SqlParameter[] parameters)
+        {
+            await ExecuteCommandAsyncPrivate(sql, false, null, parameters);
+        }
+
+        private async Task<bool> ExecuteCommandAsyncPrivate(string sql, bool isTransactional, Action<SqlDataReader> commandAction, params SqlParameter[] parameters)
+        {
+            if (string.IsNullOrWhiteSpace(sql))
             {
-                return await command.ExecuteReaderAsync();
+                await LoggerService.Error("Script content is empty");
+                return false;
             }
-            catch (Exception ex)
+
+            using SqlConnection connection = new(Configuration.ConnectionString);
+
+            await connection.OpenAsync();
+
+            if (isTransactional)
             {
-                await loggerService.Error($"SQL Execution Error: {ex.Message}");
-                return null;
+                using var transaction = connection.BeginTransaction();
+
+                try
+                {
+                    using var command = new SqlCommand(sql, connection, transaction);
+                    command.Parameters.AddRange(parameters);
+
+                    using (var result = await command.ExecuteReaderAsync())
+                    {
+                        commandAction?.Invoke(result);
+                    }
+
+                    transaction?.Commit();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    transaction?.Rollback();
+
+                    await LoggerService.Error($"SQL Execution Error: {ex.Message}");
+
+                    return false;
+                }
+            }
+            else
+            {
+                try
+                {
+                    using var command = new SqlCommand(sql, connection);
+                    command.Parameters.AddRange(parameters);
+
+                    using var result = await command.ExecuteReaderAsync();
+
+                    commandAction?.Invoke(result);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    await LoggerService.Error($"SQL Execution Error: {ex.Message}");
+
+                    return false;
+                }
             }
         }
     }

@@ -13,12 +13,11 @@ namespace SqlSensei.SqlServer.EndpointLogger
         private const string maintenanceInfoSqlTableName = "MaintenanceTableEndpointInfo";
         private const string indexInfoSqlTableName = "IndexTableEndpointInfo";
 
-        public SqlSenseiSqlServerLoggerServiceEndpoint(ISqlSenseiConfiguration configuration)
+        public SqlSenseiSqlServerLoggerServiceEndpoint(ISqlSenseiConfiguration configuration) : base(configuration)
         {
             Configuration = configuration;
+            LoggerService = this;
         }
-
-        public ISqlSenseiConfiguration Configuration { get; }
 
         public Task Error(Exception exception, string message)
         {
@@ -35,10 +34,6 @@ namespace SqlSensei.SqlServer.EndpointLogger
 
         public async Task MaintenanceInformation(IEnumerable<IMaintenanceJobLog> jobLogs, string database)
         {
-            using SqlConnection connection = new(Configuration.ConnectionString);
-
-            connection.Open();
-
             var sql = @$"
                 IF OBJECT_ID(@MaintenanceTable, 'U') IS NULL
                 BEGIN
@@ -56,44 +51,24 @@ namespace SqlSensei.SqlServer.EndpointLogger
                 END
                 ";
 
-            await ExecuteScriptAsync(connection, sql, this,
-                new SqlParameter("@MaintenanceTable", maintenanceInfoSqlTableName),
-                new SqlParameter("@DatabaseName", database));
+            await ExecuteCommandAsync(sql, new SqlParameter("@MaintenanceTable", maintenanceInfoSqlTableName), new SqlParameter("@DatabaseName", database));
 
             string insertQuery = $"INSERT INTO {maintenanceInfoSqlTableName} ([Index], [Statistic], [IsError], [ErrorMessage], [DatabaseName]) VALUES (@Index, @Statistic, @IsError, @ErrorMessage, @DatabaseName)";
 
-            using SqlTransaction transaction = connection.BeginTransaction();
-
-            try
+            foreach (var log in jobLogs)
             {
-                foreach (var log in jobLogs)
-                {
-                    using SqlCommand command = new(insertQuery, connection, transaction);
-                    command.Parameters.AddWithValue("@Index", string.IsNullOrWhiteSpace(log.Index) ? DBNull.Value : log.Index);
-                    command.Parameters.AddWithValue("@Statistic", log.Statistic);
-                    command.Parameters.AddWithValue("@IsError", log.IsError);
-                    command.Parameters.AddWithValue("@ErrorMessage", string.IsNullOrWhiteSpace(log.ErrorMessage) ? DBNull.Value : log.ErrorMessage);
-                    command.Parameters.AddWithValue("@DatabaseName", database);
-
-                    await command.ExecuteNonQueryAsync();
-                }
-
-                transaction.Commit();
+                await ExecuteCommandAsync(
+                    insertQuery,
+                    new SqlParameter("@Index", string.IsNullOrWhiteSpace(log.Index) ? DBNull.Value : log.Index),
+                    new SqlParameter("@Statistic", log.Statistic),
+                    new SqlParameter("@IsError", log.IsError),
+                    new SqlParameter("@ErrorMessage", string.IsNullOrWhiteSpace(log.ErrorMessage) ? DBNull.Value : log.ErrorMessage),
+                    new SqlParameter("@DatabaseName", database));
             }
-            catch (Exception)
-            {
-                transaction.Rollback();
-            }
-
-            connection.Close();
         }
 
         public async Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, string database)
         {
-            using SqlConnection connection = new(Configuration.ConnectionString);
-
-            connection.Open();
-
             var sql = @$"
                 IF OBJECT_ID(@IndexTable, 'U') IS NULL
                 BEGIN
@@ -111,63 +86,42 @@ namespace SqlSensei.SqlServer.EndpointLogger
                 END
             ";
 
-            await ExecuteScriptAsync(connection, sql, this,
-                new SqlParameter("@IndexTable", indexInfoSqlTableName),
-                new SqlParameter("@DatabaseName", database));
+            await ExecuteCommandAsync(sql, new SqlParameter("@IndexTable", indexInfoSqlTableName), new SqlParameter("@DatabaseName", database));
 
             string insertQuery = $"INSERT INTO {indexInfoSqlTableName} ([DatabaseName], [TableName], [MagicBenefitNumber], [Impact], [IndexDetails]) VALUES (@DatabaseName, @TableName, @MagicBenefitNumber, @Impact, @IndexDetails)";
 
-            using SqlTransaction transaction = connection.BeginTransaction();
-
-            try
+            foreach (var log in indexLogs)
             {
-                foreach (var log in indexLogs)
-                {
-                    using SqlCommand command = new(insertQuery, connection, transaction);
-                    command.Parameters.AddWithValue("@DatabaseName", log.DatabaseName);
-                    command.Parameters.AddWithValue("@TableName", log.TableName);
-                    command.Parameters.AddWithValue("@MagicBenefitNumber", log.MagicBenefitNumber);
-                    command.Parameters.AddWithValue("@Impact", log.Impact);
-                    command.Parameters.AddWithValue("@IndexDetails", log.IndexDetails);
-
-                    await command.ExecuteNonQueryAsync();
-                }
-
-                transaction.Commit();
+                await ExecuteCommandAsync(
+                    insertQuery,
+                    new SqlParameter("@DatabaseName", log.DatabaseName),
+                    new SqlParameter("@TableName", log.TableName),
+                    new SqlParameter("@MagicBenefitNumber", log.MagicBenefitNumber),
+                    new SqlParameter("@Impact", log.Impact),
+                    new SqlParameter("@IndexDetails", log.IndexDetails));
             }
-            catch (Exception)
-            {
-                transaction.Rollback();
-            }
-
-            connection.Close();
         }
 
         public async Task<List<IMaintenanceJobLog>> GetMaintenanceLogs()
         {
             List<IMaintenanceJobLog> maintenanceLogs = new();
 
-            using SqlConnection connection = new(Configuration.ConnectionString);
+            var result = await ExecuteCommandAsync(
+                $"SELECT * FROM {maintenanceInfoSqlTableName} ORDER BY DatabaseName",
+                (reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        maintenanceLogs.Add(MaintenanceJobLog.MapFromDataReader(reader));
+                    }
+                });
 
-            connection.Open();
-
-            string selectQuery = $"SELECT * FROM {maintenanceInfoSqlTableName} ORDER BY DatabaseName";
-
-            using var reader = await ExecuteCommandAsync(connection, selectQuery, this);
-
-            if (reader == null)
+            if (!result)
             {
                 await Error("GetMaintenanceLogs information error");
 
                 return maintenanceLogs;
             }
-
-            while (reader.Read())
-            {
-                maintenanceLogs.Add(MaintenanceJobLog.MapFromDataReader(reader));
-            }
-
-            connection.Close();
 
             return maintenanceLogs;
         }
@@ -176,27 +130,22 @@ namespace SqlSensei.SqlServer.EndpointLogger
         {
             List<IMonitoringJobIndexLog> monitoringLogs = new();
 
-            using SqlConnection connection = new(Configuration.ConnectionString);
+            var result = await ExecuteCommandAsync(
+                $"SELECT * FROM {indexInfoSqlTableName} ORDER BY DatabaseName",
+                (reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        monitoringLogs.Add(IndexJobEndpointInfoLog.MapFromDataReader(reader));
+                    }
+                });
 
-            connection.Open();
-
-            string selectQuery = $"SELECT * FROM {indexInfoSqlTableName} ORDER BY DatabaseName";
-
-            using var reader = await ExecuteCommandAsync(connection, selectQuery, this);
-
-            if (reader == null)
+            if (!result)
             {
                 await Error("GetMonitoringLogs information error");
 
                 return monitoringLogs;
             }
-
-            while (reader.Read())
-            {
-                monitoringLogs.Add(IndexJobEndpointInfoLog.MapFromDataReader(reader));
-            }
-
-            connection.Close();
 
             return monitoringLogs;
         }

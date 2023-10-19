@@ -21,7 +21,7 @@ namespace WebApplication1
             builder.Services
                 .RegisterSqlSenseiSqlServerEndpointLogging()
                 .RegisterSqlSenseiSqlServer(SqlServerConfiguration.Default(
-                "Data Source=.;Initial Catalog=Monitoring;Trusted_Connection=True; TrustServerCertificate=True;Application Name=Monitoring Application",
+                "Data Source=.;Initial Catalog=Monitoring;Trusted_Connection=True; TrustServerCertificate=True;Application Name=Monitoring Application;multipleactiveresultsets=true",
                 "Intrensic",
                 "Hangfire"));
 

@@ -39,9 +39,9 @@ namespace SqlSensei.Core
             return Task.CompletedTask;
         }
 
-        public Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, string database)
+        public Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, IEnumerable<IMonitoringJobIndexLogUsage> indexLogsUsage, string database)
         {
-            if (!indexLogs.Any())
+            if (!indexLogs.Any() && !indexLogsUsage.Any())
             {
                 return Task.CompletedTask;
             }
@@ -56,6 +56,17 @@ namespace SqlSensei.Core
             }
 
             Console.WriteLine(csvContent.ToString());
+
+            var csvContent2 = new StringBuilder();
+
+            csvContent2.AppendLine("Database,TableName,IndexName,IndexDetails,Usage,UserMessage");
+
+            foreach (var jobLog in indexLogsUsage)
+            {
+                csvContent.AppendLine($"{jobLog.DatabaseName},{jobLog.TableName},{jobLog.IndexName},{jobLog.Usage},{jobLog.UserMessage}");
+            }
+
+            Console.WriteLine(csvContent2.ToString());
 
             return Task.CompletedTask;
         }

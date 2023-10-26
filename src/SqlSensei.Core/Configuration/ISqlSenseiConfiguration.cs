@@ -9,7 +9,7 @@ namespace SqlSensei.Core
         List<string> MaintenanceScripts { get; }
         string ConnectionString { get; }
         List<string> Databases { get; }
-        int MaintenanceScriptDropLogsOlderThanDays { get; }
+        int DropLogsOlderThanDays { get; }
         string GetMaintenanceScript();
         string GetMonitoringLog();
     }

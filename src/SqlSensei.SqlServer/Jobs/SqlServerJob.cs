@@ -26,7 +26,7 @@ namespace SqlSensei.SqlServer
             // Go through all databases in configuration, DELETE older rows, do maintenance and log
             foreach (var databaseName in Configuration.Databases)
             {
-                var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.MaintenanceScriptDropLogsOlderThanDays);
+                var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.DropLogsOlderThanDays);
 
                 await ExecuteCommandAsync(
                     "DELETE FROM [dbo].[CommandLog] WHERE StartTime < @DeleteDate AND DatabaseName = @DatabaseName",
@@ -55,55 +55,17 @@ namespace SqlSensei.SqlServer
 
         public async Task ExecuteMonitoringLogJob()
         {
-            await ExecuteCommandAsyncNoTransaction(Configuration.GetMonitoringLog());
+            await ExecuteScriptAsyncGoStatements(Configuration.GetMonitoringLog());
         }
 
         public async Task ExecuteMonitoringJob()
         {
             foreach (var databaseName in Configuration.Databases)
             {
-                var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.MaintenanceScriptDropLogsOlderThanDays);
+                var indexLogMissing = await ExecuteMonitoringLogMissingIndexes(databaseName);
+                var indexLogUsage = await ExecuteMonitoringLogUsageIndexes(databaseName);
 
-                await ExecuteCommandAsync(
-                    @"IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
-                      BEGIN
-                            DELETE FROM [dbo].[IndexMonitoring] WHERE run_datetime < @DeleteDate AND database_name = @DatabaseName;
-                      END",
-                    new SqlParameter("@DeleteDate", deleteRecordsOlderThan),
-                    new SqlParameter("@DatabaseName", databaseName));
-
-                var monitoringIndexLogCommand = @"
-                    IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
-                        BEGIN
-                            WITH CTE AS (
-                                SELECT
-                                    *,
-                                    ROW_NUMBER() OVER (PARTITION BY create_tsql ORDER BY ID) AS RowNum
-                                FROM [dbo].[IndexMonitoring])
-
-                            SELECT *
-                            FROM CTE
-                            WHERE RowNum = 1 AND database_name = @DatabaseName;
-                        END
-                    ";
-
-                var loggingInformation = new List<IndexLog>();
-
-                var result = await ExecuteCommandAsync(
-                    monitoringIndexLogCommand,
-                    (reader) =>
-                    {
-                        loggingInformation = IndexLog.GetAll(reader);
-                    },
-                    new SqlParameter("@DatabaseName", databaseName));
-
-                if (!result)
-                {
-                    await LoggerService.Error("ExecuteMonitoringJob logging information error");
-                    return;
-                }
-
-                await LoggerService.MonitoringInformation(loggingInformation, databaseName);
+                await LoggerService.MonitoringInformation(indexLogMissing, indexLogUsage, databaseName);
             }
         }
 
@@ -133,6 +95,96 @@ namespace SqlSensei.SqlServer
                     await ExecuteScriptAsyncGoStatements(scriptContent);
                 }
             });
+        }
+
+        private async Task<List<IndexLogUsage>> ExecuteMonitoringLogUsageIndexes(string databaseName)
+        {
+            var loggingInformation = new List<IndexLogUsage>();
+
+            var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.DropLogsOlderThanDays);
+
+            await ExecuteCommandAsync(
+                @"IF OBJECT_ID('[dbo].[IndexMonitoringUsage]', 'U') IS NOT NULL
+                    BEGIN
+                        DELETE FROM [dbo].[IndexMonitoringUsage] WHERE run_datetime < @DeleteDate AND database_name = @DatabaseName;
+                    END",
+                new SqlParameter("@DeleteDate", deleteRecordsOlderThan),
+                new SqlParameter("@DatabaseName", databaseName));
+
+            var monitoringIndexLogCommand = @"
+                IF OBJECT_ID('[dbo].[IndexMonitoringUsage]', 'U') IS NOT NULL
+                    BEGIN
+                        WITH CTE AS (
+                            SELECT
+                                *,
+                                ROW_NUMBER() OVER (PARTITION BY create_tsql ORDER BY ID) AS RowNum
+                            FROM [dbo].[IndexMonitoringUsage])
+
+                        SELECT *
+                        FROM CTE
+                        WHERE RowNum = 1 AND database_name = @DatabaseName;
+                    END
+                ";
+
+            var result = await ExecuteCommandAsync(
+                monitoringIndexLogCommand,
+                (reader) =>
+                {
+                    loggingInformation = IndexLogUsage.GetAll(reader);
+                },
+                new SqlParameter("@DatabaseName", databaseName));
+
+            if (!result)
+            {
+                await LoggerService.Error("ExecuteMonitoringJob logging information error");
+            }
+
+            return loggingInformation;
+        }
+
+        private async Task<List<IndexLog>> ExecuteMonitoringLogMissingIndexes(string databaseName)
+        {
+            var loggingInformation = new List<IndexLog>();
+
+            var deleteRecordsOlderThan = DateTime.UtcNow.AddDays(-Configuration.DropLogsOlderThanDays);
+
+            await ExecuteCommandAsync(
+                @"IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
+                    BEGIN
+                        DELETE FROM [dbo].[IndexMonitoring] WHERE run_datetime < @DeleteDate AND database_name = @DatabaseName;
+                    END",
+                new SqlParameter("@DeleteDate", deleteRecordsOlderThan),
+                new SqlParameter("@DatabaseName", databaseName));
+
+            var monitoringIndexLogCommand = @"
+                IF OBJECT_ID('[dbo].[IndexMonitoring]', 'U') IS NOT NULL
+                    BEGIN
+                        WITH CTE AS (
+                            SELECT
+                                *,
+                                ROW_NUMBER() OVER (PARTITION BY create_tsql ORDER BY ID) AS RowNum
+                            FROM [dbo].[IndexMonitoring])
+
+                        SELECT *
+                        FROM CTE
+                        WHERE RowNum = 1 AND database_name = @DatabaseName;
+                    END
+                ";
+
+            var result = await ExecuteCommandAsync(
+                monitoringIndexLogCommand,
+                (reader) =>
+                {
+                    loggingInformation = IndexLog.GetAll(reader);
+                },
+                new SqlParameter("@DatabaseName", databaseName));
+
+            if (!result)
+            {
+                await LoggerService.Error("ExecuteMonitoringJob logging information error");
+            }
+
+            return loggingInformation;
         }
     }
 }

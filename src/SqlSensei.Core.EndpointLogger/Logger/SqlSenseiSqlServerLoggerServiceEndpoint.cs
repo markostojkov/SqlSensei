@@ -12,6 +12,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
     {
         private const string maintenanceInfoSqlTableName = "MaintenanceTableEndpointInfo";
         private const string indexInfoSqlTableName = "IndexTableEndpointInfo";
+        private const string indexUsageInfoSqlTableName = "IndexUsageTableEndpointInfo";
 
         public SqlSenseiSqlServerLoggerServiceEndpoint(ISqlSenseiConfiguration configuration) : base(configuration)
         {
@@ -67,7 +68,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
             }
         }
 
-        public async Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, string database)
+        public async Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, IEnumerable<IMonitoringJobIndexLogUsage> indexLogsUsage, string database)
         {
             var sql = @$"
                 IF OBJECT_ID(@IndexTable, 'U') IS NULL
@@ -99,6 +100,46 @@ namespace SqlSensei.SqlServer.EndpointLogger
                     new SqlParameter("@MagicBenefitNumber", log.MagicBenefitNumber),
                     new SqlParameter("@Impact", log.Impact),
                     new SqlParameter("@IndexDetails", log.IndexDetails));
+            }
+
+            sql = @$"
+                IF OBJECT_ID(@IndexTable, 'U') IS NULL
+                BEGIN
+                    CREATE TABLE {indexUsageInfoSqlTableName} (
+                        [DatabaseName]      NVARCHAR(MAX),
+                        [IndexName]         NVARCHAR(MAX),
+                        [TableName]         NVARCHAR(MAX),
+                        [IndexDetails]      NVARCHAR(MAX),
+                        [Usage]             NVARCHAR(MAX),
+                        [ReadsUsage]        BIGINT,
+                        [WriteUsage]        BIGINT,
+                        [UserMessage]       NVARCHAR(MAX),
+                        [IsClusteredIndex]  BIT
+                    )
+                END
+                ELSE
+                BEGIN
+                    DELETE FROM {indexUsageInfoSqlTableName} WHERE DatabaseName = @DatabaseName;
+                END
+            ";
+
+            await ExecuteCommandAsync(sql, new SqlParameter("@IndexTable", indexUsageInfoSqlTableName), new SqlParameter("@DatabaseName", database));
+
+            insertQuery = $"INSERT INTO {indexUsageInfoSqlTableName} ([DatabaseName], [IndexName], [TableName], [IndexDetails], [Usage], [ReadsUsage], [WriteUsage], [UserMessage], [IsClusteredIndex]) VALUES (@DatabaseName, @IndexName, @TableName, @IndexDetails, @Usage, @ReadsUsage, @WriteUsage, @UserMessage, @IsClusteredIndex)";
+
+            foreach (var log in indexLogsUsage)
+            {
+                await ExecuteCommandAsync(
+                    insertQuery,
+                    new SqlParameter("@DatabaseName", log.DatabaseName),
+                    new SqlParameter("@IndexName", log.IndexName),
+                    new SqlParameter("@TableName", log.TableName),
+                    new SqlParameter("@IndexDetails", log.IndexDetails),
+                    new SqlParameter("@Usage", log.Usage),
+                    new SqlParameter("@ReadsUsage", log.ReadsUsage),
+                    new SqlParameter("@WriteUsage", log.WriteUsage),
+                    new SqlParameter("@UserMessage", log.UserMessage),
+                    new SqlParameter("@IsClusteredIndex", log.IsClusteredIndex));
             }
         }
 

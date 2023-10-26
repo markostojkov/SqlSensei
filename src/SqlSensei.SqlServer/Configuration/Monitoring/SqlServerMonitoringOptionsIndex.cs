@@ -11,6 +11,15 @@
             @OutputDatabaseName = '{0}',
             @OutputSchemaName   = 'dbo',
             @OutputTableName    = 'IndexMonitoring'
+    
+            GO            
+
+            EXECUTE dbo.sp_BlitzIndex
+            @DatabaseName       = '" + _replaceDatabase + @"',
+            @Mode               = 2,
+            @OutputDatabaseName = '{0}',
+            @OutputSchemaName   = 'dbo',
+            @OutputTableName    = 'IndexMonitoringUsage'
         ";
 
         private SqlServerMonitoringOptionsIndex(string logToDatabaseName)

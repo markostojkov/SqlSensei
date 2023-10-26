@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace SqlSensei.SqlServer.EndpointLogger
 {
-    internal class SqlSenseiIndexInfoMiddleware
+    internal class SqlSenseiIndexUsageInfoMiddleware
     {
         private readonly SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint;
 
-        public SqlSenseiIndexInfoMiddleware(SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
+        public SqlSenseiIndexUsageInfoMiddleware(SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
         {
             this.loggerServiceEndpoint = loggerServiceEndpoint;
         }

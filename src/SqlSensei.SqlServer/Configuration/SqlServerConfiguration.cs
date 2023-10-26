@@ -19,12 +19,12 @@ namespace SqlSensei.SqlServer
         public List<string> MaintenanceScripts { get; }
         public string ConnectionString { get; }
         public List<string> Databases { get; }
-        public int MaintenanceScriptDropLogsOlderThanDays { get; }
+        public int DropLogsOlderThanDays { get; }
 
         private SqlServerConfiguration(
             string connectionString,
             List<string> databases,
-            int maintenanceScriptDropLogsOlderThanDays,
+            int dropLogsOlderThanDays,
             SqlServerConfigurationMonitoringOptions? monitoringOptions,
             SqlServerConfigurationMaintenanceOptions? maintenanceOptions)
         {
@@ -32,7 +32,7 @@ namespace SqlSensei.SqlServer
             MaintenanceScripts = new List<string>();
             ConnectionString = connectionString;
             Databases = databases;
-            MaintenanceScriptDropLogsOlderThanDays = maintenanceScriptDropLogsOlderThanDays;
+            DropLogsOlderThanDays = dropLogsOlderThanDays;
             _maintenanceScriptExecution = string.Empty;
             _monitoringIndexLogScriptExecution = string.Empty;
 

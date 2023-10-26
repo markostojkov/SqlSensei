@@ -5,21 +5,25 @@ namespace SqlSensei.Core
 {
     public static class IndexLogic
     {
-        private const string IndexNotUsedMessage = "This index has 0 reads meaning it only ocuppies space and makes updates more complex, keep in mind that" +
+        public const string IndexNotUsedMessage = "This index has 0 reads meaning it only ocuppies space and makes updates more complex, keep in mind that" +
             "your database might have been restarted recently and the statistics are incorrect, if that's not the case then it can be deleted";
 
-        private const string IndexIsSmallerSubset = "This index is a smaller subset of another index in the same table and can be easily deleted";
+        public const string IndexIsSmallerSubset = "This index is a smaller subset of another index in the same table and can be easily deleted";
 
         public static List<IMonitoringJobIndexLogUsage> GetIndexesWithIssues(this IEnumerable<IMonitoringJobIndexLogUsage> indexLogUsages)
         {
             var indexesWithIssue = new List<IMonitoringJobIndexLogUsage>();
 
-            var notUsedIndexes = indexLogUsages.Where(x => x.ReadsUsage == 0).Select(x =>
-            {
-                x.UserMessage = IndexNotUsedMessage;
+            var notUsedIndexes = indexLogUsages
+                .Where(x => x.IsClusteredIndex == false)
+                .Where(x => x.ReadsUsage == 0)
+                .Select(x =>
+                {
+                    x.UserMessage = IndexNotUsedMessage;
 
-                return x;
-            }).ToList();
+                    return x;
+                })
+                .ToList();
 
             indexesWithIssue.AddRange(notUsedIndexes);
 

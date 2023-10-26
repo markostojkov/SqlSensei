@@ -127,7 +127,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
 
             insertQuery = $"INSERT INTO {indexUsageInfoSqlTableName} ([DatabaseName], [IndexName], [TableName], [IndexDetails], [Usage], [ReadsUsage], [WriteUsage], [UserMessage], [IsClusteredIndex]) VALUES (@DatabaseName, @IndexName, @TableName, @IndexDetails, @Usage, @ReadsUsage, @WriteUsage, @UserMessage, @IsClusteredIndex)";
 
-            foreach (var log in indexLogsUsage)
+            foreach (var log in indexLogsUsage.GetIndexesWithIssues())
             {
                 await ExecuteCommandAsync(
                     insertQuery,
@@ -178,6 +178,30 @@ namespace SqlSensei.SqlServer.EndpointLogger
                     while (reader.Read())
                     {
                         monitoringLogs.Add(IndexJobEndpointInfoLog.MapFromDataReader(reader));
+                    }
+                });
+
+            if (!result)
+            {
+                await Error("GetMonitoringLogs information error");
+
+                return monitoringLogs;
+            }
+
+            return monitoringLogs;
+        }
+
+        public async Task<List<IMonitoringJobIndexLogUsage>> GetIndexUsageMonitoringLogs()
+        {
+            List<IMonitoringJobIndexLogUsage> monitoringLogs = new();
+
+            var result = await ExecuteCommandAsync(
+                $"SELECT * FROM {indexUsageInfoSqlTableName} ORDER BY DatabaseName",
+                (reader) =>
+                {
+                    while (reader.Read())
+                    {
+                        monitoringLogs.Add(IndexUsageJobEndpointInfoLog.MapFromDataReader(reader));
                     }
                 });
 

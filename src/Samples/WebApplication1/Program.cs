@@ -58,6 +58,7 @@ namespace WebApplication1
                .UseSqlSenseiSqlServerEndpointLogging(new SqlSenseiEndpointLoggerOptions()
                {
                    IndexInfoEndpoint = "/sql-sensei/index",
+                   IndexUsageInfoEndpoint = "/sql-sensei/index-usage",
                    MaintenanceInfoEndpoint = "/sql-sensei/maintenance"
                });
 

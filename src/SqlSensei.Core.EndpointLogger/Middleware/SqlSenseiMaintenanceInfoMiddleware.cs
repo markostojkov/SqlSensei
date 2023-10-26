@@ -8,10 +8,12 @@ namespace SqlSensei.SqlServer.EndpointLogger
 {
     internal class SqlSenseiMaintenanceInfoMiddleware
     {
+        private readonly RequestDelegate next;
         private readonly SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint;
 
-        public SqlSenseiMaintenanceInfoMiddleware(SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
+        public SqlSenseiMaintenanceInfoMiddleware(RequestDelegate next, SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
         {
+            this.next = next;
             this.loggerServiceEndpoint = loggerServiceEndpoint;
         }
 

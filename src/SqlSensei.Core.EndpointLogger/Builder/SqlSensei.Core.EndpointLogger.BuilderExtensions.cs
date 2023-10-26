@@ -21,6 +21,11 @@ namespace SqlSensei.SqlServer.EndpointLogger
                 x.UseMiddleware<SqlSenseiMaintenanceInfoMiddleware>();
             });
 
+            app.Map(new PathString(options.IndexUsageInfoEndpoint), delegate (IApplicationBuilder x)
+            {
+                x.UseMiddleware<SqlSenseiIndexUsageInfoMiddleware>();
+            });
+
             return app;
         }
 

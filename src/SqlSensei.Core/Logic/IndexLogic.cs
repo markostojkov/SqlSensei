@@ -82,16 +82,4 @@ namespace SqlSensei.Core
             return indexesWithIssue.OrderBy(x => x.TableName).ToList();
         }
     }
-
-    internal class IndexUsage
-    {
-        public string Column { get; }
-        public int Position { get; }
-
-        public IndexUsage(string column, int position)
-        {
-            Column = column;
-            Position = position;
-        }
-    }
 }

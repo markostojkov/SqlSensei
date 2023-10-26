@@ -8,16 +8,18 @@ namespace SqlSensei.SqlServer.EndpointLogger
 {
     internal class SqlSenseiIndexUsageInfoMiddleware
     {
+        private readonly RequestDelegate next;
         private readonly SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint;
 
-        public SqlSenseiIndexUsageInfoMiddleware(SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
+        public SqlSenseiIndexUsageInfoMiddleware(RequestDelegate next, SqlSenseiSqlServerLoggerServiceEndpoint loggerServiceEndpoint)
         {
+            this.next = next;
             this.loggerServiceEndpoint = loggerServiceEndpoint;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var indexMonitoringData = await loggerServiceEndpoint.GetIndexMonitoringLogs();
+            var indexMonitoringData = await loggerServiceEndpoint.GetIndexUsageMonitoringLogs();
 
             var hasErrors = indexMonitoringData.Any();
 

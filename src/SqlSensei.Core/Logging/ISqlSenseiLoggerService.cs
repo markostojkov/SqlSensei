@@ -8,7 +8,5 @@ namespace SqlSensei.Core
     {
         Task MaintenanceInformation(IEnumerable<IMaintenanceJobLog> jobLogs, string database);
         Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, IEnumerable<IMonitoringJobIndexLogUsage> indexLogsUsage, string database);
-        Task Error(Exception exception, string message);
-        Task Error(string message);
     }
 }

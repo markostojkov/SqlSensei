@@ -14,23 +14,9 @@ namespace SqlSensei.SqlServer.EndpointLogger
         private const string indexInfoSqlTableName = "IndexTableEndpointInfo";
         private const string indexUsageInfoSqlTableName = "IndexUsageTableEndpointInfo";
 
-        public SqlSenseiSqlServerLoggerServiceEndpoint(ISqlSenseiConfiguration configuration) : base(configuration)
+        public SqlSenseiSqlServerLoggerServiceEndpoint(ISqlSenseiConfiguration configuration, ISqlSenseiErrorLoggerService errorLoggerService) : base(errorLoggerService, configuration)
         {
             Configuration = configuration;
-            LoggerService = this;
-        }
-
-        public Task Error(Exception exception, string message)
-        {
-            Console.Error.WriteLine(message);
-            Console.Error.WriteLine(exception.Message);
-            return Task.CompletedTask;
-        }
-
-        public Task Error(string message)
-        {
-            Console.Error.WriteLine(message);
-            return Task.CompletedTask;
         }
 
         public async Task MaintenanceInformation(IEnumerable<IMaintenanceJobLog> jobLogs, string database)
@@ -159,7 +145,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
 
             if (!result)
             {
-                await Error("GetMaintenanceLogs information error");
+                await ErrorLoggerService.Error("GetMaintenanceLogs information error");
 
                 return maintenanceLogs;
             }
@@ -183,7 +169,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
 
             if (!result)
             {
-                await Error("GetMonitoringLogs information error");
+                await ErrorLoggerService.Error("GetMonitoringLogs information error");
 
                 return monitoringLogs;
             }
@@ -207,7 +193,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
 
             if (!result)
             {
-                await Error("GetMonitoringLogs information error");
+                await ErrorLoggerService.Error("GetMonitoringLogs information error");
 
                 return monitoringLogs;
             }

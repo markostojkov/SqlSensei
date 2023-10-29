@@ -33,6 +33,11 @@ namespace SqlSensei.SqlServer.EndpointLogger
         {
             services.TryAddSingleton<ISqlSenseiLoggerService, SqlSenseiSqlServerLoggerServiceEndpoint>();
             services.AddSingleton<SqlSenseiSqlServerLoggerServiceEndpoint>();
+#if Release
+            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerService>();
+#else
+            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerServiceDebug>();
+#endif
 
             return services;
         }

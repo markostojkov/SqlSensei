@@ -13,9 +13,10 @@ namespace SqlSensei.SqlServer
 {
     public class SqlServerJob : SqlServerBase, ISqlSenseiJob
     {
-        public SqlServerJob(ISqlSenseiConfiguration configuration, ISqlSenseiLoggerService loggerService) : base(loggerService, configuration)
+        public ISqlSenseiLoggerService LoggerService { get; }
+
+        public SqlServerJob(ISqlSenseiConfiguration configuration, ISqlSenseiLoggerService loggerService, ISqlSenseiErrorLoggerService errorLoggerService) : base(errorLoggerService, configuration)
         {
-            Configuration = configuration;
             LoggerService = loggerService;
         }
 
@@ -45,7 +46,7 @@ namespace SqlSensei.SqlServer
 
                 if (!result)
                 {
-                    await LoggerService.Error("ExecuteMaintenanceJob logging information error");
+                    await ErrorLoggerService.Error("ExecuteMaintenanceJob logging information error");
                     return;
                 }
 
@@ -136,7 +137,7 @@ namespace SqlSensei.SqlServer
 
             if (!result)
             {
-                await LoggerService.Error("ExecuteMonitoringJob logging information error");
+                await ErrorLoggerService.Error("ExecuteMonitoringJob logging information error");
             }
 
             return loggingInformation;
@@ -181,7 +182,7 @@ namespace SqlSensei.SqlServer
 
             if (!result)
             {
-                await LoggerService.Error("ExecuteMonitoringJob logging information error");
+                await ErrorLoggerService.Error("ExecuteMonitoringJob logging information error");
             }
 
             return loggingInformation;

@@ -17,4 +17,9 @@
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 		<Exec Command="dotnet format" />
 	</Target>
+
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
+	</ItemGroup>
 </Project>

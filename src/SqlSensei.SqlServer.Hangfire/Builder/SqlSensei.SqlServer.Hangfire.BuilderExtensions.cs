@@ -33,14 +33,11 @@ namespace SqlSensei.SqlServer.Hangfire.Builder
             services.AddSingleton<ISqlSenseiJob, SqlServerJob>();
             services.TryAddSingleton<ISqlSenseiLoggerService, SqlSenseiLoggerServiceConsole>();
 
-            return services;
-        }
-
-        public static IServiceCollection RegisterSqlSenseiSqlServer(this IServiceCollection services, SqlServerConfiguration configuration, ISqlSenseiLoggerService customLogger)
-        {
-            services.AddSingleton<ISqlSenseiConfiguration>(configuration);
-            services.AddSingleton<ISqlSenseiJob, SqlServerJob>();
-            services.TryAddSingleton(customLogger);
+#if Release
+            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerService>();
+#else
+            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerServiceDebug>();
+#endif
 
             return services;
         }

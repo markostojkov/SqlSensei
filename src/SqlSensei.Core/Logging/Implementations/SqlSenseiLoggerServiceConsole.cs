@@ -8,19 +8,6 @@ namespace SqlSensei.Core
 {
     public class SqlSenseiLoggerServiceConsole : ISqlSenseiLoggerService
     {
-        public Task Error(Exception exception, string message)
-        {
-            Console.Error.WriteLine(message);
-            Console.Error.WriteLine(exception.Message);
-            return Task.CompletedTask;
-        }
-
-        public Task Error(string message)
-        {
-            Console.Error.WriteLine(message);
-            return Task.CompletedTask;
-        }
-
         public Task MaintenanceInformation(IEnumerable<IMaintenanceJobLog> jobLogs, string database)
         {
             var errorCount = jobLogs.Count(jobLog => jobLog.IsError);

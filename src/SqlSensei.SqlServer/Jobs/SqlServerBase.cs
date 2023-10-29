@@ -11,12 +11,12 @@ namespace SqlSensei.SqlServer
 {
     public abstract class SqlServerBase
     {
-        protected ISqlSenseiLoggerService LoggerService { get; set; }
+        protected ISqlSenseiErrorLoggerService ErrorLoggerService { get; set; }
         protected ISqlSenseiConfiguration Configuration { get; set; }
 
-        protected SqlServerBase(ISqlSenseiLoggerService loggerService, ISqlSenseiConfiguration configuration)
+        protected SqlServerBase(ISqlSenseiErrorLoggerService loggerService, ISqlSenseiConfiguration configuration)
         {
-            LoggerService = loggerService;
+            ErrorLoggerService = loggerService;
             Configuration = configuration;
         }
 
@@ -33,7 +33,7 @@ namespace SqlSensei.SqlServer
 
             if (string.IsNullOrWhiteSpace(scriptContent))
             {
-                await LoggerService.Error("Script content is empty");
+                await ErrorLoggerService.Error("Script content is empty");
                 return;
             }
 
@@ -51,7 +51,7 @@ namespace SqlSensei.SqlServer
             }
             catch (Exception e)
             {
-                await LoggerService.Error(e, "Error executing script");
+                await ErrorLoggerService.Error(e, "Error executing script");
             }
         }
 
@@ -79,7 +79,7 @@ namespace SqlSensei.SqlServer
         {
             if (string.IsNullOrWhiteSpace(sql))
             {
-                await LoggerService.Error("Script content is empty");
+                await ErrorLoggerService.Error("Script content is empty");
                 return false;
             }
 
@@ -109,7 +109,7 @@ namespace SqlSensei.SqlServer
                 {
                     transaction?.Rollback();
 
-                    await LoggerService.Error($"SQL Execution Error: {ex.Message}");
+                    await ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
 
                     return false;
                 }
@@ -129,7 +129,7 @@ namespace SqlSensei.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    await LoggerService.Error($"SQL Execution Error: {ex.Message}");
+                    await ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
 
                     return false;
                 }

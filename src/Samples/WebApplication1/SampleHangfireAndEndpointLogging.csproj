@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SqlSensei.Core.EndpointLogger\SqlSensei.SqlServer.EndpointLogger.csproj" />
+    <ProjectReference Include="..\..\SqlSensei.SqlServer.EndpointLogger\SqlSensei.SqlServer.EndpointLogger.csproj" />
     <ProjectReference Include="..\..\SqlSensei.SqlServer.Hangfire\SqlSensei.SqlServer.Hangfire.csproj" />
     <ProjectReference Include="..\..\SqlSensei.SqlServer\SqlSensei.SqlServer.csproj" />
   </ItemGroup>

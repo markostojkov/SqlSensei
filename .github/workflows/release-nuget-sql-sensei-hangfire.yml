@@ -22,5 +22,8 @@ jobs:
     - name: Package SqlSensei.SqlServer.Hangfire
       run: dotnet pack src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj --configuration Release
 
+    - name: Setup API_KEY NuGet SqlSensei.SqlServer.Hangfire
+      run: nuget setapikey "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json
+
     - name: Publish NuGet SqlSensei.SqlServer.Hangfire
-      run: dotnet nuget push src/SqlSensei.SqlServer.Hangfire/bin/Release/*.nupkg  --source https://api.nuget.org/v3/index.json -header "${{ secrets.NUGET_PUBLISH_API_KEY }}"
+      run: dotnet nuget push src/SqlSensei.SqlServer.Hangfire/bin/Release/*.nupkg  --source https://api.nuget.org/v3/index.json

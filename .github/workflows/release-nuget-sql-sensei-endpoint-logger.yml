@@ -22,5 +22,8 @@ jobs:
     - name: Package SqlSensei.SqlServer.EndpointLogger
       run: dotnet pack src/SqlSensei.SqlServer.EndpointLogger/SqlSensei.SqlServer.EndpointLogger.csproj --configuration Release
 
+    - name: Setup API_KEY NuGet SqlSensei.SqlServer.EndpointLogger
+      run: nuget setapikey "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json
+
     - name: Publish NuGet SqlSensei.SqlServer.EndpointLogger
-      run: dotnet nuget push src/SqlSensei.SqlServer.EndpointLogger/bin/Release/*.nupkg  --source https://api.nuget.org/v3/index.json -header "${{ secrets.NUGET_PUBLISH_API_KEY }}"
+      run: dotnet nuget push src/SqlSensei.SqlServer.EndpointLogger/bin/Release/*.nupkg  --source https://api.nuget.org/v3/index.json

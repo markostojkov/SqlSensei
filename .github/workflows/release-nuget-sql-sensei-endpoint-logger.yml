@@ -10,4 +10,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Common Steps
-      uses: ./.github/workflows/nuget-publish-template.yml
+      uses: ./.github/workflows/release-nuget.yml

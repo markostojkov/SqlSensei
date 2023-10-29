@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>SqlSensei.SqlServer.Hangfire</id>
+    <version>1.0.0</version>
+    <title>SqlSensei.SqlServer.Hangfire</title>
+    <authors>Marko Stojkov</authors>
+    <owners>Marko Stojkov</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>SqlSensei.SqlServer.Hangfire</description>
+    <releaseNotes>SqlSensei.SqlServer.Hangfire</releaseNotes>
+  </metadata>
+</package>

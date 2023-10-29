@@ -23,6 +23,6 @@ jobs:
       run: dotnet pack src/SqlSensei.SqlServer.EndpointLogger/SqlSensei.SqlServer.EndpointLogger.csproj --configuration Release
 
     - name: Publish NuGet SqlSensei.SqlServer.EndpointLogger
-      run: dotnet nuget push src/SqlSensei.SqlServer.EndpointLogger/bin/Release/*.nupkg
+      run: dotnet nuget push src/SqlSensei.SqlServer.EndpointLogger/bin/Release/*.nupkg  --source https://api.nuget.org/v3/index.json
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_PUBLISH_API_KEY }}

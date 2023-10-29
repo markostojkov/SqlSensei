@@ -16,8 +16,10 @@ jobs:
       with:
         dotnet-version: '6.x'
 
-    - name: Build and package SqlSensei.SqlServer.Hangfire
+    - name: Build SqlSensei.SqlServer.Hangfire
       run: dotnet build src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj --configuration Release
+        
+    - name: Package SqlSensei.SqlServer.Hangfire
       run: dotnet pack src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj --configuration Release
 
     - name: Publish NuGet SqlSensei.SqlServer.Hangfire

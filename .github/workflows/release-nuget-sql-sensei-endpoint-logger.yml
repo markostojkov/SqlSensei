@@ -16,8 +16,10 @@ jobs:
       with:
         dotnet-version: '6.x'
 
-    - name: Build and package SqlSensei.Core.EndpointLogger
+    - name: Build SqlSensei.Core.EndpointLogger
       run: dotnet build src/SqlSensei.Core.EndpointLogger/SqlSensei.Core.EndpointLogger.csproj --configuration Release
+
+    - name: Package SqlSensei.Core.EndpointLogger
       run: dotnet pack src/SqlSensei.Core.EndpointLogger/SqlSensei.Core.EndpointLogger.csproj --configuration Release
 
     - name: Publish NuGet SqlSensei.Core.EndpointLogger

@@ -21,9 +21,9 @@ jobs:
         
     - name: Package SqlSensei.SqlServer
       run: |
-        buildNumber = ${{github.run_number}}
-        echo buildNumber
-        packageVersion = "1.0.$buildNumber"
+        buildNumber=${{github.run_number}}
+        echo $buildNumber
+        packageVersion="1.0.$buildNumber"
 
 
         dotnet pack src/SqlSensei.SqlServer/SqlSensei.SqlServer.csproj --version-suffix $packageVersion --configuration Release

@@ -23,7 +23,7 @@ jobs:
       run: |
         buildNumber=${{ github.run_number }}
         packageVersion="1.0.$buildNumber"
-        dotnet pack src/SqlSensei.Core/SqlSensei.Core.csproj -p:Version=$packageVersion --configuration Release
+        dotnet pack src/SqlSensei.Core/SqlSensei.Core.csproj --configuration Release
 
     - name: Publish NuGet SqlSensei.Core
       run: dotnet nuget push src/SqlSensei.Core/bin/Release/*.nupkg --api-key "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json

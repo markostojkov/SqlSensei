@@ -1,16 +1,29 @@
-name: Publish NuGet SqlSensei.SqlServer.Hangfire
+name: Publish NuGet Package SqlSensei.SqlServer.Hangfire
+
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        packageName: ['SqlSensei.SqlServer.Hangfire']
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Common Steps
-      uses: ./.github/workflows/release-nuget.yml
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.x'
+
+    - name: Build SqlSensei.SqlServer.Hangfire
+      run: dotnet build src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj --configuration Release
+
+    - name: Package SqlSensei.SqlServer.Hangfire
+      run: |
+        buildNumber=${{ github.run_number }}
+        packageVersion="1.0.$buildNumber"
+        dotnet pack src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj -p:Version=$packageVersion --configuration Release
+
+    - name: Publish NuGet SqlSensei.SqlServer.Hangfire
+      run: dotnet nuget push src/SqlSensei.SqlServer.Hangfire/bin/Release/*.nupkg --api-key "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json

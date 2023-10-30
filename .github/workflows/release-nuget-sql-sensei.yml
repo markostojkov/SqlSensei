@@ -1,16 +1,29 @@
-name: Publish NuGet SqlSensei.SqlServer
+name: Publish NuGet Package SqlSensei.SqlServer
+
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        packageName: ['SqlSensei.SqlServer']
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Common Steps
-      uses: ./.github/workflows/release-nuget.yml
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.x'
+
+    - name: Build SqlSensei.SqlServer
+      run: dotnet build src/SqlSensei.SqlServer/SqlSensei.SqlServer.csproj --configuration Release
+
+    - name: Package SqlSensei.SqlServer
+      run: |
+        buildNumber=${{ github.run_number }}
+        packageVersion="1.0.$buildNumber"
+        dotnet pack src/SqlSensei.SqlServer/SqlSensei.SqlServer.csproj -p:Version=$packageVersion --configuration Release
+
+    - name: Publish NuGet SqlSensei.SqlServer
+      run: dotnet nuget push src/SqlSensei.SqlServer/bin/Release/*.nupkg --api-key "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json

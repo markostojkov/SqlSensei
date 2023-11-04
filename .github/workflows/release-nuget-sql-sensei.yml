@@ -21,9 +21,7 @@ jobs:
 
     - name: Package SqlSensei.SqlServer
       run: |
-        buildNumber=${{ github.run_number }}
-        packageVersion="1.0.$buildNumber"
-        dotnet pack src/SqlSensei.SqlServer/SqlSensei.SqlServer.csproj --configuration Release
+        dotnet pack src/SqlSensei.SqlServer/SqlSensei.SqlServer.csproj -p:Version="1.0.1" --configuration Release
 
     - name: Publish NuGet SqlSensei.SqlServer
       run: dotnet nuget push src/SqlSensei.SqlServer/bin/Release/*.nupkg --api-key "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json

@@ -18,9 +18,9 @@ namespace SqlSensei.SqlServer.Hangfire.Builder
         /// <param name="queue">The name of the queue to use for enqueuing the job. Default is the Hangfire default queue.</param>
         public static IApplicationBuilder UseSqlSenseiSqlServerHangfire(this IApplicationBuilder app, SqlSenseiHangfireOptions options)
         {
-            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMaintenanceJob", options.Queue, sqlSenseiService => sqlSenseiService.ExecuteMaintenanceJob(), options.ExecuteMaintenanceJobCron);
-            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMonitoringJob", options.Queue, sqlSenseiService => sqlSenseiService.ExecuteMonitoringJob(), options.ExecuteMonitoringJobCron);
-            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMonitoringLogJob", options.Queue, sqlSenseiService => sqlSenseiService.ExecuteMonitoringLogJob(), options.ExecuteMonitoringLogJobCron);
+            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMaintenanceJob", sqlSenseiService => sqlSenseiService.ExecuteMaintenanceJob(), options.ExecuteMaintenanceJobCron, null, options.Queue);
+            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMonitoringJob", sqlSenseiService => sqlSenseiService.ExecuteMonitoringJob(), options.ExecuteMonitoringJobCron, null, options.Queue);
+            RecurringJob.AddOrUpdate<ISqlSenseiJob>("ExecuteMonitoringLogJob", sqlSenseiService => sqlSenseiService.ExecuteMonitoringLogJob(), options.ExecuteMonitoringLogJobCron, null, options.Queue);
 
             app.ApplicationServices.GetRequiredService<ISqlSenseiJob>().InstallMaintenanceAndMonitoringScripts();
 

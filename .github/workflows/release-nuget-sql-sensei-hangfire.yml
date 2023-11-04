@@ -23,7 +23,7 @@ jobs:
       run: |
         buildNumber=${{ github.run_number }}
         packageVersion="1.0.$buildNumber"
-        dotnet pack src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj -p:Version=$packageVersion --configuration Release
+        dotnet pack src/SqlSensei.SqlServer.Hangfire/SqlSensei.SqlServer.Hangfire.csproj --configuration Release
 
     - name: Publish NuGet SqlSensei.SqlServer.Hangfire
       run: dotnet nuget push src/SqlSensei.SqlServer.Hangfire/bin/Release/*.nupkg --api-key "${{ secrets.NUGET_PUBLISH_API_KEY }}" --source https://api.nuget.org/v3/index.json

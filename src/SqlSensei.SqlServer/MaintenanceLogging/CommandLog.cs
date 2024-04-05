@@ -31,7 +31,7 @@ namespace SqlSensei.SqlServer.InformationGather
 
         public static List<CommandLog> GetAll(SqlDataReader reader)
         {
-            List<CommandLog> commandLogs = new();
+            List<CommandLog> commandLogs = [];
 
             while (reader.Read())
             {

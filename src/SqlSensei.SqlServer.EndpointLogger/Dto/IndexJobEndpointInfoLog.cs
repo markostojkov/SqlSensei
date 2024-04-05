@@ -4,7 +4,7 @@ using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer.EndpointLogger
 {
-    internal class IndexJobEndpointInfoLog : IMonitoringJobIndexLog
+    internal class IndexJobEndpointInfoLog : IMonitoringJobIndexMissingLog
     {
         public string DatabaseName { get; set; }
         public string TableName { get; set; }

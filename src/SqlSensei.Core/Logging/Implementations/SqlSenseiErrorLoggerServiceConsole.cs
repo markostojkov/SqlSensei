@@ -3,13 +3,8 @@ using System.Threading.Tasks;
 
 namespace SqlSensei.Core
 {
-    public class SqlSenseiErrorLoggerServiceDebug : ISqlSenseiErrorLoggerService
+    public class SqlSenseiErrorLoggerServiceConsole : ISqlSenseiErrorLoggerService
     {
-
-        public SqlSenseiErrorLoggerServiceDebug()
-        {
-        }
-
         public Task Error(Exception exception, string message)
         {
             Console.WriteLine(message);
@@ -26,5 +21,4 @@ namespace SqlSensei.Core
             return Task.CompletedTask;
         }
     }
-
 }

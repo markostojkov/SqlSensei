@@ -1,6 +1,6 @@
 ﻿namespace SqlSensei.Core
 {
-    public interface IMaintenanceJobLog
+    public interface IMaintenanceJobLog : IDatabaseLog
     {
         public string Index { get; }
         public string Statistic { get; }

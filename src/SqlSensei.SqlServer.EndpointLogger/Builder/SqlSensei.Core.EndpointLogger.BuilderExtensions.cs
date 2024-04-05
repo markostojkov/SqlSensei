@@ -36,7 +36,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
 #if Release
             services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerService>();
 #else
-            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerServiceDebug>();
+            services.TryAddSingleton<ISqlSenseiErrorLoggerService, SqlSenseiErrorLoggerServiceConsole>();
 #endif
 
             return services;

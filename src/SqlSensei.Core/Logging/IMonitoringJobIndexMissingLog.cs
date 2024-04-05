@@ -1,8 +1,7 @@
 ﻿namespace SqlSensei.Core
 {
-    public interface IMonitoringJobIndexLog
+    public interface IMonitoringJobIndexMissingLog : IDatabaseLog
     {
-        public string DatabaseName { get; }
         public string TableName { get; }
         public long MagicBenefitNumber { get; }
         public string Impact { get; }

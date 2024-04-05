@@ -6,7 +6,7 @@ using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer.InformationGather
 {
-    public class IndexLogUsage : IMonitoringJobIndexLogUsage
+    public class IndexLogUsage : IMonitoringJobIndexUsageLog
     {
         public IndexLogUsage(string databaseName, string indexName, string tableName, string indexDetails, string usage, long readsUsage, long writeUsage, bool isClusteredIndex)
         {
@@ -22,17 +22,11 @@ namespace SqlSensei.SqlServer.InformationGather
         }
 
         public string DatabaseName { get; }
-
         public string IndexName { get; }
-
         public string TableName { get; }
-
         public string IndexDetails { get; }
-
         public string Usage { get; }
-
         public long ReadsUsage { get; }
-
         public long WriteUsage { get; }
         public bool IsClusteredIndex { get; }
         public string UserMessage { get; set; }
@@ -42,14 +36,14 @@ namespace SqlSensei.SqlServer.InformationGather
 
         public static List<IndexLogUsage> GetAll(SqlDataReader reader)
         {
-            List<IndexLogUsage> records = new List<IndexLogUsage>();
+            List<IndexLogUsage> records = [];
 
             while (reader.Read())
             {
                 var indexDefinitionKeys = reader.IsDBNull(reader.GetOrdinal("key_column_names_with_sort_order")) ? string.Empty : reader.GetString(reader.GetOrdinal("key_column_names_with_sort_order"));
                 var indexDefinitionIncludes = reader.IsDBNull(reader.GetOrdinal("include_column_names")) ? string.Empty : reader.GetString(reader.GetOrdinal("include_column_names"));
 
-                IndexLogUsage record = new IndexLogUsage(
+                IndexLogUsage record = new(
                     reader.IsDBNull(reader.GetOrdinal("database_name")) ? string.Empty : reader.GetString(reader.GetOrdinal("database_name")),
                     reader.IsDBNull(reader.GetOrdinal("index_name")) ? string.Empty : reader.GetString(reader.GetOrdinal("index_name")),
                     reader.IsDBNull(reader.GetOrdinal("table_name")) ? string.Empty : reader.GetString(reader.GetOrdinal("table_name")),

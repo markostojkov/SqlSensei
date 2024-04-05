@@ -6,7 +6,7 @@ using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer.EndpointLogger
 {
-    internal class IndexUsageJobEndpointInfoLog : IMonitoringJobIndexLogUsage
+    internal class IndexUsageJobEndpointInfoLog : IMonitoringJobIndexUsageLog
     {
         public bool IsClusteredIndex { get; set; }
 

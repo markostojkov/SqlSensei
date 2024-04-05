@@ -7,7 +7,7 @@ namespace SqlSensei.Core.Tests
         public void GetIndexesWithIssues_NoIndexes_ReturnsEmptyList()
         {
             // Arrange
-            var indexLogUsages = new List<IMonitoringJobIndexLogUsage>();
+            var indexLogUsages = new List<IMonitoringJobIndexUsageLog>();
 
             // Act
             var result = indexLogUsages.GetIndexesWithIssues();
@@ -20,7 +20,7 @@ namespace SqlSensei.Core.Tests
         public void GetIndexesWithIssues_IndexWithZeroReads_ReturnsIndexWithIssue()
         {
             // Arrange
-            var indexLogUsages = new List<IMonitoringJobIndexLogUsage>
+            var indexLogUsages = new List<IMonitoringJobIndexUsageLog>
             {
                 new TestIndexLogUsage("Db1", "Table1_Index2", "Table1", "Id {int 4} : ",                                                                   "Reads: 0 Writes: 8",    0, 8,   true),
                 new TestIndexLogUsage("Db1", "Table1_Index7", "Table1", "CustomerFK {int 4} : ",                                                           "Reads: 10 Writes: 8",   10, 8,  false),
@@ -42,7 +42,7 @@ namespace SqlSensei.Core.Tests
 
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 
-    public class TestIndexLogUsage : IMonitoringJobIndexLogUsage
+    public class TestIndexLogUsage : IMonitoringJobIndexUsageLog
     {
         public TestIndexLogUsage(string databaseName, string indexName, string tableName, string indexDetails, string usage, long readsUsage, long writeUsage, bool isClusteredIndex)
         {

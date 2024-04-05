@@ -11,15 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{B6E9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleHangfireAndEndpointLogging", "src\Samples\WebApplication1\SampleHangfireAndEndpointLogging.csproj", "{D7EAE785-9733-4205-8644-0FE20092CC8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSensei.SqlServer.Hangfire", "src\SqlSensei.SqlServer.Hangfire\SqlSensei.SqlServer.Hangfire.csproj", "{6380C2EF-31CC-433D-9B5A-EBE09927C42A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{D14E7B6B-5A82-4496-9FD0-C2758550EF46}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlServer", "SqlServer", "{353D4778-F07A-49C7-9357-894B742883EF}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSensei.Core.Tests", "src\SqlSensei.Core.Tests\SqlSensei.Core.Tests.csproj", "{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSensei.SqlServer.EndpointLogger", "src\SqlSensei.SqlServer.EndpointLogger\SqlSensei.SqlServer.EndpointLogger.csproj", "{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,18 +33,6 @@ Global
 		{D7EAE785-9733-4205-8644-0FE20092CC8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7EAE785-9733-4205-8644-0FE20092CC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D7EAE785-9733-4205-8644-0FE20092CC8F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6380C2EF-31CC-433D-9B5A-EBE09927C42A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6380C2EF-31CC-433D-9B5A-EBE09927C42A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6380C2EF-31CC-433D-9B5A-EBE09927C42A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6380C2EF-31CC-433D-9B5A-EBE09927C42A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198}.Release|Any CPU.Build.0 = Release|Any CPU
-		{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,9 +41,6 @@ Global
 		{10235F11-A7C5-4D80-AE6C-39EBD03CCB4B} = {D14E7B6B-5A82-4496-9FD0-C2758550EF46}
 		{DD6F1DB9-D497-49C5-8818-0E6B9E1A3B9C} = {353D4778-F07A-49C7-9357-894B742883EF}
 		{D7EAE785-9733-4205-8644-0FE20092CC8F} = {B6E93DAB-4DB0-499E-B7DE-A2382F92FF2F}
-		{6380C2EF-31CC-433D-9B5A-EBE09927C42A} = {353D4778-F07A-49C7-9357-894B742883EF}
-		{C65A1FCB-E75E-43F5-A8E3-4015CCA4F198} = {D14E7B6B-5A82-4496-9FD0-C2758550EF46}
-		{412547E3-46DA-4FA3-ADA2-36CD08D6FA9A} = {353D4778-F07A-49C7-9357-894B742883EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A496CBEA-217A-4BDF-911C-34E5E02188F6}

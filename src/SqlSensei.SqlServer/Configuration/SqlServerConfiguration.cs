@@ -1,7 +1,4 @@
-﻿#nullable enable
-
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 using Microsoft.Data.SqlClient;
 
@@ -11,76 +8,54 @@ namespace SqlSensei.SqlServer
 {
     public class SqlServerConfiguration : ISqlSenseiConfiguration
     {
-        private string _maintenanceScriptExecution { get; }
-        private string _monitoringIndexLogScriptExecution { get; }
-
+        // interface props
         public SqlSenseiConfigurationOptions Configuration => SqlSenseiConfigurationOptions.SqlServer;
-        public List<string> MonitoringScripts { get; }
-        public List<string> MaintenanceScripts { get; }
-        public string ConnectionString { get; }
-        public List<string> Databases { get; }
-        public int DropLogsOlderThanDays { get; }
+        public List<SqlSenseiConfigurationDatabase> Databases { get; }
+        public string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
+        public string DashboardPath { get; }
+        // interface props
+
+        public SqlServerConfigurationMonitoringOptions MonitoringOptions { get; }
+        public SqlServerConfigurationMaintenanceOptions MaintenanceOptions { get; }
 
         private SqlServerConfiguration(
-            string connectionString,
-            List<string> databases,
-            int dropLogsOlderThanDays,
-            SqlServerConfigurationMonitoringOptions? monitoringOptions,
-            SqlServerConfigurationMaintenanceOptions? maintenanceOptions)
+            List<SqlSenseiConfigurationDatabase> databases,
+            string monitoringAndMaintenanceScriptDatabaseConnection,
+            string dashboardPath,
+            SqlServerConfigurationMonitoringOptions monitoringOptions,
+            SqlServerConfigurationMaintenanceOptions maintenanceOptions)
         {
-            MonitoringScripts = new List<string>();
-            MaintenanceScripts = new List<string>();
-            ConnectionString = connectionString;
             Databases = databases;
-            DropLogsOlderThanDays = dropLogsOlderThanDays;
-            _maintenanceScriptExecution = string.Empty;
-            _monitoringIndexLogScriptExecution = string.Empty;
-
-            var connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
-
-            if (monitoringOptions is not null)
-            {
-                MonitoringScripts = new() { monitoringOptions.ScriptName };
-                _monitoringIndexLogScriptExecution = monitoringOptions.GetIndexLoggingScript(connectionStringBuilder.InitialCatalog, databases);
-            }
-
-            if (maintenanceOptions is not null)
-            {
-                MaintenanceScripts = new() { maintenanceOptions.ScriptName };
-                _maintenanceScriptExecution = maintenanceOptions.GetScript(databases);
-            }
+            MonitoringAndMaintenanceScriptDatabaseConnection = monitoringAndMaintenanceScriptDatabaseConnection;
+            DashboardPath = dashboardPath;
+            MonitoringOptions = monitoringOptions;
+            MaintenanceOptions = maintenanceOptions;
         }
 
-        public static SqlServerConfiguration Default(string connectionString, params string[] databasesToPerformActionsOn)
+        public static SqlServerConfiguration Default(
+            List<SqlSenseiConfigurationDatabase> databases,
+            string monitoringAndMaintenanceScriptDatabaseConnection,
+            string dashboardPath)
         {
-            return new SqlServerConfiguration(connectionString,
-                databasesToPerformActionsOn.ToList(),
-                30,
-                SqlServerConfigurationMonitoringOptions.CoreNoQueryStore,
-                SqlServerConfigurationMaintenanceOptions.OlaHallengrenDefault);
+            return new SqlServerConfiguration(databases,
+                monitoringAndMaintenanceScriptDatabaseConnection,
+                dashboardPath,
+                SqlServerConfigurationMonitoringOptions.Default,
+                SqlServerConfigurationMaintenanceOptions.Default);
         }
 
-        public static SqlServerConfiguration Create(string connectionString,
-            int keepLogForDays = 30,
-            SqlServerConfigurationMonitoringOptions? monitoringOptions = null,
-            SqlServerConfigurationMaintenanceOptions? maintenanceOptions = null,
-            params string[] databasesToPerformActionsOn)
+        public static SqlServerConfiguration Create(
+            List<SqlSenseiConfigurationDatabase> databases,
+            string monitoringAndMaintenanceScriptDatabaseConnection,
+            string dashboardPath,
+            SqlServerConfigurationMonitoringOptions monitoringOptions,
+            SqlServerConfigurationMaintenanceOptions maintenanceOptions)
         {
-            return new SqlServerConfiguration(connectionString,
-                databasesToPerformActionsOn.ToList(),
-                keepLogForDays,
+            return new SqlServerConfiguration(databases,
+                monitoringAndMaintenanceScriptDatabaseConnection,
+                dashboardPath,
                 monitoringOptions,
                 maintenanceOptions);
-        }
-
-        public string GetMaintenanceScript()
-        {
-            return _maintenanceScriptExecution;
-        }
-
-        public string GetMonitoringLog()
-        {
-            return _monitoringIndexLogScriptExecution;
         }
     }
 }

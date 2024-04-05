@@ -1,27 +1,49 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+
+using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer
 {
     public class SqlServerConfigurationMonitoringOptions
     {
+        private static readonly string _replaceDatabase = "replace-database";
+        private readonly string _script = @"
+            EXECUTE dbo.sp_BlitzIndex
+            @DatabaseName       = '" + _replaceDatabase + @"',
+            @Mode               = 3,
+            @OutputDatabaseName = '{0}',
+            @OutputSchemaName   = 'dbo',
+            @OutputTableName    = '" + SqlServerSql.MonitoringMissingIndexTableLogTo + @"'
+    
+            GO            
+
+            EXECUTE dbo.sp_BlitzIndex
+            @DatabaseName       = '" + _replaceDatabase + @"',
+            @Mode               = 2,
+            @OutputDatabaseName = '{0}',
+            @OutputSchemaName   = 'dbo',
+            @OutputTableName    = '" + SqlServerSql.MonitoringUsageIndexTableLogTo + @"'
+        ";
+
+        public string ScriptName { get; }
+
         private SqlServerConfigurationMonitoringOptions(string scriptName)
         {
             ScriptName = scriptName;
         }
 
-        public static SqlServerConfigurationMonitoringOptions CoreNoQueryStore => new("Install-Core-Blitz-No-Query-Store.sql");
+        public static SqlServerConfigurationMonitoringOptions Default => new("MonitoringSolution.sql");
 
-        public string ScriptName { get; }
-
-        public string GetIndexLoggingScript(string logToDatabase, IEnumerable<string> databases)
+        public string GetScript(IEnumerable<SqlSenseiConfigurationDatabase> databases, string monitoringAndMaintenanceScriptDatabaseName)
         {
-            return SqlServerMonitoringOptionsIndex.Create(logToDatabase).GetScript(databases.ToArray());
-        }
+            string scriptForAllDatabases = string.Empty;
 
-        public string GetIndexLoggingScript(string logToDatabase, string[] databases)
-        {
-            return SqlServerMonitoringOptionsIndex.Create(logToDatabase).GetScript(databases);
+            foreach (var database in databases)
+            {
+                scriptForAllDatabases += string.Format(_script, monitoringAndMaintenanceScriptDatabaseName).Replace(_replaceDatabase, database.Database);
+            }
+
+            return scriptForAllDatabases;
         }
     }
 }

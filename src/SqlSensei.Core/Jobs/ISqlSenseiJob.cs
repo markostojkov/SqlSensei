@@ -9,7 +9,5 @@ namespace SqlSensei.Core
         Task ExecuteMaintenanceJob();
 
         Task ExecuteMonitoringJob();
-
-        Task ExecuteMonitoringLogJob();
     }
 }

@@ -7,7 +7,7 @@ using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer.InformationGather
 {
-    public class IndexLog : IMonitoringJobIndexLog
+    public class IndexLog : IMonitoringJobIndexMissingLog
     {
         public int ID { get; set; }
         public Guid RunID { get; set; }
@@ -33,11 +33,11 @@ namespace SqlSensei.SqlServer.InformationGather
 
         public static List<IndexLog> GetAll(SqlDataReader reader)
         {
-            List<IndexLog> records = new List<IndexLog>();
+            List<IndexLog> records = [];
 
             while (reader.Read())
             {
-                IndexLog record = new IndexLog
+                IndexLog record = new()
                 {
                     ID = reader.IsDBNull(reader.GetOrdinal("id")) ? 0 : reader.GetInt32(reader.GetOrdinal("id")),
                     RunID = reader.IsDBNull(reader.GetOrdinal("run_id")) ? Guid.Empty : reader.GetGuid(reader.GetOrdinal("run_id")),

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using SqlSensei.Core;
+
 namespace SqlSensei.SqlServer
 {
     public class SqlServerConfigurationMaintenanceOptions
@@ -19,6 +21,8 @@ namespace SqlSensei.SqlServer
             @LogToTable = 'Y'
         ";
 
+        public string ScriptName { get; }
+
         private SqlServerConfigurationMaintenanceOptions(
             string scriptName,
             SqlServerConfigurationMaintenanceOptionsStatistics statistics,
@@ -29,7 +33,7 @@ namespace SqlSensei.SqlServer
             _scriptExecution = string.Format(_script, fragmentationLow.IndexFunction, fragmentationHigh.IndexFunction, fragmentationLow.Fragmentation, fragmentationHigh.Fragmentation, statistics.Statistics);
         }
 
-        public static SqlServerConfigurationMaintenanceOptions OlaHallengrenDefault => new(
+        public static SqlServerConfigurationMaintenanceOptions Default => new(
             "MaintenanceSolution.sql",
             SqlServerConfigurationMaintenanceOptionsStatistics.All,
             new SqlServerConfigurationMaintenanceOptionsFragmentation(5,
@@ -41,8 +45,6 @@ namespace SqlSensei.SqlServer
                 SqlServerConfigurationMaintenanceOptionsIndex.RebuildOffline,
                 SqlServerConfigurationMaintenanceOptionsIndex.Reorganize));
 
-        public string ScriptName { get; }
-
         public static SqlServerConfigurationMaintenanceOptions Create(
             SqlServerConfigurationMaintenanceOptionsStatistics statistics,
             SqlServerConfigurationMaintenanceOptionsFragmentation fragmentation1,
@@ -51,9 +53,9 @@ namespace SqlSensei.SqlServer
             return new("MaintenanceSolution.sql", statistics, fragmentation1, fragmentation2);
         }
 
-        public string GetScript(List<string> databases)
+        public string GetScript(IEnumerable<SqlSenseiConfigurationDatabase> databases)
         {
-            return _scriptExecution.Replace(_replaceDatabase, string.Join(",", databases));
+            return _scriptExecution.Replace(_replaceDatabase, string.Join(",", databases.Select(x => x.Database)));
         }
     }
 

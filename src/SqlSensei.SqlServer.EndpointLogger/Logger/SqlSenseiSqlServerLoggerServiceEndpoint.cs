@@ -54,7 +54,7 @@ namespace SqlSensei.SqlServer.EndpointLogger
             }
         }
 
-        public async Task MonitoringInformation(IEnumerable<IMonitoringJobIndexLog> indexLogs, IEnumerable<IMonitoringJobIndexLogUsage> indexLogsUsage, string database)
+        public async Task MonitoringInformation(IEnumerable<IMonitoringJobIndexMissingLog> indexLogs, IEnumerable<IMonitoringJobIndexUsageLog> indexLogsUsage, string database)
         {
             var sql = @$"
                 IF OBJECT_ID(@IndexTable, 'U') IS NULL
@@ -153,9 +153,9 @@ namespace SqlSensei.SqlServer.EndpointLogger
             return maintenanceLogs;
         }
 
-        public async Task<List<IMonitoringJobIndexLog>> GetIndexMonitoringLogs()
+        public async Task<List<IMonitoringJobIndexMissingLog>> GetIndexMonitoringLogs()
         {
-            List<IMonitoringJobIndexLog> monitoringLogs = new();
+            List<IMonitoringJobIndexMissingLog> monitoringLogs = new();
 
             var result = await ExecuteCommandAsync(
                 $"SELECT * FROM {indexInfoSqlTableName} ORDER BY DatabaseName",
@@ -177,9 +177,9 @@ namespace SqlSensei.SqlServer.EndpointLogger
             return monitoringLogs;
         }
 
-        public async Task<List<IMonitoringJobIndexLogUsage>> GetIndexUsageMonitoringLogs()
+        public async Task<List<IMonitoringJobIndexUsageLog>> GetIndexUsageMonitoringLogs()
         {
-            List<IMonitoringJobIndexLogUsage> monitoringLogs = new();
+            List<IMonitoringJobIndexUsageLog> monitoringLogs = new();
 
             var result = await ExecuteCommandAsync(
                 $"SELECT * FROM {indexUsageInfoSqlTableName} ORDER BY DatabaseName",

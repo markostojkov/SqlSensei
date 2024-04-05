@@ -1,0 +1,17 @@
+dashboard with credentaisl
+
+SQL SERVER
+functions:
+	- maintenance index using OLA Hall.
+		- display indexes that were maintained and if errors
+	- monitoring
+		- missing index requests
+		- index usage
+		- bad query plans that are there too long
+	- security
+		- if some user has high privilige
+
+THEY WILL SEND LOGS TO US FOR FREE
+WITH API KEYS
+
+C:\Users\mst\Desktop\SqlSensei\src\SqlSensei.Core\Logic\IndexLogic.cs I WILL DELETE IT WE CAN FIND IT IN GITHUB

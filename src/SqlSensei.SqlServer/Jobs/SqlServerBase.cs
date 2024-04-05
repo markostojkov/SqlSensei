@@ -12,22 +12,19 @@ namespace SqlSensei.SqlServer
     public abstract class SqlServerBase
     {
         protected ISqlSenseiErrorLoggerService ErrorLoggerService { get; set; }
-        protected ISqlSenseiConfiguration Configuration { get; set; }
+        protected SqlServerConfiguration Configuration { get; set; }
+        protected SqlConnectionStringBuilder ConnectionStringParsed { get; }
 
-        protected SqlServerBase(ISqlSenseiErrorLoggerService loggerService, ISqlSenseiConfiguration configuration)
+        protected SqlServerBase(ISqlSenseiErrorLoggerService loggerService, SqlServerConfiguration configuration)
         {
             ErrorLoggerService = loggerService;
             Configuration = configuration;
-        }
-
-        protected SqlServerBase(ISqlSenseiConfiguration configuration)
-        {
-            Configuration = configuration;
+            ConnectionStringParsed = new SqlConnectionStringBuilder(configuration.MonitoringAndMaintenanceScriptDatabaseConnection);
         }
 
         protected async Task ExecuteScriptAsyncGoStatements(string scriptContent)
         {
-            using SqlConnection connection = new(Configuration.ConnectionString);
+            using SqlConnection connection = new(Configuration.MonitoringAndMaintenanceScriptDatabaseConnection);
 
             connection.Open();
 
@@ -65,14 +62,14 @@ namespace SqlSensei.SqlServer
             return await ExecuteCommandAsyncPrivate(sql, false, commandAction, parameters);
         }
 
-        protected async Task ExecuteCommandAsync(string sql, params SqlParameter[] parameters)
+        protected async Task<bool> ExecuteCommandAsync(string sql, params SqlParameter[] parameters)
         {
-            await ExecuteCommandAsyncPrivate(sql, true, null, parameters);
+            return await ExecuteCommandAsyncPrivate(sql, true, null, parameters);
         }
 
-        protected async Task ExecuteCommandAsyncNoTransaction(string sql, params SqlParameter[] parameters)
+        protected async Task<bool> ExecuteCommandAsyncNoTransaction(string sql, params SqlParameter[] parameters)
         {
-            await ExecuteCommandAsyncPrivate(sql, false, null, parameters);
+            return await ExecuteCommandAsyncPrivate(sql, false, null, parameters);
         }
 
         private async Task<bool> ExecuteCommandAsyncPrivate(string sql, bool isTransactional, Action<SqlDataReader> commandAction, params SqlParameter[] parameters)
@@ -83,7 +80,7 @@ namespace SqlSensei.SqlServer
                 return false;
             }
 
-            using SqlConnection connection = new(Configuration.ConnectionString);
+            using SqlConnection connection = new(Configuration.MonitoringAndMaintenanceScriptDatabaseConnection);
 
             await connection.OpenAsync();
 

@@ -7,11 +7,11 @@ using Microsoft.ApplicationInsights.Extensibility;
 
 namespace SqlSensei.Core
 {
-    public class SqlSenseiErrorLoggerService : ISqlSenseiErrorLoggerService
+    public class SqlSenseiErrorLoggerServiceApplicationInsights : ISqlSenseiErrorLoggerService
     {
         private readonly TelemetryClient telemetryClient;
 
-        public SqlSenseiErrorLoggerService()
+        public SqlSenseiErrorLoggerServiceApplicationInsights()
         {
             var config = TelemetryConfiguration.CreateDefault();
             config.ConnectionString = @"InstrumentationKey=62e9e73f-c9a9-44b1-a821-035e9bf992bf;IngestionEndpoint=https://germanywestcentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://germanywestcentral.livediagnostics.monitor.azure.com/";
@@ -34,5 +34,4 @@ namespace SqlSensei.Core
             return Task.CompletedTask;
         }
     }
-
 }

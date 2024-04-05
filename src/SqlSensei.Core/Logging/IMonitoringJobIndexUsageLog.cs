@@ -2,10 +2,9 @@
 
 namespace SqlSensei.Core
 {
-    public interface IMonitoringJobIndexLogUsage
+    public interface IMonitoringJobIndexUsageLog : IDatabaseLog
     {
         public bool IsClusteredIndex { get; }
-        public string DatabaseName { get; }
         public string IndexName { get; }
         public string TableName { get; }
         public string IndexDetails { get; }

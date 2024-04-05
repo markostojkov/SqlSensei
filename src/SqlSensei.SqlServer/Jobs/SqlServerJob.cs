@@ -84,7 +84,7 @@ namespace SqlSensei.SqlServer
 
         public void InstallMaintenanceAndMonitoringScripts()
         {
-            Task.Run(async () =>
+            _ = Task.Run(async () =>
             {
                 await ExecuteScript(Configuration.MaintenanceOptions.ScriptName);
                 await ExecuteScript(Configuration.MonitoringOptions.ScriptName);

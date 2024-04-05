@@ -6,12 +6,12 @@ namespace WebApplication1
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
-            builder.Services.AddEndpointsApiExplorer();
+            _ = builder.Services.AddControllers();
+            _ = builder.Services.AddEndpointsApiExplorer();
 
             var app = builder.Build();
 
-            app.MapControllers();
+            _ = app.MapControllers();
 
             app.Run();
         }

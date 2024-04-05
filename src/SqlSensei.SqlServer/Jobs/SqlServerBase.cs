@@ -40,10 +40,10 @@ namespace SqlSensei.SqlServer
                                           .Where(commandString => !string.IsNullOrWhiteSpace(commandString))
                                           .ToList();
 
-                foreach (string commandString in commandStrings)
+                foreach (var commandString in commandStrings)
                 {
                     using SqlCommand command = new(commandString, connection);
-                    await command.ExecuteNonQueryAsync();
+                    _ = await command.ExecuteNonQueryAsync();
                 }
             }
             catch (Exception e)

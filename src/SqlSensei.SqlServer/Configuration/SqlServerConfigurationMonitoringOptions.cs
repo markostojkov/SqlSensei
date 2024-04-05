@@ -36,7 +36,7 @@ namespace SqlSensei.SqlServer
 
         public string GetScript(IEnumerable<SqlSenseiConfigurationDatabase> databases, string monitoringAndMaintenanceScriptDatabaseName)
         {
-            string scriptForAllDatabases = string.Empty;
+            var scriptForAllDatabases = string.Empty;
 
             foreach (var database in databases)
             {

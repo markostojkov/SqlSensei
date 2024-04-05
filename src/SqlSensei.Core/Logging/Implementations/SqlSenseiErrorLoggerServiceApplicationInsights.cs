@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Microsoft.ApplicationInsights;
+﻿using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
+
+using System;
+using System.Threading.Tasks;
 
 namespace SqlSensei.Core
 {

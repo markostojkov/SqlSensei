@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SqlSensei.Core;
 
-using Microsoft.Data.SqlClient;
-
-using SqlSensei.Core;
+using System.Collections.Generic;
 
 namespace SqlSensei.SqlServer
 {

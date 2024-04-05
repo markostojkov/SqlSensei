@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using SqlSensei.Core;
+using SqlSensei.SqlServer.InformationGather;
+
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-
-using SqlSensei.Core;
-using SqlSensei.SqlServer.InformationGather;
 
 namespace SqlSensei.SqlServer
 {

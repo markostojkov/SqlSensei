@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+
+using SqlSensei.Core;
+
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
-using Microsoft.Data.SqlClient;
-
-using SqlSensei.Core;
 
 namespace SqlSensei.SqlServer
 {

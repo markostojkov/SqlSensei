@@ -7,5 +7,8 @@ namespace SqlSensei.Core
         SqlSenseiConfigurationOptions Configuration { get; }
         List<SqlSenseiConfigurationDatabase> Databases { get; }
         string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
+        string ApiKey { get; }
+        bool ReportErrorsToSqlSensei { get; }
+        SqlSenseiConfigurationApiVersion ApiVersion { get; }
     }
 }

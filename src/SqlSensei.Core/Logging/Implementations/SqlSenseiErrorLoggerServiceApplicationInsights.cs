@@ -3,7 +3,6 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 
 using System;
-using System.Threading.Tasks;
 
 namespace SqlSensei.Core
 {
@@ -18,20 +17,16 @@ namespace SqlSensei.Core
             telemetryClient = new TelemetryClient(config);
         }
 
-        public Task Error(Exception exception, string message)
+        public void Error(Exception exception, string message)
         {
             telemetryClient.TrackException(exception);
             telemetryClient.TrackTrace(message, SeverityLevel.Error);
-
-            return Task.CompletedTask;
         }
 
-        public Task Error(string message)
+        public void Error(string message)
         {
             telemetryClient.TrackTrace(message, SeverityLevel.Error);
             telemetryClient.TrackException(new SystemException(message));
-
-            return Task.CompletedTask;
         }
     }
 }

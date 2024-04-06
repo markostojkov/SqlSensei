@@ -10,48 +10,58 @@ namespace SqlSensei.SqlServer
         public SqlSenseiConfigurationOptions Configuration => SqlSenseiConfigurationOptions.SqlServer;
         public List<SqlSenseiConfigurationDatabase> Databases { get; }
         public string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
-        public string DashboardPath { get; }
+        public string ApiKey { get; }
+        public bool ReportErrorsToSqlSensei { get; }
+        public SqlSenseiConfigurationApiVersion ApiVersion { get; } = SqlSenseiConfigurationApiVersion.Version1;
         // interface props
 
         public SqlServerConfigurationMonitoringOptions MonitoringOptions { get; }
         public SqlServerConfigurationMaintenanceOptions MaintenanceOptions { get; }
 
         private SqlServerConfiguration(
+            string apiKey,
+            bool reportErrorsToSqlSensei,
             List<SqlSenseiConfigurationDatabase> databases,
             string monitoringAndMaintenanceScriptDatabaseConnection,
-            string dashboardPath,
             SqlServerConfigurationMonitoringOptions monitoringOptions,
             SqlServerConfigurationMaintenanceOptions maintenanceOptions)
         {
+            ApiKey = apiKey;
+            ReportErrorsToSqlSensei = reportErrorsToSqlSensei;
             Databases = databases;
             MonitoringAndMaintenanceScriptDatabaseConnection = monitoringAndMaintenanceScriptDatabaseConnection;
-            DashboardPath = dashboardPath;
             MonitoringOptions = monitoringOptions;
             MaintenanceOptions = maintenanceOptions;
         }
 
         public static SqlServerConfiguration Default(
+            string apiKey,
             List<SqlSenseiConfigurationDatabase> databases,
             string monitoringAndMaintenanceScriptDatabaseConnection,
-            string dashboardPath)
+            bool reportErrorsToSqlSensei = true)
         {
-            return new SqlServerConfiguration(databases,
+            return new SqlServerConfiguration(
+                apiKey,
+                reportErrorsToSqlSensei,
+                databases,
                 monitoringAndMaintenanceScriptDatabaseConnection,
-                dashboardPath,
                 SqlServerConfigurationMonitoringOptions.Default,
                 SqlServerConfigurationMaintenanceOptions.Default);
         }
 
         public static SqlServerConfiguration Create(
+            string apiKey,
             List<SqlSenseiConfigurationDatabase> databases,
             string monitoringAndMaintenanceScriptDatabaseConnection,
-            string dashboardPath,
             SqlServerConfigurationMonitoringOptions monitoringOptions,
-            SqlServerConfigurationMaintenanceOptions maintenanceOptions)
+            SqlServerConfigurationMaintenanceOptions maintenanceOptions,
+            bool reportErrorsToSqlSensei = true)
         {
-            return new SqlServerConfiguration(databases,
+            return new SqlServerConfiguration(
+                apiKey,
+                reportErrorsToSqlSensei,
+                databases,
                 monitoringAndMaintenanceScriptDatabaseConnection,
-                dashboardPath,
                 monitoringOptions,
                 maintenanceOptions);
         }

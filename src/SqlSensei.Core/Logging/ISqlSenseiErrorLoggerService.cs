@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace SqlSensei.Core
 {
     public interface ISqlSenseiErrorLoggerService
     {
-        Task Error(Exception exception, string message);
-        Task Error(string message);
+        void Error(Exception exception, string message);
+        void Error(string message);
     }
 }

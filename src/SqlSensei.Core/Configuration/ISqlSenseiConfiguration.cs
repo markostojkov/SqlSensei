@@ -9,6 +9,6 @@ namespace SqlSensei.Core
         string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
         string ApiKey { get; }
         bool ReportErrorsToSqlSensei { get; }
-        SqlSenseiConfigurationApiVersion ApiVersion { get; }
+        string ApiVersion { get; }
     }
 }

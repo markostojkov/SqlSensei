@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SqlSensei.Core
 {
@@ -43,10 +42,7 @@ namespace SqlSensei.Core
         string indexDetails,
         string usage,
         long readsUsage,
-        long writeUsage,
-        string userMessage,
-        IEnumerable<string> indexColumns,
-        IEnumerable<string> indexIncludeColumns)
+        long writeUsage)
     {
         [JsonProperty("databaseName")]
         public string DatabaseName { get; } = databaseName;
@@ -71,14 +67,5 @@ namespace SqlSensei.Core
 
         [JsonProperty("writeUsage")]
         public long WriteUsage { get; } = writeUsage;
-
-        [JsonProperty("userMessage")]
-        public string UserMessage { get; set; } = userMessage;
-
-        [JsonProperty("indexColumns")]
-        public List<string> IndexColumns { get; set; } = indexColumns.ToList();
-
-        [JsonProperty("indexIncludeColumns")]
-        public List<string> IndexIncludeColumns { get; set; } = indexIncludeColumns.ToList();
     }
 }

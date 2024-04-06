@@ -18,7 +18,6 @@ namespace SqlSensei.SqlServer.InformationGather
             ReadsUsage = readsUsage;
             WriteUsage = writeUsage;
             IsClusteredIndex = isClusteredIndex;
-            UserMessage = string.Empty;
         }
 
         public string DatabaseName { get; }
@@ -29,10 +28,6 @@ namespace SqlSensei.SqlServer.InformationGather
         public long ReadsUsage { get; }
         public long WriteUsage { get; }
         public bool IsClusteredIndex { get; }
-        public string UserMessage { get; set; }
-
-        public List<string> IndexColumns { get; set; }
-        public List<string> IndexIncludeColumns { get; set; }
 
         public static List<IndexLogUsage> GetAll(SqlDataReader reader)
         {

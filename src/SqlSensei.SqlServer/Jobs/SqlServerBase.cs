@@ -30,7 +30,7 @@ namespace SqlSensei.SqlServer
 
             if (string.IsNullOrWhiteSpace(scriptContent))
             {
-                await ErrorLoggerService.Error("Script content is empty");
+                ErrorLoggerService.Error("Script content is empty");
                 return;
             }
 
@@ -48,7 +48,7 @@ namespace SqlSensei.SqlServer
             }
             catch (Exception e)
             {
-                await ErrorLoggerService.Error(e, "Error executing script");
+                ErrorLoggerService.Error(e, "Error executing script");
             }
         }
 
@@ -76,7 +76,7 @@ namespace SqlSensei.SqlServer
         {
             if (string.IsNullOrWhiteSpace(sql))
             {
-                await ErrorLoggerService.Error("Script content is empty");
+                ErrorLoggerService.Error("Script content is empty");
                 return false;
             }
 
@@ -106,7 +106,7 @@ namespace SqlSensei.SqlServer
                 {
                     transaction?.Rollback();
 
-                    await ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
+                    ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
 
                     return false;
                 }
@@ -126,7 +126,7 @@ namespace SqlSensei.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    await ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
+                    ErrorLoggerService.Error($"SQL Execution Error: {ex.Message}");
 
                     return false;
                 }

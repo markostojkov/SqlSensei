@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SqlSensei.Core
+﻿namespace SqlSensei.Core
 {
     public interface IMonitoringJobIndexUsageLog : IDatabaseLog
     {
@@ -11,8 +9,5 @@ namespace SqlSensei.Core
         public string Usage { get; }
         public long ReadsUsage { get; }
         public long WriteUsage { get; }
-        public string UserMessage { get; set; }
-        public List<string> IndexColumns { get; set; }
-        public List<string> IndexIncludeColumns { get; set; }
     }
 }

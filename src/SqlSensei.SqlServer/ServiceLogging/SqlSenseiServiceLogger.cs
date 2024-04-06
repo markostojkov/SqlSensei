@@ -19,7 +19,7 @@ namespace SqlSensei.SqlServer
             ISqlSenseiErrorLoggerService errorLogger)
         {
             HttpClient = httpClientFactory.CreateClient("SqlSenseiClient");
-            HttpClient.BaseAddress = new Uri($"https://api.sqlsensei.net/sqlserver/v{configuration.ApiVersion}");
+            HttpClient.BaseAddress = new Uri($"https://api.sqlsensei.net/sqlserver/{configuration.ApiVersion}");
             HttpClient.DefaultRequestHeaders.Add("sqlsensei-token", configuration.ApiKey);
             ErrorLogger = errorLogger;
         }
@@ -66,15 +66,12 @@ namespace SqlSensei.SqlServer
                     x.IndexDetails,
                     x.Usage,
                     x.ReadsUsage,
-                    x.WriteUsage,
-                    x.UserMessage,
-                    x.IndexColumns,
-                    x.IndexIncludeColumns)));
+                    x.WriteUsage)));
 
             var jsonContent = JsonConvert.SerializeObject(request);
             var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            var response = await HttpClient.PostAsync("maintenance/log", httpContent);
+            var response = await HttpClient.PostAsync("monitoring/log", httpContent);
 
             if (!response.IsSuccessStatusCode)
             {

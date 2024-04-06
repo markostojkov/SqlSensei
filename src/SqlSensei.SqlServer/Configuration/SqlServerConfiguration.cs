@@ -12,7 +12,7 @@ namespace SqlSensei.SqlServer
         public string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
         public string ApiKey { get; }
         public bool ReportErrorsToSqlSensei { get; }
-        public SqlSenseiConfigurationApiVersion ApiVersion { get; } = SqlSenseiConfigurationApiVersion.Version1;
+        public string ApiVersion { get; } = SqlSenseiConfigurationApiVersion.Version1;
         // interface props
 
         public SqlServerConfigurationMonitoringOptions MonitoringOptions { get; }

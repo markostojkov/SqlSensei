@@ -4,9 +4,15 @@ using System.Linq;
 
 namespace SqlSensei.Core
 {
-    public class MaintenanceLogRequest(IEnumerable<MaintenanceLog> logs)
+    public class MaintenanceLogRequest
     {
-        public List<MaintenanceLog> Logs { get; } = logs.ToList();
+        [JsonProperty("logs")]
+        public List<MaintenanceLog> Logs { get; }
+
+        public MaintenanceLogRequest(List<MaintenanceLog> logs)
+        {
+            Logs = logs;
+        }
     }
 
     public class MaintenanceLog(string databaseName, string index, string statistic, bool isError, string errorMessage)

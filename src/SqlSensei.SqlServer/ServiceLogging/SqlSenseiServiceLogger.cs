@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using SqlSensei.Core;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -19,65 +18,105 @@ namespace SqlSensei.SqlServer
             ISqlSenseiErrorLoggerService errorLogger)
         {
             HttpClient = httpClientFactory.CreateClient("SqlSenseiClient");
-            HttpClient.BaseAddress = new Uri($"https://api.sqlsensei.net/sqlserver/{configuration.ApiVersion}");
+            HttpClient.BaseAddress = EnvHelpers.ApiUri(configuration.ApiVersion);
             HttpClient.DefaultRequestHeaders.Add("sqlsensei-token", configuration.ApiKey);
             ErrorLogger = errorLogger;
         }
 
         public ISqlSenseiErrorLoggerService ErrorLogger { get; }
 
-        public async Task LogMaintenance(IEnumerable<IMaintenanceJobLog> logs)
+        public async Task<Result<CanExecuteJobsResponse>> GetCanExecuteJobs()
         {
-            var request = new MaintenanceLogRequest(
-                logs.Select(x => new MaintenanceLog(
-                    x.DatabaseName,
-                    x.Index,
-                    x.Statistic,
-                    x.IsError,
-                    x.ErrorMessage)));
-
-            var jsonContent = JsonConvert.SerializeObject(request);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var response = await HttpClient.PostAsync("maintenance/log", httpContent);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
+                var response = await HttpClient.GetAsync("can-execute-jobs");
+
                 var x = await response.Content.ReadAsStringAsync();
 
-                ErrorLogger.Error(x);
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorLogger.Error(x);
+
+                    return Result.Invalid<CanExecuteJobsResponse>(x);
+                }
+
+                return JsonConvert.DeserializeObject<Result<CanExecuteJobsResponse>>(x);
+            }
+            catch (System.Exception e)
+            {
+                ErrorLogger.Error(e.Message);
+
+                return Result.Invalid<CanExecuteJobsResponse>(e.Message);
             }
         }
 
-        public async Task LogMonitoring(IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex)
+        public async Task LogMaintenance(long jobId, IEnumerable<IMaintenanceJobLog> logs)
         {
-            var request = new MonitoringLogRequest(
-                logsMissingIndex.Select(x => new MonitoringJobIndexMissingLog(
-                    x.DatabaseName,
-                    x.TableName,
-                    x.MagicBenefitNumber,
-                    x.Impact,
-                    x.IndexDetails)),
-                logsUsageIndex.Select(x => new MonitoringJobIndexUsageLog(
-                    x.DatabaseName,
-                    x.IsClusteredIndex,
-                    x.IndexName,
-                    x.TableName,
-                    x.IndexDetails,
-                    x.Usage,
-                    x.ReadsUsage,
-                    x.WriteUsage)));
-
-            var jsonContent = JsonConvert.SerializeObject(request);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            var response = await HttpClient.PostAsync("monitoring/log", httpContent);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                var x = await response.Content.ReadAsStringAsync();
+                var request = new MaintenanceLogRequest(
+                    logs.Select(x => new MaintenanceLog(
+                        x.DatabaseName,
+                        x.Index,
+                        x.Statistic,
+                        x.IsError,
+                        x.ErrorMessage))
+                        .ToList());
 
-                ErrorLogger.Error(x);
+                var jsonContent = JsonConvert.SerializeObject(request);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await HttpClient.PostAsync($"jobs/{jobId}/maintenance", httpContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var x = await response.Content.ReadAsStringAsync();
+
+                    ErrorLogger.Error(x);
+                }
+            }
+            catch (System.Exception e)
+            {
+                ErrorLogger.Error(e.Message);
+            }
+        }
+
+        public async Task LogMonitoring(long jobId, IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex)
+        {
+            try
+            {
+                var request = new MonitoringLogRequest(
+                    logsMissingIndex.Select(x => new MonitoringJobIndexMissingLog(
+                        x.DatabaseName,
+                        x.TableName,
+                        x.MagicBenefitNumber,
+                        x.Impact,
+                        x.IndexDetails)),
+                    logsUsageIndex.Select(x => new MonitoringJobIndexUsageLog(
+                        x.DatabaseName,
+                        x.IsClusteredIndex,
+                        x.IndexName,
+                        x.TableName,
+                        x.IndexDetails,
+                        x.Usage,
+                        x.ReadsUsage,
+                        x.WriteUsage)));
+
+                var jsonContent = JsonConvert.SerializeObject(request);
+                var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                var response = await HttpClient.PostAsync($"jobs/{jobId}/monitoring", httpContent);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var x = await response.Content.ReadAsStringAsync();
+
+                    ErrorLogger.Error(x);
+                }
+            }
+            catch (System.Exception e)
+            {
+                ErrorLogger.Error(e.Message);
             }
         }
     }

@@ -5,7 +5,8 @@ namespace SqlSensei.Core
 {
     public interface IServiceLogger
     {
-        Task LogMaintenance(IEnumerable<IMaintenanceJobLog> logs);
-        Task LogMonitoring(IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex);
+        Task<Result<CanExecuteJobsResponse>> GetCanExecuteJobs();
+        Task LogMaintenance(long jobId, IEnumerable<IMaintenanceJobLog> logs);
+        Task LogMonitoring(long jobId, IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex);
     }
 }

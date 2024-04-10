@@ -2,6 +2,7 @@
 (
     [Id]                    BIGINT IDENTITY(1,1)    NOT NULL,
     [CompanyFk]             BIGINT                  NOT NULL,
+    [JobFk]                 BIGINT                  NOT NULL,
     [DatabaseName]          NVARCHAR(128)           NOT NULL,
     [IsClusteredIndex]      BIT                     NOT NULL,
     [IndexName]             NVARCHAR(128)           NOT NULL,
@@ -11,5 +12,6 @@
     [ReadsUsage]            BIGINT                  NOT NULL,
     [WriteUsage]            BIGINT                  NOT NULL,
     CONSTRAINT [PK_MonitoringJobIndexUsageLog] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_MonitoringJobIndexUsageLog_JobExecution] FOREIGN KEY ([JobFk]) REFERENCES [dbo].[JobExecution]([Id]),
     CONSTRAINT [FK_MonitoringJobIndexUsageLog_Company] FOREIGN KEY ([CompanyFk]) REFERENCES [dbo].[Company]([Id])
 );

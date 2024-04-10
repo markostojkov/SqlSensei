@@ -1,7 +1,7 @@
 ﻿namespace SqlSensei.Core
 {
-    public class SqlSenseiConfigurationApiVersion
+    public enum SqlSenseiConfigurationApiVersion
     {
-        public const string Version1 = "v1";
+        Version1 = 1
     }
 }

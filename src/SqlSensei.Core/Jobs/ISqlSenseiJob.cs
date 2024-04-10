@@ -6,8 +6,10 @@ namespace SqlSensei.Core
     {
         void InstallMaintenanceAndMonitoringScripts();
 
-        Task ExecuteMaintenanceJob();
+        Task ExecuteMaintenanceJob(long jobId);
 
-        Task ExecuteMonitoringJob();
+        Task ExecuteMonitoringJob(long jobId);
+
+        void StartService();
     }
 }

@@ -1,6 +1,10 @@
-﻿using System.Net;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
-namespace SqlSensei.Api.Utils
+namespace SqlSensei.Core
 {
     public class Result : ResultCommonLogic
     {
@@ -172,6 +176,16 @@ namespace SqlSensei.Api.Utils
 
     public class Result<T> : ResultCommonLogic
     {
+        [JsonConstructor]
+        public Result(
+            T value,
+            bool isFailure,
+            string message,
+            ResultType resultType) : base(resultType, isFailure, message)
+        {
+            Value = value;
+        }
+
         internal Result(ResultType resultType, string message)
             : base(resultType, isFailure: true, message: message)
         {
@@ -245,15 +259,15 @@ namespace SqlSensei.Api.Utils
 
         public Exception Exception { get; }
 
-        public bool IsFailure { get; }
+        public bool IsFailure { get; protected set; }
 
         public bool IsSuccess => !IsFailure;
 
         public bool IsNotFound => IsFailure && HttpStatusCode == HttpStatusCode.NotFound;
 
-        public string Message { get; }
+        public string Message { get; protected set; }
 
-        public ResultType ResultType { get; }
+        public ResultType ResultType { get; protected set; }
 
         public HttpStatusCode HttpStatusCode
         {
@@ -294,4 +308,3 @@ namespace SqlSensei.Api.Utils
         }
     }
 }
-

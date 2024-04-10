@@ -1,4 +1,4 @@
-﻿namespace SqlSensei.Api.Utils
+﻿namespace SqlSensei.Core
 {
     public enum ResultType
     {

@@ -61,12 +61,14 @@
     <Folder Include="dbo\MaintenanceLog" />
     <Folder Include="dbo\MonitoringMissingIndexLog" />
     <Folder Include="dbo\MonitoringUsageIndexLog" />
+    <Folder Include="dbo\JobExecution" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Company\Company.sql" />
     <Build Include="dbo\MaintenanceLog\MaintenanceLog.sql" />
     <Build Include="dbo\MonitoringMissingIndexLog\MonitoringMissingIndexLog.sql" />
     <Build Include="dbo\MonitoringUsageIndexLog\MonitoringUsageIndexLog.sql" />
+    <Build Include="dbo\JobExecution\JobExecution.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

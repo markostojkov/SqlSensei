@@ -1,6 +1,6 @@
-﻿using SqlSensei.Api.CurrentCompany;
+﻿using Microsoft.EntityFrameworkCore;
+using SqlSensei.Api.CurrentCompany;
 using SqlSensei.Api.Storage;
-using SqlSensei.Api.Utils;
 using SqlSensei.Core;
 
 namespace SqlSensei.Api.Services
@@ -10,7 +10,7 @@ namespace SqlSensei.Api.Services
         public SqlSenseiDbContext DbContext { get; } = dbContext;
         public CurrentCompanyService Company { get; } = company;
 
-        public async Task<Result> StoreMaintenanceLogs(MaintenanceLogRequest logs)
+        public async Task<Result> StoreMaintenanceLogs(long jobId, MaintenanceLogRequest logs)
         {
             var companyResult = Company.GetCurrentCompany();
 
@@ -19,12 +19,25 @@ namespace SqlSensei.Api.Services
                 return companyResult;
             }
 
-            var dbLogs = logs.Logs.Select(x => new Storage.MaintenanceLog(companyResult.Value.Id,
-                                                                          x.DatabaseName,
-                                                                          x.Index,
-                                                                          x.Statistic,
-                                                                          x.IsError,
-                                                                          x.ErrorMessage));
+            var job = await DbContext.Jobs
+                .FirstOrDefaultAsync(x => x.Id == jobId && x.CompanyFk == companyResult.Value.Id && x.Status == JobStatus.InProgress);
+
+            if (job == null)
+            {
+                return Result.NotFound(ResultCodes.JobNotFound);
+            }
+
+            job.Status = JobStatus.Completed;
+            job.CompletedOn = DateTime.UtcNow;
+
+            var dbLogs = logs.Logs.Select(x => new Storage.MaintenanceLog(
+                companyResult.Value.Id,
+                jobId,
+                x.DatabaseName,
+                x.Index,
+                x.Statistic,
+                x.IsError,
+                x.ErrorMessage));
 
             DbContext.MaintenanceLogs.AddRange(dbLogs);
 
@@ -33,7 +46,7 @@ namespace SqlSensei.Api.Services
             return Result.Ok();
         }
 
-        public async Task<Result> StoreMonitoringLogs(MonitoringLogRequest logs)
+        public async Task<Result> StoreMonitoringLogs(long jobId, MonitoringLogRequest logs)
         {
             var companyResult = Company.GetCurrentCompany();
 
@@ -42,24 +55,39 @@ namespace SqlSensei.Api.Services
                 return companyResult;
             }
 
-            var dbLogsUsageIndex = logs.IndexUsageLogs.Select(x => new Storage.MonitoringJobIndexUsageLog(companyResult.Value.Id,
-                                                                                                     x.DatabaseName,
-                                                                                                     x.IsClusteredIndex,
-                                                                                                     x.IndexName,
-                                                                                                     x.TableName,
-                                                                                                     x.IndexDetails,
-                                                                                                     x.Usage,
-                                                                                                     x.ReadsUsage,
-                                                                                                     x.WriteUsage));
+            var job = await DbContext.Jobs
+                .FirstOrDefaultAsync(x => x.Id == jobId && x.CompanyFk == companyResult.Value.Id && x.Status == JobStatus.InProgress);
+
+            if (job == null)
+            {
+                return Result.NotFound(ResultCodes.JobNotFound);
+            }
+
+            job.Status = JobStatus.Completed;
+            job.CompletedOn = DateTime.UtcNow;
+
+            var dbLogsUsageIndex = logs.IndexUsageLogs.Select(x => new Storage.MonitoringJobIndexUsageLog(
+                companyResult.Value.Id,
+                jobId,
+                x.DatabaseName,
+                x.IsClusteredIndex,
+                x.IndexName,
+                x.TableName,
+                x.IndexDetails,
+                x.Usage,
+                x.ReadsUsage,
+                x.WriteUsage));
 
             DbContext.MonitoringJobIndexUsageLogs.AddRange(dbLogsUsageIndex);
 
-            var dbLogsMissingIndex = logs.IndexMissingLogs.Select(x => new Storage.MonitoringJobIndexMissingLog(companyResult.Value.Id,
-                                                                                                     x.DatabaseName,
-                                                                                                     x.TableName,
-                                                                                                     x.MagicBenefitNumber,
-                                                                                                     x.Impact,
-                                                                                                     x.IndexDetails));
+            var dbLogsMissingIndex = logs.IndexMissingLogs.Select(x => new Storage.MonitoringJobIndexMissingLog(
+                companyResult.Value.Id,
+                jobId,
+                x.DatabaseName,
+                x.TableName,
+                x.MagicBenefitNumber,
+                x.Impact,
+                x.IndexDetails));
 
             DbContext.MonitoringJobIndexMissingLogs.AddRange(dbLogsMissingIndex);
 

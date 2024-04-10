@@ -1,5 +1,6 @@
-﻿using SqlSensei.Api.Storage;
-using SqlSensei.Api.Utils;
+﻿using Microsoft.EntityFrameworkCore;
+using SqlSensei.Api.Storage;
+using SqlSensei.Core;
 
 namespace SqlSensei.Api.CurrentCompany
 {
@@ -18,21 +19,28 @@ namespace SqlSensei.Api.CurrentCompany
             return Result.Ok(CurrentCompany);
         }
 
-        public void SetCurrentCompany(Guid apiKey)
+        public async Task SetCurrentCompany(Guid apiKey)
         {
-            var company = DbContext.Companies
+            var company = await DbContext.Companies
                 .Where(c => c.ApiKey == apiKey)
-                .Select(c => new CurrentCompany(c.Id, c.Name, c.ApiKey))
-                .SingleOrDefault();
+                .Select(c => new CurrentCompany(c.Id, c.Name, c.ApiKey, c.DoMaintenancePeriod, c.DoMonitoringPeriod))
+                .SingleOrDefaultAsync();
 
             CurrentCompany = company;
         }
     }
 
-    public class CurrentCompany(long id, string name, Guid apiKey)
+    public class CurrentCompany(
+        long id,
+        string name,
+        Guid apiKey,
+        SqlSenseiRunMaintenancePeriod maintenancePeriod,
+        SqlSenseiRunMonitoringPeriod monitoringPeriod)
     {
         public long Id { get; } = id;
         public string Name { get; } = name;
         public Guid ApiKey { get; } = apiKey;
+        public SqlSenseiRunMaintenancePeriod DoMaintenancePeriod { get; } = maintenancePeriod;
+        public SqlSenseiRunMonitoringPeriod DoMonitoringPeriod { get; } = monitoringPeriod;
     }
 }

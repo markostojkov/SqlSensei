@@ -13,9 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlServer", "SqlServer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{16E0B732-C89F-4EA8-8E33-005A550AA489}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlSensei.Api", "src\SqlSensei.Api\SqlSensei.Api.csproj", "{FA3BAD31-A89A-4DD0-A533-A1E078211348}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SqlSensei.Api", "src\SqlSensei.Api\SqlSensei.Api.csproj", "{FA3BAD31-A89A-4DD0-A533-A1E078211348}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "SqlSensei.Database", "src\SqlSensei.Database\SqlSensei.Database.sqlproj", "{E474F857-0028-4404-9C69-73EA3345DC91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A38CB5D5-ED1E-4B89-A381-8648288D9C8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleDefault", "src\Samples\SampleDefault\SampleDefault.csproj", "{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +45,10 @@ Global
 		{E474F857-0028-4404-9C69-73EA3345DC91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E474F857-0028-4404-9C69-73EA3345DC91}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E474F857-0028-4404-9C69-73EA3345DC91}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +58,7 @@ Global
 		{DD6F1DB9-D497-49C5-8818-0E6B9E1A3B9C} = {353D4778-F07A-49C7-9357-894B742883EF}
 		{FA3BAD31-A89A-4DD0-A533-A1E078211348} = {16E0B732-C89F-4EA8-8E33-005A550AA489}
 		{E474F857-0028-4404-9C69-73EA3345DC91} = {16E0B732-C89F-4EA8-8E33-005A550AA489}
+		{F5ADC2E5-84D7-40C9-8048-50FB4BA3535A} = {A38CB5D5-ED1E-4B89-A381-8648288D9C8E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A496CBEA-217A-4BDF-911C-34E5E02188F6}

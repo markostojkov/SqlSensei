@@ -24,18 +24,18 @@ namespace SqlSensei.SqlServer
 
         protected async Task ExecuteScriptAsyncGoStatements(string scriptContent)
         {
-            using SqlConnection connection = new(Configuration.MonitoringAndMaintenanceScriptDatabaseConnection);
-
-            connection.Open();
-
-            if (string.IsNullOrWhiteSpace(scriptContent))
-            {
-                ErrorLoggerService.Error("Script content is empty");
-                return;
-            }
-
             try
             {
+                using SqlConnection connection = new(Configuration.MonitoringAndMaintenanceScriptDatabaseConnection);
+
+                connection.Open();
+
+                if (string.IsNullOrWhiteSpace(scriptContent))
+                {
+                    ErrorLoggerService.Error("Script content is empty");
+                    return;
+                }
+
                 var commandStrings = Regex.Split(scriptContent, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)
                                           .Where(commandString => !string.IsNullOrWhiteSpace(commandString))
                                           .ToList();

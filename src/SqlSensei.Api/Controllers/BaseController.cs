@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SqlSensei.Api.Utils;
+using SqlSensei.Core;
 
 namespace SqlSensei.Api.Controllers
 {

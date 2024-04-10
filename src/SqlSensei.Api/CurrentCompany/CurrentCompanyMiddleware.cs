@@ -8,7 +8,7 @@
         {
             if (context.Request.Headers.TryGetValue("sqlsensei-token", out var token) && Guid.TryParse(token, out var apiKey))
             {
-                currentCompanyService.SetCurrentCompany(apiKey);
+                await currentCompanyService.SetCurrentCompany(apiKey);
             }
 
             await _next(context);

@@ -15,7 +15,35 @@ namespace SqlSensei.SqlServer
     {
         public IServiceLogger ServiceLogger { get; } = serviceLogger;
 
-        public async Task ExecuteMaintenanceJob()
+        public void StartService()
+        {
+            _ = Task.Run(async () =>
+            {
+                while (true)
+                {
+                    var canExecuteJobsResponse = await ServiceLogger.GetCanExecuteJobs();
+
+                    if (canExecuteJobsResponse.IsFailure)
+                    {
+                        continue;
+                    }
+
+                    if (canExecuteJobsResponse.Value.CanExecuteMaintenance)
+                    {
+                        await ExecuteMaintenanceJob(canExecuteJobsResponse.Value.MaintenanceJobId);
+                    }
+
+                    if (canExecuteJobsResponse.Value.CanExecuteMonitoringIndexMissing && canExecuteJobsResponse.Value.CanExecuteMonitoringIndexUsage)
+                    {
+                        await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringIndexJobId);
+                    }
+
+                    await Task.Delay(EnvHelpers.DelayForJob());
+                }
+            });
+        }
+
+        public async Task ExecuteMaintenanceJob(long jobId)
         {
             var result = await ExecuteCommandAsync(SqlServerSql.MaintenanceTruncateLogTable);
 
@@ -40,10 +68,10 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ServiceLogger.LogMaintenance(maintenanceResults);
+            await ServiceLogger.LogMaintenance(jobId, maintenanceResults);
         }
 
-        public async Task ExecuteMonitoringJob()
+        public async Task ExecuteMonitoringJob(long jobId)
         {
             var result = await ExecuteCommandAsync(SqlServerSql.MonitoringMissingIndexTruncateLogTable);
 
@@ -79,7 +107,7 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ServiceLogger.LogMonitoring(indexMissingResults, indexUsageResults);
+            await ServiceLogger.LogMonitoring(jobId, indexMissingResults, indexUsageResults);
         }
 
         public void InstallMaintenanceAndMonitoringScripts()

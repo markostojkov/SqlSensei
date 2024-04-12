@@ -62,6 +62,7 @@
     <Folder Include="dbo\MonitoringMissingIndexLog" />
     <Folder Include="dbo\MonitoringUsageIndexLog" />
     <Folder Include="dbo\JobExecution" />
+    <Folder Include="dbo\Server" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Company\Company.sql" />
@@ -69,6 +70,7 @@
     <Build Include="dbo\MonitoringMissingIndexLog\MonitoringMissingIndexLog.sql" />
     <Build Include="dbo\MonitoringUsageIndexLog\MonitoringUsageIndexLog.sql" />
     <Build Include="dbo\JobExecution\JobExecution.sql" />
+    <Build Include="dbo\Server\Server.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

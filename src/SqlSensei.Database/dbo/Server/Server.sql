@@ -1,0 +1,11 @@
+﻿CREATE TABLE [dbo].[Server]
+(
+	[Id]					BIGINT				IDENTITY (1, 1) NOT NULL,
+	[Name]					NVARCHAR(64)		NOT NULL,
+	[CompanyFk]				BIGINT				NOT NULL,
+	[ApiKey]				UNIQUEIDENTIFIER	NOT NULL,
+	[DoMaintenancePeriod]	SMALLINT			NOT NULL DEFAULT 1,
+	[DoMonitoringPeriod]	SMALLINT			NOT NULL DEFAULT 0,
+	CONSTRAINT [PK_Server] PRIMARY KEY CLUSTERED ([Id] ASC) WITH (FILLFACTOR = 100),
+	CONSTRAINT [FK_Server_Company] FOREIGN KEY ([CompanyFk]) REFERENCES [dbo].[Company]([Id])
+)

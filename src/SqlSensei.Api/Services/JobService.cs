@@ -45,7 +45,7 @@ namespace SqlSensei.Api.Services
                 var lastMaintenanceJobDate = jobsMaintenanceForCompany.First().CreatedOn;
                 var weeksSinceLastJob = (DateTime.UtcNow - lastMaintenanceJobDate).TotalDays / 7;
 
-                switch (companyResult.Value.DoMaintenancePeriod)
+                switch (companyResult.Value.CurrentServer.DoMaintenancePeriod)
                 {
                     case SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM:
                         canExecuteMaintenance = weeksSinceLastJob >= 1;
@@ -71,7 +71,7 @@ namespace SqlSensei.Api.Services
                 var lastMonitoringJobDate = jobsMonitoringForCompany.First().CreatedOn;
                 var minutesSinceLastJob = (DateTime.UtcNow - lastMonitoringJobDate).TotalMinutes;
 
-                switch (companyResult.Value.DoMonitoringPeriod)
+                switch (companyResult.Value.CurrentServer.DoMonitoringPeriod)
                 {
                     case SqlSenseiRunMonitoringPeriod.Every15Minutes:
                         canExecuteMonitoring = minutesSinceLastJob >= 15;
@@ -93,6 +93,7 @@ namespace SqlSensei.Api.Services
                 maintenanceJob = new JobExecution()
                 {
                     CompanyFk = companyResult.Value.Id,
+                    ServerFk = companyResult.Value.CurrentServer.Id,
                     Type = JobType.Maintenance,
                     Status = JobStatus.InProgress,
                     CreatedOn = DateTime.UtcNow,
@@ -106,6 +107,7 @@ namespace SqlSensei.Api.Services
                 monitoringJob = new JobExecution()
                 {
                     CompanyFk = companyResult.Value.Id,
+                    ServerFk = companyResult.Value.CurrentServer.Id,
                     Type = JobType.Maintenance,
                     Status = JobStatus.InProgress,
                     CreatedOn = DateTime.UtcNow,

@@ -5,6 +5,7 @@ namespace SqlSensei.Api.Storage
     public class SqlSenseiDbContext(DbContextOptions<SqlSenseiDbContext> options) : DbContext(options)
     {
         public DbSet<Company> Companies { get; set; }
+        public DbSet<Server> Servers { get; set; }
         public DbSet<JobExecution> Jobs { get; set; }
         public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
         public DbSet<MonitoringJobIndexMissingLog> MonitoringJobIndexMissingLogs { get; set; }
@@ -19,9 +20,21 @@ namespace SqlSensei.Api.Storage
                 _ = entity.HasKey(e => e.Id);
                 _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
                 _ = entity.Property(e => e.Name).HasColumnType("nvarchar").IsRequired().HasMaxLength(64);
+            });
+
+            _ = modelBuilder.Entity<Server>(entity =>
+            {
+                entity.ToTable(nameof(Server), "dbo");
+
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.Name).HasColumnType("nvarchar").IsRequired().HasMaxLength(64);
                 _ = entity.Property(e => e.ApiKey).HasColumnType("uniqueidentifier").IsRequired();
                 _ = entity.Property(e => e.DoMaintenancePeriod).HasColumnType("smallint").IsRequired();
                 _ = entity.Property(e => e.DoMonitoringPeriod).HasColumnType("smallint").IsRequired();
+
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<JobExecution>(entity =>
@@ -30,11 +43,13 @@ namespace SqlSensei.Api.Storage
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
                 entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.ServerFk).HasColumnType("bigint").IsRequired();
                 entity.Property(e => e.Type).HasColumnType("smallint").IsRequired();
                 entity.Property(e => e.Status).HasColumnType("smallint").IsRequired();
                 entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime").IsRequired();
                 entity.Property(e => e.CompletedOn).HasColumnType("smalldatetime");
                 entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Server).WithMany().HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<MaintenanceLog>(entity =>

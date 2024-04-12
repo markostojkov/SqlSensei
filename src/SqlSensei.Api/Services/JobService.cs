@@ -53,6 +53,9 @@ namespace SqlSensei.Api.Services
                     case SqlSenseiRunMaintenancePeriod.EveryOtherWeekendSundayAt6AM:
                         canExecuteMaintenance = weeksSinceLastJob >= 2;
                         break;
+                    case SqlSenseiRunMaintenancePeriod.Never:
+                        canExecuteMaintenance = false;
+                        break;
                 }
             }
 

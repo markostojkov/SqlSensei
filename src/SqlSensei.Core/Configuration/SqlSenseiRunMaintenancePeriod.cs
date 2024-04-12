@@ -4,5 +4,6 @@
     {
         EveryWeekendSundayAt6AM,
         EveryOtherWeekendSundayAt6AM,
+        Never
     }
 }

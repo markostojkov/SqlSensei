@@ -33,7 +33,7 @@ namespace SqlSensei.Core
             }
             else
             {
-                return 60000;
+                return 10000;
             }
         }
     }

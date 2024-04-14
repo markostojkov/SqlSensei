@@ -16,7 +16,7 @@
     public enum JobType
     {
         Maintenance,
-        MonitoringIndex
+        Monitoring
     }
 
     public enum JobStatus

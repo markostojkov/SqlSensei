@@ -28,7 +28,7 @@ namespace SqlSensei.Api.Services
 
             var jobsMonitoringForCompany = await DbContext.Jobs
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
-                .Where(x => x.Type == JobType.MonitoringIndex)
+                .Where(x => x.Type == JobType.Monitoring)
                 .OrderByDescending(x => x.CreatedOn)
                 .Take(10)
                 .ToListAsync();
@@ -108,7 +108,7 @@ namespace SqlSensei.Api.Services
                 {
                     CompanyFk = companyResult.Value.Id,
                     ServerFk = companyResult.Value.CurrentServer.Id,
-                    Type = JobType.Maintenance,
+                    Type = JobType.Monitoring,
                     Status = JobStatus.InProgress,
                     CreatedOn = DateTime.UtcNow,
                 };

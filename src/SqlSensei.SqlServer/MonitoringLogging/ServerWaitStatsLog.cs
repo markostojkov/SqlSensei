@@ -17,7 +17,7 @@ namespace SqlSensei.SqlServer.InformationGather
             while (reader.Read())
             {
                 var type = reader.IsDBNull(reader.GetOrdinal("wait_type")) ? string.Empty : reader.GetString(reader.GetOrdinal("wait_type"));
-                var timeInMs = reader.IsDBNull(reader.GetOrdinal("wait_type_ms")) ? -1 : reader.GetInt64(reader.GetOrdinal("wait_type_ms"));
+                var timeInMs = reader.IsDBNull(reader.GetOrdinal("wait_time_ms")) ? -1 : reader.GetInt64(reader.GetOrdinal("wait_time_ms"));
 
                 var record = new ServerWaitStatsLog(type, timeInMs);
 

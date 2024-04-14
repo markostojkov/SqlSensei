@@ -81,7 +81,13 @@ namespace SqlSensei.SqlServer
             }
         }
 
-        public async Task LogMonitoring(long jobId, IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex)
+        public async Task LogMonitoring(
+            long jobId,
+            IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex,
+            IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex,
+            IEnumerable<IMonitoringJobServerLog> logsServer,
+            IEnumerable<IMonitoringJobServerPerformanceLogWaitStat> logsWaitStatsServer,
+            IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer)
         {
             try
             {
@@ -100,7 +106,19 @@ namespace SqlSensei.SqlServer
                         x.IndexDetails,
                         x.Usage,
                         x.ReadsUsage,
-                        x.WriteUsage)));
+                        x.WriteUsage)),
+                    logsServer.Select(x => new MonitoringJobServerLog(
+                        x.DatabaseName,
+                        x.Priority,
+                        x.CheckId,
+                        x.Details)),
+                    logsWaitStatsServer.Select(x => new MonitoringJobServerWaitStatLog(
+                        x.Type,
+                        x.TimeInMs)),
+                    logsFindingsServer.Select(x => new MonitoringJobServerFindingLog(
+                        x.CheckId,
+                        x.Priority,
+                        x.Details)));
 
                 var jsonContent = JsonConvert.SerializeObject(request);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

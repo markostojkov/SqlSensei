@@ -37,8 +37,16 @@ namespace SqlSensei.Api
             _ = app.MapControllers();
 
             _ = app.UseCurrentCompanyMiddleware();
-            
+
+#if DEBUG
+            using (var serviceScope = app.Services.CreateScope())
+            {
+                serviceScope?.ServiceProvider.GetRequiredService<SqlSenseiDbContext>().SeedData();
+            }
+#endif
+
             app.Run();
+
         }
     }
 }

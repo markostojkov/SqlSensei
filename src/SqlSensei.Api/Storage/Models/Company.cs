@@ -9,5 +9,10 @@
         {
             Name = name;
         }
+
+        public Company()
+        {
+            Name = string.Empty;
+        }
     }
 }

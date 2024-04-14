@@ -63,6 +63,9 @@
     <Folder Include="dbo\MonitoringUsageIndexLog" />
     <Folder Include="dbo\JobExecution" />
     <Folder Include="dbo\Server" />
+    <Folder Include="dbo\MonitoringJobServerLog" />
+    <Folder Include="dbo\MonitoringJobServerFindingLog" />
+    <Folder Include="dbo\MonitoringJobServerWaitStatLog" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Company\Company.sql" />
@@ -71,6 +74,9 @@
     <Build Include="dbo\MonitoringUsageIndexLog\MonitoringUsageIndexLog.sql" />
     <Build Include="dbo\JobExecution\JobExecution.sql" />
     <Build Include="dbo\Server\Server.sql" />
+    <Build Include="dbo\MonitoringJobServerLog\MonitoringJobServerLog.sql" />
+    <Build Include="dbo\MonitoringJobServerFindingLog\MonitoringJobServerFindingLog.sql" />
+    <Build Include="dbo\MonitoringJobServerWaitStatLog\MonitoringJobServerWaitStatLog.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

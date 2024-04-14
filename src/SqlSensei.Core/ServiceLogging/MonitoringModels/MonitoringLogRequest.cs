@@ -1,14 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿#nullable enable
+
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace SqlSensei.Core
 {
     public class MonitoringLogRequest(
         IEnumerable<MonitoringJobIndexMissingLog> indexMissingLogs,
-        IEnumerable<MonitoringJobIndexUsageLog> indexUsageLogs)
+        IEnumerable<MonitoringJobIndexUsageLog> indexUsageLogs,
+        IEnumerable<MonitoringJobServerLog> serverLogs,
+        IEnumerable<MonitoringJobServerWaitStatLog> serverWaitStatLogs,
+        IEnumerable<MonitoringJobServerFindingLog> serverFindingLogs)
     {
         public IEnumerable<MonitoringJobIndexMissingLog> IndexMissingLogs { get; } = indexMissingLogs;
         public IEnumerable<MonitoringJobIndexUsageLog> IndexUsageLogs { get; } = indexUsageLogs;
+        public IEnumerable<MonitoringJobServerLog> ServerLogs { get; } = serverLogs;
+        public IEnumerable<MonitoringJobServerWaitStatLog> ServerWaitStatLogs { get; } = serverWaitStatLogs;
+        public IEnumerable<MonitoringJobServerFindingLog> ServerFindingLogs { get; } = serverFindingLogs;
     }
 
     public class MonitoringJobIndexMissingLog(
@@ -67,5 +75,45 @@ namespace SqlSensei.Core
 
         [JsonProperty("writeUsage")]
         public long WriteUsage { get; } = writeUsage;
+    }
+
+    public class MonitoringJobServerLog(
+        string? databaseName,
+        short priority,
+        int checkId,
+        string details)
+    {
+        [JsonProperty("databaseName")]
+        public string? DatabaseName { get; } = databaseName;
+
+        [JsonProperty("priority")]
+        public short Priority { get; } = priority;
+
+        [JsonProperty("checkId")]
+        public int CheckId { get; } = checkId;
+
+        [JsonProperty("details")]
+        public string Details { get; } = details;
+    }
+
+    public class MonitoringJobServerWaitStatLog(string type, long timeInMs)
+    {
+        [JsonProperty("type")]
+        public string Type { get; } = type;
+
+        [JsonProperty("timeInMs")]
+        public long TimeInMs { get; } = timeInMs;
+    }
+
+    public class MonitoringJobServerFindingLog(int checkId, short priority, string details)
+    {
+        [JsonProperty("checkId")]
+        public int CheckId { get; } = checkId;
+
+        [JsonProperty("priority")]
+        public short Priority { get; } = priority;
+
+        [JsonProperty("details")]
+        public string Details { get; } = details;
     }
 }

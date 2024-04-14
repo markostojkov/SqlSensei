@@ -91,6 +91,33 @@ namespace SqlSensei.Api.Services
 
             DbContext.MonitoringJobIndexMissingLogs.AddRange(dbLogsMissingIndex);
 
+            var dbLogsServer = logs.ServerLogs.Select(x => new Storage.MonitoringJobServerLog(
+                companyResult.Value.Id,
+                jobId,
+                x.DatabaseName,
+                x.Priority,
+                x.CheckId,
+                x.Details));
+
+            DbContext.MonitoringJobServerLogs.AddRange(dbLogsServer);
+
+            var dbLogsWaitStatsServer = logs.ServerWaitStatLogs.Select(x => new Storage.MonitoringJobServerWaitStatLog(
+                companyResult.Value.Id,
+                jobId,
+                x.Type,
+                x.TimeInMs));
+
+            DbContext.MonitoringJobServerWaitStatLogs.AddRange(dbLogsWaitStatsServer);
+
+            var dbLogsFindingsServer = logs.ServerFindingLogs.Select(x => new Storage.MonitoringJobServerFindingLog(
+                companyResult.Value.Id,
+                jobId,
+                x.CheckId,
+                x.Priority,
+                x.Details));
+
+            DbContext.MonitoringJobServerFindingLogs.AddRange(dbLogsFindingsServer);
+
             _ = await DbContext.SaveChangesAsync();
 
             return Result.Ok();

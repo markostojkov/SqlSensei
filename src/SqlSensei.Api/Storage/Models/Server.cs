@@ -17,5 +17,10 @@ namespace SqlSensei.Api.Storage
             Name = name;
             ApiKey = Guid.NewGuid();
         }
+
+        public Server()
+        {
+            Name = string.Empty;
+        }
     }
 }

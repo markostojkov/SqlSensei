@@ -11,7 +11,7 @@ namespace SampleDefault
             _ = builder.Services.AddAuthorization();
 
             builder.Services.RegisterSqlSenseiUsingSqlServer(SqlServerConfiguration.Default(
-                "F556BFF2-872A-42BC-A1E0-4324AFB7F453",
+                "fd2639d8-11cb-4e12-b93e-580975ee5531",
                 [
                     new SqlSensei.Core.SqlSenseiConfigurationDatabase("Intrensic", "Data Source=.;Initial Catalog=Intrensic;Trusted_Connection=True; TrustServerCertificate=True;Integrated Security=True;Application Name=Application"),
                     new SqlSensei.Core.SqlSenseiConfigurationDatabase("HangFire", "Data Source=.;Initial Catalog=HangFire;Trusted_Connection=True; TrustServerCertificate=True;Integrated Security=True;Application Name=Application")

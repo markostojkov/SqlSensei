@@ -8,6 +8,9 @@ namespace SqlSensei.Api.Storage
         public DbSet<Server> Servers { get; set; }
         public DbSet<JobExecution> Jobs { get; set; }
         public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
+        public DbSet<MonitoringJobServerLog> MonitoringJobServerLogs { get; set; }
+        public DbSet<MonitoringJobServerWaitStatLog> MonitoringJobServerWaitStatLogs { get; set; }
+        public DbSet<MonitoringJobServerFindingLog> MonitoringJobServerFindingLogs { get; set; }
         public DbSet<MonitoringJobIndexMissingLog> MonitoringJobIndexMissingLogs { get; set; }
         public DbSet<MonitoringJobIndexUsageLog> MonitoringJobIndexUsageLogs { get; set; }
 
@@ -67,6 +70,54 @@ namespace SqlSensei.Api.Storage
                 entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<MonitoringJobServerLog>(entity =>
+            {
+                entity.ToTable(nameof(MonitoringJobServerLog), "dbo");
+                
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128);
+                entity.Property(e => e.Priority).HasColumnType("tinyint");
+                entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
+                entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+
+                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<MonitoringJobServerWaitStatLog>(entity =>
+            {
+                entity.ToTable(nameof(MonitoringJobServerWaitStatLog), "dbo");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.Type).HasColumnType("nvarchar").HasMaxLength(60);
+                entity.Property(e => e.TimeInMs).HasColumnType("bigint");
+
+                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<MonitoringJobServerFindingLog>(entity =>
+            {
+                entity.ToTable(nameof(MonitoringJobServerFindingLog), "dbo");
+
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                entity.Property(e => e.Priority).HasColumnType("tinyint");
+                entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
+                entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+
+                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+            });
+
             modelBuilder.Entity<MonitoringJobIndexMissingLog>(entity =>
             {
                 entity.ToTable(nameof(MonitoringJobIndexMissingLog), "dbo");
@@ -105,6 +156,32 @@ namespace SqlSensei.Api.Storage
                 entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
                 entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
+        }
+
+        public void SeedData()
+        {
+            var companyExists = Companies.Any(c => c.Name == "SqlSenseiTest");
+
+            if (!companyExists)
+            {
+                Companies.Add(new Company ("SqlSenseiTest"));
+            }
+
+            var serverExists = Servers.Any(s => s.Name == "SqlSenseiTestServer");
+
+            if (!serverExists)
+            {
+                Servers.Add(new Server
+                {
+                    Name = "SqlSenseiTestServer",
+                    ApiKey = Guid.Parse("fd2639d8-11cb-4e12-b93e-580975ee5531"),
+                    CompanyFk = 1,
+                    DoMaintenancePeriod = Core.SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM,
+                    DoMonitoringPeriod = Core.SqlSenseiRunMonitoringPeriod.Every15Minutes
+                });
+            }
+
+            SaveChanges();
         }
     }
 }

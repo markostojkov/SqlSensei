@@ -7,6 +7,12 @@ namespace SqlSensei.Core
     {
         Task<Result<CanExecuteJobsResponse>> GetCanExecuteJobs();
         Task LogMaintenance(long jobId, IEnumerable<IMaintenanceJobLog> logs);
-        Task LogMonitoring(long jobId, IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex, IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex);
+        Task LogMonitoring(
+            long jobId,
+            IEnumerable<IMonitoringJobIndexMissingLog> logsMissingIndex,
+            IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex,
+            IEnumerable<IMonitoringJobServerLog> logsServer,
+            IEnumerable<IMonitoringJobServerPerformanceLogWaitStat> logsWaitStatsServer,
+            IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer);
     }
 }

@@ -21,6 +21,8 @@ namespace SqlSensei.SqlServer
             {
                 while (true)
                 {
+                    await Task.Delay(EnvHelpers.DelayForJob());
+
                     var canExecuteJobsResponse = await ServiceLogger.GetCanExecuteJobs();
 
                     if (canExecuteJobsResponse.IsFailure)
@@ -37,8 +39,6 @@ namespace SqlSensei.SqlServer
                     {
                         await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringIndexJobId);
                     }
-
-                    await Task.Delay(EnvHelpers.DelayForJob());
                 }
             });
         }
@@ -73,7 +73,35 @@ namespace SqlSensei.SqlServer
 
         public async Task ExecuteMonitoringJob(long jobId)
         {
-            var result = await ExecuteCommandAsync(SqlServerSql.MonitoringMissingIndexTruncateLogTable);
+            var result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerWaitStatsTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerWaitStatsCategoriesTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerFindingsTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringMissingIndexTruncateLogTable);
 
             if (!result)
             {
@@ -87,11 +115,13 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ExecuteScriptAsyncGoStatements(
-                Configuration.MonitoringOptions.GetScript(Configuration.Databases, ConnectionStringParsed.InitialCatalog));
+            await ExecuteScriptAsyncGoStatements(Configuration.MonitoringOptions.GetScript(Configuration.Databases, ConnectionStringParsed.InitialCatalog));
 
             var indexUsageResults = new List<IndexLogUsage>();
             var indexMissingResults = new List<IndexLog>();
+            var serverResults = new List<ServerLog>();
+            var serverWaitStatsResults = new List<ServerWaitStatsLog>();
+            var serverFindingResults = new List<ServerFindingLog>();
 
             result = await ExecuteCommandAsync(SqlServerSql.MonitoringUsageIndexSelectLogTable, (reader) => indexUsageResults = IndexLogUsage.GetAll(reader));
 
@@ -107,7 +137,28 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ServiceLogger.LogMonitoring(jobId, indexMissingResults, indexUsageResults);
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerSelectLogTable, (reader) => serverResults = ServerLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerWaitStatsSelectLogTable, (reader) => serverWaitStatsResults = ServerWaitStatsLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerFindingsSelectLogTable, (reader) => serverFindingResults = ServerFindingLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            await ServiceLogger.LogMonitoring(jobId, indexMissingResults, indexUsageResults, serverResults, serverWaitStatsResults, serverFindingResults);
         }
 
         public void InstallMaintenanceAndMonitoringScripts()

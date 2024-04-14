@@ -99,7 +99,7 @@ namespace SqlSensei.Api.Services
                     CreatedOn = DateTime.UtcNow,
                 };
 
-                DbContext.Jobs.Add(maintenanceJob);
+                _ = DbContext.Jobs.Add(maintenanceJob);
             }
 
             if (canExecuteMonitoring)
@@ -113,10 +113,10 @@ namespace SqlSensei.Api.Services
                     CreatedOn = DateTime.UtcNow,
                 };
 
-                DbContext.Jobs.Add(monitoringJob);
+                _ = DbContext.Jobs.Add(monitoringJob);
             }
 
-            await DbContext.SaveChangesAsync();
+            _ = await DbContext.SaveChangesAsync();
 
             return Result.Ok(new CanExecuteJobsResponse(
                 canExecuteMaintenance,

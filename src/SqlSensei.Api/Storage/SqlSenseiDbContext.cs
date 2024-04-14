@@ -18,7 +18,7 @@ namespace SqlSensei.Api.Storage
         {
             _ = modelBuilder.Entity<Company>(entity =>
             {
-                entity.ToTable(nameof(Company), "dbo");
+                _ = entity.ToTable(nameof(Company), "dbo");
 
                 _ = entity.HasKey(e => e.Id);
                 _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
@@ -27,7 +27,7 @@ namespace SqlSensei.Api.Storage
 
             _ = modelBuilder.Entity<Server>(entity =>
             {
-                entity.ToTable(nameof(Server), "dbo");
+                _ = entity.ToTable(nameof(Server), "dbo");
 
                 _ = entity.HasKey(e => e.Id);
                 _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
@@ -40,121 +40,121 @@ namespace SqlSensei.Api.Storage
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<JobExecution>(entity =>
+            _ = modelBuilder.Entity<JobExecution>(entity =>
             {
-                entity.ToTable(nameof(JobExecution), "dbo");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.ServerFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.Type).HasColumnType("smallint").IsRequired();
-                entity.Property(e => e.Status).HasColumnType("smallint").IsRequired();
-                entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime").IsRequired();
-                entity.Property(e => e.CompletedOn).HasColumnType("smalldatetime");
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Server).WithMany().HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.ToTable(nameof(JobExecution), "dbo");
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.ServerFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.Type).HasColumnType("smallint").IsRequired();
+                _ = entity.Property(e => e.Status).HasColumnType("smallint").IsRequired();
+                _ = entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime").IsRequired();
+                _ = entity.Property(e => e.CompletedOn).HasColumnType("smalldatetime");
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Server).WithMany().HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MaintenanceLog>(entity =>
+            _ = modelBuilder.Entity<MaintenanceLog>(entity =>
             {
-                entity.ToTable(nameof(MaintenanceLog), "dbo");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
-                entity.Property(e => e.Index).HasColumnType("nvarchar").HasMaxLength(128);
-                entity.Property(e => e.Statistic).HasColumnType("nvarchar").HasMaxLength(128);
-                entity.Property(e => e.IsError).HasColumnType("bit").IsRequired();
-                entity.Property(e => e.ErrorMessage).HasColumnType("nvarchar(max)");
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.ToTable(nameof(MaintenanceLog), "dbo");
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
+                _ = entity.Property(e => e.Index).HasColumnType("nvarchar").HasMaxLength(128);
+                _ = entity.Property(e => e.Statistic).HasColumnType("nvarchar").HasMaxLength(128);
+                _ = entity.Property(e => e.IsError).HasColumnType("bit").IsRequired();
+                _ = entity.Property(e => e.ErrorMessage).HasColumnType("nvarchar(max)");
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MonitoringJobServerLog>(entity =>
+            _ = modelBuilder.Entity<MonitoringJobServerLog>(entity =>
             {
-                entity.ToTable(nameof(MonitoringJobServerLog), "dbo");
-                
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128);
-                entity.Property(e => e.Priority).HasColumnType("tinyint");
-                entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
-                entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+                _ = entity.ToTable(nameof(MonitoringJobServerLog), "dbo");
 
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128);
+                _ = entity.Property(e => e.Priority).HasColumnType("tinyint");
+                _ = entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
+                _ = entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MonitoringJobServerWaitStatLog>(entity =>
+            _ = modelBuilder.Entity<MonitoringJobServerWaitStatLog>(entity =>
             {
-                entity.ToTable(nameof(MonitoringJobServerWaitStatLog), "dbo");
+                _ = entity.ToTable(nameof(MonitoringJobServerWaitStatLog), "dbo");
 
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.Type).HasColumnType("nvarchar").HasMaxLength(60);
-                entity.Property(e => e.TimeInMs).HasColumnType("bigint");
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.Type).HasColumnType("nvarchar").HasMaxLength(60);
+                _ = entity.Property(e => e.TimeInMs).HasColumnType("bigint");
 
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MonitoringJobServerFindingLog>(entity =>
+            _ = modelBuilder.Entity<MonitoringJobServerFindingLog>(entity =>
             {
-                entity.ToTable(nameof(MonitoringJobServerFindingLog), "dbo");
+                _ = entity.ToTable(nameof(MonitoringJobServerFindingLog), "dbo");
 
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.Priority).HasColumnType("tinyint");
-                entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
-                entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.Priority).HasColumnType("tinyint");
+                _ = entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
+                _ = entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
 
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MonitoringJobIndexMissingLog>(entity =>
+            _ = modelBuilder.Entity<MonitoringJobIndexMissingLog>(entity =>
             {
-                entity.ToTable(nameof(MonitoringJobIndexMissingLog), "dbo");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
-                entity.Property(e => e.TableName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
-                entity.Property(e => e.MagicBenefitNumber).HasColumnType("bigint").IsRequired();
-                entity.Property(e => e.Impact).HasColumnType("nvarchar(max").IsRequired();
-                entity.Property(e => e.IndexDetails).HasColumnType("nvarchar(max)").IsRequired();
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.ToTable(nameof(MonitoringJobIndexMissingLog), "dbo");
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.DatabaseName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
+                _ = entity.Property(e => e.TableName).HasColumnType("nvarchar").HasMaxLength(128).IsRequired();
+                _ = entity.Property(e => e.MagicBenefitNumber).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.Impact).HasColumnType("nvarchar(max").IsRequired();
+                _ = entity.Property(e => e.IndexDetails).HasColumnType("nvarchar(max)").IsRequired();
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
 
-            modelBuilder.Entity<MonitoringJobIndexUsageLog>(entity =>
+            _ = modelBuilder.Entity<MonitoringJobIndexUsageLog>(entity =>
             {
-                entity.ToTable(nameof(MonitoringJobIndexUsageLog), "dbo");
+                _ = entity.ToTable(nameof(MonitoringJobIndexUsageLog), "dbo");
 
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
 
-                entity.Property(e => e.CompanyFk).IsRequired().HasColumnType("bigint");
-                entity.Property(e => e.JobFk).IsRequired().HasColumnType("bigint");
+                _ = entity.Property(e => e.CompanyFk).IsRequired().HasColumnType("bigint");
+                _ = entity.Property(e => e.JobFk).IsRequired().HasColumnType("bigint");
 
-                entity.Property(e => e.DatabaseName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
-                entity.Property(e => e.IsClusteredIndex).IsRequired().HasColumnType("bit");
-                entity.Property(e => e.IndexName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
-                entity.Property(e => e.TableName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
-                entity.Property(e => e.IndexDetails).IsRequired().HasColumnType("nvarchar(max)");
-                entity.Property(e => e.Usage).IsRequired().HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.DatabaseName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
+                _ = entity.Property(e => e.IsClusteredIndex).IsRequired().HasColumnType("bit");
+                _ = entity.Property(e => e.IndexName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
+                _ = entity.Property(e => e.TableName).IsRequired().HasMaxLength(128).HasColumnType("nvarchar");
+                _ = entity.Property(e => e.IndexDetails).IsRequired().HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.Usage).IsRequired().HasColumnType("nvarchar(max)");
 
-                entity.Property(e => e.ReadsUsage).IsRequired().HasColumnType("bigint");
-                entity.Property(e => e.WriteUsage).IsRequired().HasColumnType("bigint");
+                _ = entity.Property(e => e.ReadsUsage).IsRequired().HasColumnType("bigint");
+                _ = entity.Property(e => e.WriteUsage).IsRequired().HasColumnType("bigint");
 
-                entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });
         }
 
@@ -164,14 +164,14 @@ namespace SqlSensei.Api.Storage
 
             if (!companyExists)
             {
-                Companies.Add(new Company ("SqlSenseiTest"));
+                _ = Companies.Add(new Company("SqlSenseiTest"));
             }
 
             var serverExists = Servers.Any(s => s.Name == "SqlSenseiTestServer");
 
             if (!serverExists)
             {
-                Servers.Add(new Server
+                _ = Servers.Add(new Server
                 {
                     Name = "SqlSenseiTestServer",
                     ApiKey = Guid.Parse("fd2639d8-11cb-4e12-b93e-580975ee5531"),
@@ -181,7 +181,7 @@ namespace SqlSensei.Api.Storage
                 });
             }
 
-            SaveChanges();
+            _ = SaveChanges();
         }
     }
 }

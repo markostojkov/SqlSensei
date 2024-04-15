@@ -37,7 +37,7 @@ namespace SqlSensei.SqlServer
 
                     if (canExecuteJobsResponse.Value.CanExecuteMonitoring)
                     {
-                        await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringIndexJobId);
+                        await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringJobId);
                     }
                 }
             });
@@ -52,7 +52,7 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            result = await ExecuteCommandAsyncNoTransaction(Configuration.MaintenanceOptions.GetScript(Configuration.Databases));
+            result = await ExecuteCommandAsyncNoTransaction(Configuration.MaintenanceOptions.GetScript(Configuration.DatabasesForMaintenance));
 
             if (!result)
             {

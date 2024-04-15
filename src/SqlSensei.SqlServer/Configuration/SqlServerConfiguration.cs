@@ -8,11 +8,11 @@ namespace SqlSensei.SqlServer
     {
         // interface props
         public SqlSenseiConfigurationOptions Configuration => SqlSenseiConfigurationOptions.SqlServer;
-        public List<SqlSenseiConfigurationDatabase> Databases { get; }
+        public SqlSenseiConfigurationApiVersion ApiVersion { get; } = SqlSenseiConfigurationApiVersion.Version1;
+        public List<SqlSenseiConfigurationDatabase> DatabasesForMaintenance { get; }
         public string MonitoringAndMaintenanceScriptDatabaseConnection { get; }
         public string ApiKey { get; }
         public bool ReportErrorsToSqlSensei { get; }
-        public SqlSenseiConfigurationApiVersion ApiVersion { get; } = SqlSenseiConfigurationApiVersion.Version1;
         // interface props
 
         public SqlServerConfigurationMonitoringOptions MonitoringOptions { get; }
@@ -28,7 +28,7 @@ namespace SqlSensei.SqlServer
         {
             ApiKey = apiKey;
             ReportErrorsToSqlSensei = reportErrorsToSqlSensei;
-            Databases = databases;
+            DatabasesForMaintenance = databases;
             MonitoringAndMaintenanceScriptDatabaseConnection = monitoringAndMaintenanceScriptDatabaseConnection;
             MonitoringOptions = monitoringOptions;
             MaintenanceOptions = maintenanceOptions;

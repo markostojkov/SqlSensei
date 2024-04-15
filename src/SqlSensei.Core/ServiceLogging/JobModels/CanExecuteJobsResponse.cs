@@ -4,11 +4,11 @@
         bool canExecuteMaintenance,
         bool canExecuteMonitoring,
         long maintenanceJobId,
-        long monitoringIndexJobId)
+        long monitoringJobId)
     {
         public bool CanExecuteMaintenance { get; } = canExecuteMaintenance;
         public bool CanExecuteMonitoring { get; } = canExecuteMonitoring;
         public long MaintenanceJobId { get; } = maintenanceJobId;
-        public long MonitoringIndexJobId { get; } = monitoringIndexJobId;
+        public long MonitoringJobId { get; } = monitoringJobId;
     }
 }

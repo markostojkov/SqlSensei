@@ -13,6 +13,7 @@ namespace SqlSensei.Api.Storage
         public DbSet<MonitoringJobServerFindingLog> MonitoringJobServerFindingLogs { get; set; }
         public DbSet<MonitoringJobIndexMissingLog> MonitoringJobIndexMissingLogs { get; set; }
         public DbSet<MonitoringJobIndexUsageLog> MonitoringJobIndexUsageLogs { get; set; }
+        public DbSet<MonitoringQueryLog> MonitoringQueryLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -152,6 +153,44 @@ namespace SqlSensei.Api.Storage
 
                 _ = entity.Property(e => e.ReadsUsage).IsRequired().HasColumnType("bigint");
                 _ = entity.Property(e => e.WriteUsage).IsRequired().HasColumnType("bigint");
+
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            _ = modelBuilder.Entity<MonitoringQueryLog>(entity =>
+            {
+                _ = entity.ToTable(nameof(MonitoringQueryLog), "dbo");
+
+                _ = entity.HasKey(e => e.Id);
+                _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
+
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
+                _ = entity.Property(e => e.QueryLogSortBy).IsRequired().HasColumnType("tinyint");
+                _ = entity.Property(e => e.DatabaseName).IsRequired().HasColumnType("nvarchar(128)");
+                _ = entity.Property(e => e.QueryPlanCost).HasColumnType("float");
+                _ = entity.Property(e => e.QueryText).HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.Warnings).HasColumnType("varchar(max)");
+                _ = entity.Property(e => e.QueryPlan).HasColumnType("xml");
+                _ = entity.Property(e => e.MissingIndexes).HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.ImplicitConversionInfo).HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.ExecutionCount).HasColumnType("bigint");
+                _ = entity.Property(e => e.ExecutionsPerMinute).HasColumnType("money");
+                _ = entity.Property(e => e.TotalCpu).HasColumnType("bigint");
+                _ = entity.Property(e => e.AverageCpu).HasColumnType("bigint");
+                _ = entity.Property(e => e.TotalDuration).HasColumnType("bigint");
+                _ = entity.Property(e => e.AverageDuration).HasColumnType("bigint");
+                _ = entity.Property(e => e.TotalReads).HasColumnType("bigint");
+                _ = entity.Property(e => e.AverageReads).HasColumnType("bigint");
+                _ = entity.Property(e => e.TotalReturnedRows).HasColumnType("bigint");
+                _ = entity.Property(e => e.AverageReturnedRows).HasColumnType("money");
+                _ = entity.Property(e => e.MinReturnedRows).HasColumnType("bigint");
+                _ = entity.Property(e => e.MaxReturnedRows).HasColumnType("bigint");
+                _ = entity.Property(e => e.NumberOfPlans).HasColumnType("int");
+                _ = entity.Property(e => e.NumberOfDistinctPlans).HasColumnType("int");
+                _ = entity.Property(e => e.LastExecutionTime).HasColumnType("datetime");
+                _ = entity.Property(e => e.QueryHash).HasColumnType("binary(8)").IsRequired(false);
 
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
                 _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);

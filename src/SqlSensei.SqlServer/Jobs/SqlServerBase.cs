@@ -43,7 +43,7 @@ namespace SqlSensei.SqlServer
                 foreach (var commandString in commandStrings)
                 {
                     using SqlCommand command = new(commandString, connection);
-                    command.CommandTimeout = 120;
+                    command.CommandTimeout = 240;
                     _ = await command.ExecuteNonQueryAsync();
                 }
             }

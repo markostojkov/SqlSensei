@@ -87,7 +87,12 @@ namespace SqlSensei.SqlServer
             IEnumerable<IMonitoringJobIndexUsageLog> logsUsageIndex,
             IEnumerable<IMonitoringJobServerLog> logsServer,
             IEnumerable<IMonitoringJobServerPerformanceLogWaitStat> logsWaitStatsServer,
-            IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer)
+            IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer,
+            IEnumerable<IMonitoringJobQueryLog> queryCpuLogs,
+            IEnumerable<IMonitoringJobQueryLog> queryReadLogs,
+            IEnumerable<IMonitoringJobQueryLog> queryWriteLogs,
+            IEnumerable<IMonitoringJobQueryLog> queryDurationLogs,
+            IEnumerable<IMonitoringJobQueryLog> queryMemoryGrantLogs)
         {
             try
             {
@@ -118,7 +123,12 @@ namespace SqlSensei.SqlServer
                     logsFindingsServer.Select(x => new MonitoringJobServerFindingLog(
                         x.CheckId,
                         x.Priority,
-                        x.Details)));
+                        x.Details)),
+                    MapQueryLogs(queryCpuLogs),
+                    MapQueryLogs(queryReadLogs),
+                    MapQueryLogs(queryWriteLogs),
+                    MapQueryLogs(queryDurationLogs),
+                    MapQueryLogs(queryMemoryGrantLogs));
 
                 var jsonContent = JsonConvert.SerializeObject(request);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -136,6 +146,34 @@ namespace SqlSensei.SqlServer
             {
                 ErrorLogger.Error(e.Message);
             }
+        }
+
+        private static IEnumerable<MonitoringJobQueryLog> MapQueryLogs(IEnumerable<IMonitoringJobQueryLog> queryLogs)
+        {
+            return queryLogs.Select(log => new MonitoringJobQueryLog(
+                log.DatabaseName,
+                log.QueryPlanCost,
+                log.QueryText,
+                log.Warnings,
+                log.QueryPlan,
+                log.MissingIndexes,
+                log.ImplicitConversionInfo,
+                log.ExecutionCount,
+                log.ExecutionsPerMinute,
+                log.TotalCPU,
+                log.AverageCPU,
+                log.TotalDuration,
+                log.AverageDuration,
+                log.TotalReads,
+                log.AverageReads,
+                log.TotalReturnedRows,
+                log.AverageReturnedRows,
+                log.MinReturnedRows,
+                log.MaxReturnedRows,
+                log.NumberOfPlans,
+                log.NumberOfDistinctPlans,
+                log.LastExecutionTime,
+                log.QueryHash));
         }
     }
 }

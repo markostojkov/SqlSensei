@@ -66,6 +66,7 @@
     <Folder Include="dbo\MonitoringJobServerLog" />
     <Folder Include="dbo\MonitoringJobServerFindingLog" />
     <Folder Include="dbo\MonitoringJobServerWaitStatLog" />
+    <Folder Include="dbo\MonitoringQueryLog" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Company\Company.sql" />
@@ -77,6 +78,7 @@
     <Build Include="dbo\MonitoringJobServerLog\MonitoringJobServerLog.sql" />
     <Build Include="dbo\MonitoringJobServerFindingLog\MonitoringJobServerFindingLog.sql" />
     <Build Include="dbo\MonitoringJobServerWaitStatLog\MonitoringJobServerWaitStatLog.sql" />
+    <Build Include="dbo\MonitoringQueryLog\MonitoringQueryLog.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />

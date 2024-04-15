@@ -1,15 +1,9 @@
-﻿using SqlSensei.Core;
-
-using System.Collections.Generic;
-
-namespace SqlSensei.SqlServer
+﻿namespace SqlSensei.SqlServer
 {
     public class SqlServerConfigurationMonitoringOptions
     {
-        private static readonly string _replaceDatabase = "replace-database";
         private readonly string _script = @"
             EXECUTE dbo.sp_BlitzIndex
-            @DatabaseName       = '" + _replaceDatabase + @"',
             @Mode               = 3,
             @OutputDatabaseName = '{0}',
             @OutputSchemaName   = 'dbo',
@@ -18,7 +12,6 @@ namespace SqlSensei.SqlServer
             GO            
 
             EXECUTE dbo.sp_BlitzIndex
-            @DatabaseName       = '" + _replaceDatabase + @"',
             @Mode               = 2,
             @OutputDatabaseName = '{0}',
             @OutputSchemaName   = 'dbo',
@@ -43,6 +36,47 @@ namespace SqlSensei.SqlServer
             @OutputTableNameWaitStats = '" + SqlServerSql.MonitoringServerWaitStatsTableLogTo + @"'
 
             GO
+
+            EXECUTE dbo.sp_BlitzCache
+            @ExpertMode = 1,
+            @OutputDatabaseName = '{2}' ,
+            @OutputSchemaName = 'dbo',
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryCpuTableLogTo + @"'
+
+            GO
+
+            EXECUTE dbo.sp_BlitzCache
+            @ExpertMode = 1,
+            @OutputDatabaseName = '{3}' ,
+            @OutputSchemaName = 'dbo',
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryReadsTableLogTo + @"'
+
+            GO
+
+            EXECUTE dbo.sp_BlitzCache
+            @ExpertMode = 1,
+            @OutputDatabaseName = '{4}' ,
+            @OutputSchemaName = 'dbo',
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryWritesTableLogTo + @"'
+
+            GO
+
+            EXECUTE dbo.sp_BlitzCache
+            @ExpertMode = 1,
+            @OutputDatabaseName = '{5}' ,
+            @OutputSchemaName = 'dbo',
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryDurationTableLogTo + @"'
+
+            GO
+
+            EXECUTE dbo.sp_BlitzCache
+            @ExpertMode = 1,
+            @OutputDatabaseName = '{6}' ,
+            @OutputSchemaName = 'dbo',
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryMemoryGrantTableLogTo + @"'
+
+            GO
+
         ";
 
         public string ScriptName { get; }
@@ -54,14 +88,19 @@ namespace SqlSensei.SqlServer
 
         public static SqlServerConfigurationMonitoringOptions Default => new("MonitoringSolution.sql");
 
-        public string GetScript(IEnumerable<SqlSenseiConfigurationDatabase> databases, string monitoringAndMaintenanceScriptDatabaseName)
+        public string GetScript(string monitoringAndMaintenanceScriptDatabaseName)
         {
-            var scriptForAllDatabases = string.Format(_scriptMonitoringWholeServer, monitoringAndMaintenanceScriptDatabaseName, monitoringAndMaintenanceScriptDatabaseName);
+            var scriptForAllDatabases = string.Format(
+                _scriptMonitoringWholeServer,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName,
+                monitoringAndMaintenanceScriptDatabaseName);
 
-            foreach (var database in databases)
-            {
-                scriptForAllDatabases += string.Format(_script, monitoringAndMaintenanceScriptDatabaseName).Replace(_replaceDatabase, database.Database);
-            }
+            scriptForAllDatabases += string.Format(_script, monitoringAndMaintenanceScriptDatabaseName);
 
             return scriptForAllDatabases;
         }

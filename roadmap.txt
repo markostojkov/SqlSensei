@@ -15,3 +15,25 @@ THEY WILL SEND LOGS TO US FOR FREE
 WITH API KEYS
 
 C:\Users\mst\Desktop\SqlSensei\src\SqlSensei.Core\Logic\IndexLogic.cs I WILL DELETE IT WE CAN FIND IT IN GITHUB
+
+
+JobExecuted
+
+server stuff sp_Blitz:
+- data in danger (no backup, corruption, bad version of sql server corruption)
+- server in danger (mem is low, not used CPU/RAM, bad version of sqlserver security issue)
+- server performance can be better (slow storage, missing indexses, rid / keey lookups)
+- cache cleared (i dont think its neccessary to show this to the user maybe we need it in order to calculate whether plan cache makes sense)
+- server info (hardware etc...)
+
+server stuff sp_BlitzFirst
+
+- server performance can be better (blocking queries, query with open transaction)
+- server info cpu util, databases, data size
+
+how we give insights:
+
+
+
+IF @SortOrder NOT IN ('cpu',  'reads', 'writes',
+                       'duration', 'memory grant',)

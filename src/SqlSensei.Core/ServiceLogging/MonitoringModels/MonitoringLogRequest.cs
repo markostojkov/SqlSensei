@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace SqlSensei.Core
@@ -10,13 +11,23 @@ namespace SqlSensei.Core
         IEnumerable<MonitoringJobIndexUsageLog> indexUsageLogs,
         IEnumerable<MonitoringJobServerLog> serverLogs,
         IEnumerable<MonitoringJobServerWaitStatLog> serverWaitStatLogs,
-        IEnumerable<MonitoringJobServerFindingLog> serverFindingLogs)
+        IEnumerable<MonitoringJobServerFindingLog> serverFindingLogs,
+        IEnumerable<MonitoringJobQueryLog> queryLogsCpu,
+        IEnumerable<MonitoringJobQueryLog> queryLogsRead,
+        IEnumerable<MonitoringJobQueryLog> queryLogsWrite,
+        IEnumerable<MonitoringJobQueryLog> queryLogsDuration,
+        IEnumerable<MonitoringJobQueryLog> queryLogsMemoryGrant)
     {
         public IEnumerable<MonitoringJobIndexMissingLog> IndexMissingLogs { get; } = indexMissingLogs;
         public IEnumerable<MonitoringJobIndexUsageLog> IndexUsageLogs { get; } = indexUsageLogs;
         public IEnumerable<MonitoringJobServerLog> ServerLogs { get; } = serverLogs;
         public IEnumerable<MonitoringJobServerWaitStatLog> ServerWaitStatLogs { get; } = serverWaitStatLogs;
         public IEnumerable<MonitoringJobServerFindingLog> ServerFindingLogs { get; } = serverFindingLogs;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogsCpu { get; } = queryLogsCpu;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogsRead { get; } = queryLogsRead;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogsWrite { get; } = queryLogsWrite;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogsDuration { get; } = queryLogsDuration;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogsMemoryGrant { get; } = queryLogsMemoryGrant;
     }
 
     public class MonitoringJobIndexMissingLog(
@@ -115,5 +126,100 @@ namespace SqlSensei.Core
 
         [JsonProperty("details")]
         public string Details { get; } = details;
+    }
+
+    public class MonitoringJobQueryLog(
+        string databaseName,
+        float? queryPlanCost,
+        string queryText,
+        string warnings,
+        string queryPlan,
+        string missingIndexes,
+        string implicitConversionInfo,
+        long? executionCount,
+        decimal? executionsPerMinute,
+        long? totalCPU,
+        long? averageCPU,
+        long? totalDuration,
+        long? averageDuration,
+        long? totalReads,
+        long? averageReads,
+        long? totalReturnedRows,
+        decimal? averageReturnedRows,
+        long? minReturnedRows,
+        long? maxReturnedRows,
+        int? numberOfPlans,
+        int? numberOfDistinctPlans,
+        DateTime? lastExecutionTime,
+        byte[]? queryHash)
+    {
+        [JsonProperty("databaseName")]
+        public string DatabaseName { get; } = databaseName;
+
+        [JsonProperty("queryPlanCost")]
+        public float? QueryPlanCost { get; } = queryPlanCost;
+
+        [JsonProperty("queryText")]
+        public string QueryText { get; } = queryText;
+
+        [JsonProperty("warnings")]
+        public string Warnings { get; } = warnings;
+
+        [JsonProperty("queryPlan")]
+        public string QueryPlan { get; } = queryPlan;
+
+        [JsonProperty("missingIndexes")]
+        public string MissingIndexes { get; } = missingIndexes;
+
+        [JsonProperty("implicitConversionInfo")]
+        public string ImplicitConversionInfo { get; } = implicitConversionInfo;
+
+        [JsonProperty("executionCount")]
+        public long? ExecutionCount { get; } = executionCount;
+
+        [JsonProperty("executionsPerMinute")]
+        public decimal? ExecutionsPerMinute { get; } = executionsPerMinute;
+
+        [JsonProperty("totalCPU")]
+        public long? TotalCPU { get; } = totalCPU;
+
+        [JsonProperty("averageCPU")]
+        public long? AverageCPU { get; } = averageCPU;
+
+        [JsonProperty("totalDuration")]
+        public long? TotalDuration { get; } = totalDuration;
+
+        [JsonProperty("averageDuration")]
+        public long? AverageDuration { get; } = averageDuration;
+
+        [JsonProperty("totalReads")]
+        public long? TotalReads { get; } = totalReads;
+
+        [JsonProperty("averageReads")]
+        public long? AverageReads { get; } = averageReads;
+
+        [JsonProperty("totalReturnedRows")]
+        public long? TotalReturnedRows { get; } = totalReturnedRows;
+
+        [JsonProperty("averageReturnedRows")]
+        public decimal? AverageReturnedRows { get; } = averageReturnedRows;
+
+        [JsonProperty("minReturnedRows")]
+        public long? MinReturnedRows { get; } = minReturnedRows;
+
+        [JsonProperty("maxReturnedRows")]
+        public long? MaxReturnedRows { get; } = maxReturnedRows;
+
+        [JsonProperty("numberOfPlans")]
+        public int? NumberOfPlans { get; } = numberOfPlans;
+
+        [JsonProperty("numberOfDistinctPlans")]
+        public int? NumberOfDistinctPlans { get; } = numberOfDistinctPlans;
+
+        [JsonProperty("lastExecutionTime")]
+        public DateTime? LastExecutionTime { get; } = lastExecutionTime;
+
+        [JsonProperty("queryHash")]
+        public byte[]? QueryHash { get; } = queryHash;
     }
 }

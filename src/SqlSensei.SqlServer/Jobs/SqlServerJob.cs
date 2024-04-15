@@ -80,6 +80,41 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryCpuTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryReadsTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryWritesTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryDurationTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryMemoryGrantTruncateLogTable);
+
+            if (!result)
+            {
+                return;
+            }
+
             result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerWaitStatsTruncateLogTable);
 
             if (!result)
@@ -115,13 +150,18 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ExecuteScriptAsyncGoStatements(Configuration.MonitoringOptions.GetScript(Configuration.Databases, ConnectionStringParsed.InitialCatalog));
+            await ExecuteScriptAsyncGoStatements(Configuration.MonitoringOptions.GetScript(ConnectionStringParsed.InitialCatalog));
 
             var indexUsageResults = new List<IndexLogUsage>();
             var indexMissingResults = new List<IndexLog>();
             var serverResults = new List<ServerLog>();
             var serverWaitStatsResults = new List<ServerWaitStatsLog>();
             var serverFindingResults = new List<ServerFindingLog>();
+            var queryCpuResults = new List<QueryLog>();
+            var queryReadsResults = new List<QueryLog>();
+            var queryWritesResults = new List<QueryLog>();
+            var queryDurationResults = new List<QueryLog>();
+            var queryMemoryGrantResults = new List<QueryLog>();
 
             result = await ExecuteCommandAsync(SqlServerSql.MonitoringUsageIndexSelectLogTable, (reader) => indexUsageResults = IndexLogUsage.GetAll(reader));
 
@@ -158,7 +198,53 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ServiceLogger.LogMonitoring(jobId, indexMissingResults, indexUsageResults, serverResults, serverWaitStatsResults, serverFindingResults);
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryCpuSelectLogTable, (reader) => queryCpuResults = QueryLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryReadsSelectLogTable, (reader) => queryReadsResults = QueryLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryWritesSelectLogTable, (reader) => queryWritesResults = QueryLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryDurationSelectLogTable, (reader) => queryDurationResults = QueryLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryMemoryGrantSelectLogTable, (reader) => queryMemoryGrantResults = QueryLog.GetAll(reader));
+
+            if (!result)
+            {
+                return;
+            }
+
+            await ServiceLogger.LogMonitoring(
+                jobId,
+                indexMissingResults,
+                indexUsageResults,
+                serverResults,
+                serverWaitStatsResults,
+                serverFindingResults,
+                queryCpuResults,
+                queryReadsResults,
+                queryWritesResults,
+                queryDurationResults,
+                queryMemoryGrantResults);
         }
 
         public void InstallMaintenanceAndMonitoringScripts()

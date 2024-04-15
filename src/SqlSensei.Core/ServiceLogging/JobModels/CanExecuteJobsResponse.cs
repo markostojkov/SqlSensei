@@ -2,14 +2,12 @@
 {
     public class CanExecuteJobsResponse(
         bool canExecuteMaintenance,
-        bool canExecuteMonitoringIndexUsage,
-        bool canExecuteMonitoringIndexMissing,
+        bool canExecuteMonitoring,
         long maintenanceJobId,
         long monitoringIndexJobId)
     {
         public bool CanExecuteMaintenance { get; } = canExecuteMaintenance;
-        public bool CanExecuteMonitoringIndexUsage { get; } = canExecuteMonitoringIndexUsage;
-        public bool CanExecuteMonitoringIndexMissing { get; } = canExecuteMonitoringIndexMissing;
+        public bool CanExecuteMonitoring { get; } = canExecuteMonitoring;
         public long MaintenanceJobId { get; } = maintenanceJobId;
         public long MonitoringIndexJobId { get; } = monitoringIndexJobId;
     }

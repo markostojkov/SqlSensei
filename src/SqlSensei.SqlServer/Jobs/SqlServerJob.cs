@@ -35,7 +35,7 @@ namespace SqlSensei.SqlServer
                         await ExecuteMaintenanceJob(canExecuteJobsResponse.Value.MaintenanceJobId);
                     }
 
-                    if (canExecuteJobsResponse.Value.CanExecuteMonitoringIndexMissing && canExecuteJobsResponse.Value.CanExecuteMonitoringIndexUsage)
+                    if (canExecuteJobsResponse.Value.CanExecuteMonitoring)
                     {
                         await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringIndexJobId);
                     }

@@ -121,7 +121,6 @@ namespace SqlSensei.Api.Services
             return Result.Ok(new CanExecuteJobsResponse(
                 canExecuteMaintenance,
                 canExecuteMonitoring,
-                canExecuteMonitoring,
                 maintenanceJob.Id,
                 monitoringJob.Id));
         }

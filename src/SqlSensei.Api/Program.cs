@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using Microsoft.EntityFrameworkCore;
 using SqlSensei.Api.CurrentCompany;
+using SqlSensei.Api.Insights;
 using SqlSensei.Api.Services;
 using SqlSensei.Api.Storage;
 
@@ -18,6 +19,7 @@ namespace SqlSensei.Api
             _ = builder.Services.AddScoped<CurrentCompanyService>();
             _ = builder.Services.AddScoped<StoreLogsToDatabaseService>();
             _ = builder.Services.AddScoped<JobService>();
+            _ = builder.Services.AddScoped<SqlServerInsights>();
             _ = builder.Services.AddApiVersioning(options =>
             {
                 options.DefaultApiVersion = new ApiVersion(1, 0);

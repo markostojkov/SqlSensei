@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using SqlSensei.Api.Insights;
 using SqlSensei.Api.Services;
 using SqlSensei.Core;
 
@@ -8,10 +9,11 @@ namespace SqlSensei.Api.Controllers
     [ApiController]
     [Route("[controller]/v{version:apiVersion}")]
     [ApiVersion((double)SqlSenseiConfigurationApiVersion.Version1)]
-    public class SqlServerController(StoreLogsToDatabaseService storeLogsToDatabaseService, JobService jobService) : BaseController
+    public class SqlServerController(StoreLogsToDatabaseService storeLogsToDatabaseService, JobService jobService, SqlServerInsights serverInsights) : BaseController
     {
         public StoreLogsToDatabaseService StoreLogsToDatabaseService { get; } = storeLogsToDatabaseService;
         public JobService JobService { get; } = jobService;
+        public SqlServerInsights ServerInsights { get; } = serverInsights;
 
         [HttpPost("jobs/{jobId:long}/monitoring")]
         public async Task<IActionResult> PostMonitoringLogs(long jobId, [FromBody] MonitoringLogRequest request)
@@ -33,6 +35,14 @@ namespace SqlSensei.Api.Controllers
         public async Task<IActionResult> CanExecuteJobs()
         {
             var result = await JobService.CanExecuteJobs();
+
+            return OkOrError(result);
+        }
+
+        [HttpGet("jobs/{jobId:long}/monitoring")]
+        public async Task<IActionResult> GetMonitoring(long jobId)
+        {
+            var result = await ServerInsights.GetInisights(jobId);
 
             return OkOrError(result);
         }

@@ -154,6 +154,9 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.ReadsUsage).IsRequired().HasColumnType("bigint");
                 _ = entity.Property(e => e.WriteUsage).IsRequired().HasColumnType("bigint");
 
+                _ = entity.Ignore(e => e.IndexColumns);
+                _ = entity.Ignore(e => e.IndexIncludeColumns);
+
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
                 _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);
             });

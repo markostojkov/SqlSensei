@@ -15,5 +15,7 @@
         public long WriteUsage { get; set; } = writeUsage;
         public virtual Company Company { get; set; }
         public virtual JobExecution Job { get; set; }
+        public List<string> IndexColumns { get; set; }
+        public List<string> IndexIncludeColumns { get; set; }
     }
 }

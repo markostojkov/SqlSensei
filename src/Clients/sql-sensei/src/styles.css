@@ -1,0 +1,23 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.tooltip-indicator::after {
+  content: '?' !important;
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  text-align: center !important;
+  line-height: 18px !important;
+  border-radius: 50% !important;
+  background-color: #007bff !important;
+  color: white !important;
+  margin-left: 5px !important;
+  font-size: 16px !important;
+  font-weight: normal !important;
+}

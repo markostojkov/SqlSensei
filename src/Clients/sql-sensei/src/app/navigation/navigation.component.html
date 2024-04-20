@@ -1,0 +1,10 @@
+<mat-toolbar>
+  <span>SqlSensei</span>
+  <span class="spacer"></span>
+  <button mat-button [routerLink]="'sql-server/servers'">Servers</button>
+  <span class="spacer-full"></span>
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
+<div class="container">
+  <router-outlet></router-outlet>
+</div>

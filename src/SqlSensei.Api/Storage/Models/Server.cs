@@ -11,6 +11,7 @@ namespace SqlSensei.Api.Storage
         public SqlSenseiRunMaintenancePeriod DoMaintenancePeriod { get; set; }
         public SqlSenseiRunMonitoringPeriod DoMonitoringPeriod { get; set; }
         public virtual Company Company { get; set; }
+        public virtual ICollection<JobExecution> Jobs { get; set; }
 
         public Server(string name)
         {

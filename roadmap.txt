@@ -37,3 +37,6 @@ how we give insights:
 
 IF @SortOrder NOT IN ('cpu',  'reads', 'writes',
                        'duration', 'memory grant',)
+
+
+CX PACKETS TOO HIGH MAYBE IM DOING THE LOGS WRONG MAYBE DO blitzfirst FIRST

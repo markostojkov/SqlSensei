@@ -2,7 +2,7 @@
   "profiles": {
     "Docker": {
       "commandName": "Docker",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/sqlserver/v1/can-execute-jobs",
       "environmentVariables": {
         "ASPNETCORE_HTTP_PORTS": "80",

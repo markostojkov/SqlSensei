@@ -1,0 +1,103 @@
+<h2 mat-dialog-title>Wait stats explanation</h2>
+<mat-dialog-content class="mat-typography">
+  @if (biggestWaitStat) {
+  <p>
+    <ng-container [ngSwitch]="biggestWaitStat.waitType">
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.CxPacket">
+        <p>
+          The <strong>CxPacket</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This indicates contention in the
+          network communication packets, potentially due to high network traffic or inefficient queries causing data transmission delays.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Bad paralelism due to <b>MAXDOP</b>. <a href="http://support.microsoft.com/kb/2806535">Microsoft recommendation</a></li>
+          <li>
+            Queries that should single threaded go parralel due to <b>Cost Threshold for Parallelism</b>.
+            <a href="http://technet.microsoft.com/en-us/library/ms188603(v=sql.105).aspx">Microsoft recommendation</a>
+          </li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.SosSchedulerYield">
+        <p>
+          The <strong>SosSchedulerYield</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This indicates that the
+          SQL Server worker threads are frequently yielding control to other tasks, possibly due to CPU pressure.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>CPU intensive workload like sorts</li>
+          <li>Not enough CPU for the workload</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.Threadpool">
+        <p>
+          The <strong>Threadpool</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This suggests that SQL Server is
+          encountering thread exhaustion, which could be due to insufficient worker threads to handle concurrent requests.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Insufficient worker threads available to handle concurrent requests</li>
+          <li>High concurrency leading to thread exhaustion</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.Lock">
+        <p>
+          The <strong>Lock</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This indicates contention for locks on
+          database resources, potentially due to long-running transactions or inadequate indexing.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Long-running transactions causing lock contention</li>
+          <li>Inadequate indexing leading to table or row locks</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.ResourceSemaphore">
+        <p>
+          The <strong>ResourceSemaphore</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This suggests contention
+          for system resources such as memory or CPU, which could lead to performance degradation.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Memory pressure causing resource contention</li>
+          <li>CPU saturation leading to resource bottlenecks</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.AsyncNetworkIo">
+        <p>
+          The <strong>AsyncNetworkIo</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This indicates waiting for
+          asynchronous network I/O operations, typically seen in applications with high network activity.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>High network latency causing delays in I/O operations</li>
+          <li>Network congestion leading to queuing of I/O requests</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.PageIoLatch">
+        <p>
+          The <strong>PageIoLatch</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This suggests waiting for I/O
+          operations related to database page reads or writes, indicating potential disk latency issues.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Not enough indexes which cause I/O</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchCase="SqlServerPerformanceWaitType.WriteLog">
+        <p>
+          The <strong>WriteLog</strong> wait type has the highest cumulative wait time of <strong>{{ biggestWaitStat.waitInS }} seconds</strong>. This indicates waiting for
+          transactions to be written to the transaction log, which could occur due to heavy transactional activity.
+        </p>
+        <p>Potential Issues:</p>
+        <ul>
+          <li>Heavy transactional activity causing log file contention</li>
+          <li>Slow disk I/O for log writes leading to log flush delays</li>
+        </ul>
+      </ng-container>
+      <ng-container *ngSwitchDefault> Unknown wait type. </ng-container>
+    </ng-container>
+  </p>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Ok</button>
+</mat-dialog-actions>

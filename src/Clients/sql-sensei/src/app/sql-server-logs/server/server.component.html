@@ -1,0 +1,55 @@
+@if ( server; as s) {
+<h2>{{ s.name }}</h2>
+<hr />
+
+<div class="row">
+  <div class="col-md-4">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Server Details</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p><b>Name:</b> {{ s.sqlServerCheck.serverInfo.serverName }}</p>
+        <p><b>Databases on server:</b> {{ s.sqlServerCheck.serverInfo.databaseCount }}</p>
+        <p><b>All databases size in GB:</b> {{ s.sqlServerCheck.serverInfo.databaseSizeInGb }}</p>
+        <p><b>CPU logical cores:</b> {{ s.sqlServerCheck.serverInfo.logicalCpu }}</p>
+        <p><b>Memory in GB:</b> {{ s.sqlServerCheck.serverInfo.memoryInGb }}</p>
+        <p><b>Architecture:</b> {{ s.sqlServerCheck.serverInfo.is32Bit ? '32 BIT' : '64 BIT' }}</p>
+        <p><b>Server last restart:</b> {{ s.sqlServerCheck.serverInfo.lastRestartServer | date : 'short' }}</p>
+        <p><b>SQL Server last restart:</b> {{ s.sqlServerCheck.serverInfo.lastRestartSqlServer | date : 'short' }}</p>
+
+        @if (s.sqlServerCheck.serverInfo.defaultTraceContentInHours) {
+        <p class="tooltip-indicator" matTooltip="Duration for retaining trace data used to monitor SQL Server activities and diagnose issues.">
+          <b>Tracing since:</b> {{ convertHoursToDatetime(s.sqlServerCheck.serverInfo.defaultTraceContentInHours) | date : 'short' }}
+        </p>
+        }
+        <p><b>Version:</b> {{ s.sqlServerCheck.serverInfo.versionDetails }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="col-md-8">
+    @if (waitStats) {
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title
+          class="tooltip-indicator"
+          matTooltip="Every query on your server needs resources like CPU, RAM and needs to coehist with other queries. Here is what your server is bottlenecked by"
+          >Server Bottlenecks</mat-card-title
+        >
+        <mat-card-subtitle>
+          <button mat-button (click)="getBottleneck()">What's my bottleneck?</button>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab label="7 days">
+            <canvas class="pt-3" baseChart [type]="'line'" [data]="lineChartData" [options]="lineChartOptions" [legend]="true"> </canvas>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+
+    }
+  </div>
+</div>
+}

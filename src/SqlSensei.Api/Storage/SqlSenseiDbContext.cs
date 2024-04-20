@@ -5,6 +5,7 @@ namespace SqlSensei.Api.Storage
     public class SqlSenseiDbContext(DbContextOptions<SqlSenseiDbContext> options) : DbContext(options)
     {
         public DbSet<Company> Companies { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Server> Servers { get; set; }
         public DbSet<JobExecution> Jobs { get; set; }
         public DbSet<MaintenanceLog> MaintenanceLogs { get; set; }
@@ -24,6 +25,18 @@ namespace SqlSensei.Api.Storage
                 _ = entity.HasKey(e => e.Id);
                 _ = entity.Property(e => e.Id).HasColumnType("bigint").ValueGeneratedOnAdd();
                 _ = entity.Property(e => e.Name).HasColumnType("nvarchar").IsRequired().HasMaxLength(64);
+            });
+
+            _ = modelBuilder.Entity<User>(entity =>
+            {
+                _ = entity.ToTable(nameof(User), "dbo");
+
+                _ = entity.HasKey(e => e.Identifier);
+                _ = entity.Property(e => e.Identifier).HasColumnType("nvarchar").HasMaxLength(256).IsRequired();
+                _ = entity.Property(e => e.AuthProvider).HasColumnType("int").IsRequired();
+                _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
+
+                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
             });
 
             _ = modelBuilder.Entity<Server>(entity =>
@@ -53,7 +66,7 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime").IsRequired();
                 _ = entity.Property(e => e.CompletedOn).HasColumnType("smalldatetime");
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
-                _ = entity.HasOne(e => e.Server).WithMany().HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Server).WithMany(e => e.Jobs).HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
             });
 
             _ = modelBuilder.Entity<MaintenanceLog>(entity =>
@@ -220,6 +233,18 @@ namespace SqlSensei.Api.Storage
                     CompanyFk = 1,
                     DoMaintenancePeriod = Core.SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM,
                     DoMonitoringPeriod = Core.SqlSenseiRunMonitoringPeriod.Every15Minutes
+                });
+            }
+
+            var userExists = Users.Any(s => s.Identifier == "e9e64b42-2466-4a96-9324-a9ba198a4bea");
+
+            if (!userExists)
+            {
+                _ = Users.Add(new User
+                {
+                    Identifier = "e9e64b42-2466-4a96-9324-a9ba198a4bea",
+                    CompanyFk = 1,
+                    AuthProvider = AuthProvider.Google,
                 });
             }
 

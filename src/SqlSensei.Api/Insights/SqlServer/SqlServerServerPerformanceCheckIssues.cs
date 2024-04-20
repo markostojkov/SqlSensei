@@ -1,5 +1,5 @@
 ﻿using SqlSensei.Api.Storage;
-using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -76,6 +76,13 @@ namespace SqlSensei.Api.Insights
         public SqlServerPerformanceWaitType WaitType { get; } = waitType;
     }
 
+    public class SqlServerPerformanceWaitStatGraph(long timeInMs, SqlServerPerformanceWaitType waitType, DateTime? dateTime)
+    {
+        public long TimeInMs { get; } = timeInMs;
+        public SqlServerPerformanceWaitType WaitType { get; } = waitType;
+        public DateTime? DateTime { get; } = dateTime;
+    }
+
     public class SqlServerServerPerformanceCheckIssues
     {
         private static readonly Dictionary<string, SqlServerPerformanceWaitType> waitTypeDictionary = new()
@@ -123,12 +130,24 @@ namespace SqlSensei.Api.Insights
             {23, "CPU Utilization"},
         };
 
+        public static IEnumerable<SqlServerPerformanceWaitStatGraph> GetSqlServerWaitStatsGraph(IEnumerable<MonitoringJobServerWaitStatLog> waitStats)
+        {
+            return waitStats
+                .Where(x => waitTypeDictionary.ContainsKey(x.Type))
+                .GroupBy(x => new { CreatedOn = new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0), WaitType = waitTypeDictionary.GetValueOrDefault(x.Type) })
+                .Select(x => new SqlServerPerformanceWaitStatGraph(
+                    (long)Math.Round(x.Average(y => y.TimeInMs)),
+                    x.Key.WaitType,
+                    x.Key.CreatedOn));
+        }
+
         public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(
             IEnumerable<MonitoringJobServerFindingLog> logs,
             IEnumerable<MonitoringJobServerWaitStatLog> logsWaitStats,
             IEnumerable<MonitoringQueryLog> badQueries)
         {
             var cpuLog = logs.FirstOrDefault(x => x.CheckId == 23);
+
             float? batchRequestsPerSecond = null;
             float? reCompilesPerSecond = null;
             float? waitTimePerCorePerSec = null;

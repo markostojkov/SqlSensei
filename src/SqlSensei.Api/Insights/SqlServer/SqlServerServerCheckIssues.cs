@@ -55,7 +55,7 @@ namespace SqlSensei.Api.Insights
         int? logicalCpu,
         int? memoryInGb,
         string? serverName,
-        string? verionDetails)
+        string? versionDetails)
     {
         public bool Is32Bit { get; } = is32Bit;
         public DateTime? LastRestartServer { get; } = lastRestartServer;
@@ -66,7 +66,7 @@ namespace SqlSensei.Api.Insights
         public int? LogicalCpu { get; } = logicalCpu;
         public int? MemoryInGb { get; } = memoryInGb;
         public string? ServerName { get; } = serverName;
-        public string? VerionDetails { get; } = verionDetails;
+        public string? VersionDetails { get; } = versionDetails;
     }
 
     public class SqlServerServerCheckIssues

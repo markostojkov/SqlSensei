@@ -9,11 +9,16 @@ namespace SqlSensei.Api.Controllers
     [ApiController]
     [Route("[controller]/v{version:apiVersion}")]
     [ApiVersion((double)SqlSenseiConfigurationApiVersion.Version1)]
-    public class SqlServerController(StoreLogsToDatabaseService storeLogsToDatabaseService, JobService jobService, SqlServerInsights serverInsights) : BaseController
+    public class SqlServerController(
+        StoreLogsToDatabaseService storeLogsToDatabaseService,
+        JobService jobService,
+        SqlServerInsights serverInsights,
+        ServersService serversService) : BaseController
     {
         public StoreLogsToDatabaseService StoreLogsToDatabaseService { get; } = storeLogsToDatabaseService;
         public JobService JobService { get; } = jobService;
         public SqlServerInsights ServerInsights { get; } = serverInsights;
+        public ServersService ServersService { get; } = serversService;
 
         [HttpPost("jobs/{jobId:long}/monitoring")]
         public async Task<IActionResult> PostMonitoringLogs(long jobId, [FromBody] MonitoringLogRequest request)
@@ -39,10 +44,26 @@ namespace SqlSensei.Api.Controllers
             return OkOrError(result);
         }
 
-        [HttpGet("jobs/{jobId:long}/monitoring")]
-        public async Task<IActionResult> GetMonitoring(long jobId)
+        [HttpGet("servers")]
+        public async Task<IActionResult> GetServers()
         {
-            var result = await ServerInsights.GetInisights(jobId);
+            var result = await ServersService.GetServers();
+
+            return OkOrError(result);
+        }
+
+        [HttpGet("servers/{serverId:long}")]
+        public async Task<IActionResult> GetServerInsights(long serverId)
+        {
+            var result = await ServerInsights.GetInsights(serverId);
+
+            return OkOrError(result);
+        }
+
+        [HttpGet("servers/{serverId:long}/wait-stats")]
+        public async Task<IActionResult> GetServerWaitStats(long serverId, [FromQuery]DateTime start, [FromQuery]DateTime end)
+        {
+            var result = await ServerInsights.GetWaitStats(serverId, start, end);
 
             return OkOrError(result);
         }

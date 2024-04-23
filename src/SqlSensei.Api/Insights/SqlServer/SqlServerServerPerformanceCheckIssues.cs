@@ -247,36 +247,7 @@ namespace SqlSensei.Api.Insights
                 .Select(x => new SqlServerPerformanceWaitStat(x.TimeInMs, waitTypeDictionary.GetValueOrDefault(x.Type)))
                 .OrderByDescending(stats => stats.TimeInMs);
 
-            var selectedBadQueriesByWaitType = new List<SqlServerBadQuery>();
-
-            if (waitStats.Any())
-            {
-                switch (waitStats.First().WaitType)
-                {
-                    case SqlServerPerformanceWaitType.CxPacket:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Cpu).Select(x => Convert(x)));
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Reads).Select(x => Convert(x)));
-                        break;
-                    case SqlServerPerformanceWaitType.SosSchedulerYield:
-                    case SqlServerPerformanceWaitType.Threadpool:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Reads).Select(x => Convert(x)));
-                        break;
-                    case SqlServerPerformanceWaitType.Lock:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Duration).Select(x => Convert(x)));
-                        break;
-                    case SqlServerPerformanceWaitType.ResourceSemaphore:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.MemoryGrant).Select(x => Convert(x)));
-                        break;
-                    case SqlServerPerformanceWaitType.PageIoLatch:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Reads).Select(x => Convert(x)));
-                        break;
-                    case SqlServerPerformanceWaitType.WriteLog:
-                        selectedBadQueriesByWaitType.AddRange(badQueries.Where(x => x.QueryLogSortBy == QueryLogSortBy.Writes).Select(x => Convert(x)));
-                        break;
-                }
-            }
-
-            return new SqlServerPerformanceCheck(serverInfo, waitStats, selectedBadQueriesByWaitType);
+            return new SqlServerPerformanceCheck(serverInfo, waitStats, badQueries.Select(x => Convert(x)));
         }
 
         private static SqlServerBadQuery Convert(MonitoringQueryLog x)

@@ -12,22 +12,14 @@ namespace SqlSensei.Core
         IEnumerable<MonitoringJobServerLog> serverLogs,
         IEnumerable<MonitoringJobServerWaitStatLog> serverWaitStatLogs,
         IEnumerable<MonitoringJobServerFindingLog> serverFindingLogs,
-        IEnumerable<MonitoringJobQueryLog> queryLogsCpu,
-        IEnumerable<MonitoringJobQueryLog> queryLogsRead,
-        IEnumerable<MonitoringJobQueryLog> queryLogsWrite,
-        IEnumerable<MonitoringJobQueryLog> queryLogsDuration,
-        IEnumerable<MonitoringJobQueryLog> queryLogsMemoryGrant)
+        IEnumerable<MonitoringJobQueryLog> queryLogs)
     {
         public IEnumerable<MonitoringJobIndexMissingLog> IndexMissingLogs { get; } = indexMissingLogs;
         public IEnumerable<MonitoringJobIndexUsageLog> IndexUsageLogs { get; } = indexUsageLogs;
         public IEnumerable<MonitoringJobServerLog> ServerLogs { get; } = serverLogs;
         public IEnumerable<MonitoringJobServerWaitStatLog> ServerWaitStatLogs { get; } = serverWaitStatLogs;
         public IEnumerable<MonitoringJobServerFindingLog> ServerFindingLogs { get; } = serverFindingLogs;
-        public IEnumerable<MonitoringJobQueryLog> QueryLogsCpu { get; } = queryLogsCpu;
-        public IEnumerable<MonitoringJobQueryLog> QueryLogsRead { get; } = queryLogsRead;
-        public IEnumerable<MonitoringJobQueryLog> QueryLogsWrite { get; } = queryLogsWrite;
-        public IEnumerable<MonitoringJobQueryLog> QueryLogsDuration { get; } = queryLogsDuration;
-        public IEnumerable<MonitoringJobQueryLog> QueryLogsMemoryGrant { get; } = queryLogsMemoryGrant;
+        public IEnumerable<MonitoringJobQueryLog> QueryLogs { get; } = queryLogs;
     }
 
     public class MonitoringJobIndexMissingLog(

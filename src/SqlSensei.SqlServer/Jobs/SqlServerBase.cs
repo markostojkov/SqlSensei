@@ -43,7 +43,7 @@ namespace SqlSensei.SqlServer
                 foreach (var commandString in commandStrings)
                 {
                     using SqlCommand command = new(commandString, connection);
-                    command.CommandTimeout = 240;
+                    command.CommandTimeout = 300;
                     _ = await command.ExecuteNonQueryAsync();
                 }
             }
@@ -93,7 +93,7 @@ namespace SqlSensei.SqlServer
                 {
                     using var command = new SqlCommand(sql, connection, transaction);
                     command.Parameters.AddRange(parameters);
-
+                    command.CommandTimeout = 300;
                     using (var result = await command.ExecuteReaderAsync())
                     {
                         commandAction?.Invoke(result);

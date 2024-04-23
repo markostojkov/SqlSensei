@@ -14,10 +14,6 @@ namespace SqlSensei.Core
             IEnumerable<IMonitoringJobServerLog> logsServer,
             IEnumerable<IMonitoringJobServerPerformanceLogWaitStat> logsWaitStatsServer,
             IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer,
-            IEnumerable<IMonitoringJobQueryLog> queryCpuLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryReadLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryWriteLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryDurationLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryMemoryGrantLogs);
+            IEnumerable<IMonitoringJobQueryLog> queryLogs);
     }
 }

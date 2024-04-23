@@ -3,7 +3,6 @@
     [Id]                        BIGINT IDENTITY(1,1)     NOT NULL,
     [CompanyFk]                 BIGINT                   NOT NULL,
     [JobFk]                     BIGINT                   NOT NULL,
-    [QueryLogSortBy]            TINYINT                  NOT NULL,
     [DatabaseName]              NVARCHAR(128)            NOT NULL,
     [QueryPlanCost]             FLOAT                    NULL,
     [QueryText]                 NVARCHAR(MAX)            NULL,

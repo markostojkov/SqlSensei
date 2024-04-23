@@ -88,11 +88,7 @@ namespace SqlSensei.SqlServer
             IEnumerable<IMonitoringJobServerLog> logsServer,
             IEnumerable<IMonitoringJobServerPerformanceLogWaitStat> logsWaitStatsServer,
             IEnumerable<IMonitoringJobServerPerformanceLogFinding> logsFindingsServer,
-            IEnumerable<IMonitoringJobQueryLog> queryCpuLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryReadLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryWriteLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryDurationLogs,
-            IEnumerable<IMonitoringJobQueryLog> queryMemoryGrantLogs)
+            IEnumerable<IMonitoringJobQueryLog> queryLogs)
         {
             try
             {
@@ -124,11 +120,7 @@ namespace SqlSensei.SqlServer
                         x.CheckId,
                         x.Priority,
                         x.Details)),
-                    MapQueryLogs(queryCpuLogs),
-                    MapQueryLogs(queryReadLogs),
-                    MapQueryLogs(queryWriteLogs),
-                    MapQueryLogs(queryDurationLogs),
-                    MapQueryLogs(queryMemoryGrantLogs));
+                    MapQueryLogs(queryLogs));
 
                 var jsonContent = JsonConvert.SerializeObject(request);
                 var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");

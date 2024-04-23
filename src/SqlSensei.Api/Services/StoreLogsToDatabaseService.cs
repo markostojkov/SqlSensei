@@ -118,23 +118,18 @@ namespace SqlSensei.Api.Services
 
             DbContext.MonitoringJobServerFindingLogs.AddRange(dbLogsFindingsServer);
 
-            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogsCpu, QueryLogSortBy.Cpu);
-            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogsRead, QueryLogSortBy.Reads);
-            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogsWrite, QueryLogSortBy.Writes);
-            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogsDuration, QueryLogSortBy.Duration);
-            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogsMemoryGrant, QueryLogSortBy.MemoryGrant);
+            StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogs);
 
             _ = await DbContext.SaveChangesAsync();
 
             return Result.Ok();
         }
 
-        private void StoreQueryLogs(long companyId, long jobId, IEnumerable<MonitoringJobQueryLog> logs, QueryLogSortBy sortBy)
+        private void StoreQueryLogs(long companyId, long jobId, IEnumerable<MonitoringJobQueryLog> logs)
         {
             var dbLogs = logs.Select(x => new MonitoringQueryLog(
                 companyId,
                 jobId,
-                sortBy,
                 x.DatabaseName,
                 x.QueryPlanCost,
                 x.QueryText,

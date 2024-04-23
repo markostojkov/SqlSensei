@@ -3,7 +3,6 @@
     public class MonitoringQueryLog(
         long companyFk,
         long jobFk,
-        QueryLogSortBy queryLogSortBy,
         string databaseName,
         float? queryPlanCost,
         string queryText,
@@ -31,7 +30,6 @@
         public long Id { get; set; }
         public long CompanyFk { get; set; } = companyFk;
         public long JobFk { get; set; } = jobFk;
-        public QueryLogSortBy QueryLogSortBy { get; set; } = queryLogSortBy;
         public string DatabaseName { get; set; } = databaseName;
         public float? QueryPlanCost { get; set; } = queryPlanCost;
         public string QueryText { get; set; } = queryText;
@@ -57,14 +55,5 @@
         public byte[]? QueryHash { get; set; } = queryHash;
         public virtual Company Company { get; set; }
         public virtual JobExecution Job { get; set; }
-    }
-
-    public enum QueryLogSortBy
-    {
-        Cpu,
-        Reads,
-        Writes,
-        Duration,
-        MemoryGrant
     }
 }

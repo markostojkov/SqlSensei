@@ -2,6 +2,7 @@
 using SqlSensei.SqlServer.InformationGather;
 
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,23 +22,30 @@ namespace SqlSensei.SqlServer
             {
                 while (true)
                 {
-                    await Task.Delay(EnvHelpers.DelayForJob());
-
-                    var canExecuteJobsResponse = await ServiceLogger.GetCanExecuteJobs();
-
-                    if (canExecuteJobsResponse.IsFailure)
+                    try
                     {
-                        continue;
+                        await Task.Delay(EnvHelpers.DelayForJob());
+
+                        var canExecuteJobsResponse = await ServiceLogger.GetCanExecuteJobs();
+
+                        if (canExecuteJobsResponse.IsFailure)
+                        {
+                            continue;
+                        }
+
+                        if (canExecuteJobsResponse.Value.CanExecuteMaintenance)
+                        {
+                            await ExecuteMaintenanceJob(canExecuteJobsResponse.Value.MaintenanceJobId);
+                        }
+
+                        if (canExecuteJobsResponse.Value.CanExecuteMonitoring)
+                        {
+                            await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringJobId);
+                        }
                     }
-
-                    if (canExecuteJobsResponse.Value.CanExecuteMaintenance)
+                    catch (System.Exception e)
                     {
-                        await ExecuteMaintenanceJob(canExecuteJobsResponse.Value.MaintenanceJobId);
-                    }
-
-                    if (canExecuteJobsResponse.Value.CanExecuteMonitoring)
-                    {
-                        await ExecuteMonitoringJob(canExecuteJobsResponse.Value.MonitoringJobId);
+                        ErrorLoggerService.Error(e, e.Message);
                     }
                 }
             });
@@ -80,35 +88,7 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryCpuTruncateLogTable);
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryReadsTruncateLogTable);
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryWritesTruncateLogTable);
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryDurationTruncateLogTable);
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryMemoryGrantTruncateLogTable);
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryTruncateLogTable);
 
             if (!result)
             {
@@ -150,18 +130,33 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            await ExecuteScriptAsyncGoStatements(Configuration.MonitoringOptions.GetScript(ConnectionStringParsed.InitialCatalog));
+            var serverWaitStatsResults = new List<ServerWaitStatsLog>();
+            var serverFindingResults = new List<ServerFindingLog>();
+
+            result = await ExecuteCommandAsync(Configuration.MonitoringOptions.GetCurrentServerStateScript(), (reader) =>
+            {
+                var table1 = new DataTable();
+                table1.Load(reader);
+
+                serverFindingResults = ServerFindingLog.GetAll(table1);
+
+                var table2 = new DataTable();
+                table2.Load(reader);
+
+                serverWaitStatsResults = ServerWaitStatsLog.GetAll(table2);
+            });
+
+            if (!result)
+            {
+                return;
+            }
+
+            await ExecuteScriptAsyncGoStatements(Configuration.MonitoringOptions.GetScript(ConnectionStringParsed.InitialCatalog, ServerWaitStatsLog.WaitType(serverWaitStatsResults)));
 
             var indexUsageResults = new List<IndexLogUsage>();
             var indexMissingResults = new List<IndexLog>();
             var serverResults = new List<ServerLog>();
-            var serverWaitStatsResults = new List<ServerWaitStatsLog>();
-            var serverFindingResults = new List<ServerFindingLog>();
-            var queryCpuResults = new List<QueryLog>();
-            var queryReadsResults = new List<QueryLog>();
-            var queryWritesResults = new List<QueryLog>();
-            var queryDurationResults = new List<QueryLog>();
-            var queryMemoryGrantResults = new List<QueryLog>();
+            var queryResults = new List<QueryLog>();
 
             result = await ExecuteCommandAsync(SqlServerSql.MonitoringUsageIndexSelectLogTable, (reader) => indexUsageResults = IndexLogUsage.GetAll(reader));
 
@@ -184,49 +179,7 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerWaitStatsSelectLogTable, (reader) => serverWaitStatsResults = ServerWaitStatsLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringServerFindingsSelectLogTable, (reader) => serverFindingResults = ServerFindingLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryCpuSelectLogTable, (reader) => queryCpuResults = QueryLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryReadsSelectLogTable, (reader) => queryReadsResults = QueryLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryWritesSelectLogTable, (reader) => queryWritesResults = QueryLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryDurationSelectLogTable, (reader) => queryDurationResults = QueryLog.GetAll(reader));
-
-            if (!result)
-            {
-                return;
-            }
-
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQueryMemoryGrantSelectLogTable, (reader) => queryMemoryGrantResults = QueryLog.GetAll(reader));
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQuerySelectLogTable, (reader) => queryResults = QueryLog.GetAll(reader));
 
             if (!result)
             {
@@ -240,11 +193,7 @@ namespace SqlSensei.SqlServer
                 serverResults,
                 serverWaitStatsResults,
                 serverFindingResults,
-                queryCpuResults,
-                queryReadsResults,
-                queryWritesResults,
-                queryDurationResults,
-                queryMemoryGrantResults);
+                queryResults);
         }
 
         public void InstallMaintenanceAndMonitoringScripts()

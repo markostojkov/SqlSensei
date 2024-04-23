@@ -28,57 +28,13 @@
             
             GO
 
-            EXECUTE dbo.sp_BlitzFirst
-            @ExpertMode = 1,
-            @Seconds = 30,
-            @OutputResultSets = N'Findings|WaitStats',
-            @OutputDatabaseName = '{1}' ,
-            @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringServerFindingsTableLogTo + @"',
-            @OutputTableNameWaitStats = '" + SqlServerSql.MonitoringServerWaitStatsTableLogTo + @"'
-
-            GO
-
             EXECUTE dbo.sp_BlitzCache
-            @ExpertMode = 1,
-            @OutputDatabaseName = '{2}' ,
+            @SortOrder = '{1}',
+            @OutputDatabaseName = '{0}' ,
             @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringQueryCpuTableLogTo + @"'
+            @OutputTableName = '" + SqlServerSql.MonitoringQueryTableLogTo + @"'
 
             GO
-
-            EXECUTE dbo.sp_BlitzCache
-            @ExpertMode = 1,
-            @OutputDatabaseName = '{3}' ,
-            @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringQueryReadsTableLogTo + @"'
-
-            GO
-
-            EXECUTE dbo.sp_BlitzCache
-            @ExpertMode = 1,
-            @OutputDatabaseName = '{4}' ,
-            @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringQueryWritesTableLogTo + @"'
-
-            GO
-
-            EXECUTE dbo.sp_BlitzCache
-            @ExpertMode = 1,
-            @OutputDatabaseName = '{5}' ,
-            @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringQueryDurationTableLogTo + @"'
-
-            GO
-
-            EXECUTE dbo.sp_BlitzCache
-            @ExpertMode = 1,
-            @OutputDatabaseName = '{6}' ,
-            @OutputSchemaName = 'dbo',
-            @OutputTableName = '" + SqlServerSql.MonitoringQueryMemoryGrantTableLogTo + @"'
-
-            GO
-
         ";
 
         public string ScriptName { get; }
@@ -90,21 +46,18 @@
 
         public static SqlServerConfigurationMonitoringOptions Default => new("MonitoringSolution.sql");
 
-        public string GetScript(string monitoringAndMaintenanceScriptDatabaseName)
+        public string GetScript(string monitoringAndMaintenanceScriptDatabaseName, string sortQueriesBy)
         {
-            var scriptForAllDatabases = string.Format(
-                _scriptMonitoringWholeServer,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName,
-                monitoringAndMaintenanceScriptDatabaseName);
+            var scriptForAllDatabases = string.Format(_scriptMonitoringWholeServer, monitoringAndMaintenanceScriptDatabaseName, sortQueriesBy);
 
             scriptForAllDatabases += string.Format(_script, monitoringAndMaintenanceScriptDatabaseName);
 
             return scriptForAllDatabases;
+        }
+
+        public string GetCurrentServerStateScript()
+        {
+            return @"EXECUTE dbo.sp_BlitzFirst  @ExpertMode = 1, @Seconds = 30, @OutputResultSets = N'Findings|WaitStats'";
         }
     }
 }

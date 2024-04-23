@@ -4,11 +4,7 @@
     {
         #region Monitoring
 
-        public static string MonitoringQueryCpuTableLogTo => "MonitoringQueryCpuTableLogTo";
-        public static string MonitoringQueryReadsTableLogTo => "MonitoringQueryReadsTableLogTo";
-        public static string MonitoringQueryWritesTableLogTo => "MonitoringQueryWritesTableLogTo";
-        public static string MonitoringQueryDurationTableLogTo => "MonitoringQueryDurationTableLogTo";
-        public static string MonitoringQueryMemoryGrantTableLogTo => "MonitoringQueryMemoryGrantTableLogTo";
+        public static string MonitoringQueryTableLogTo => "MonitoringQueryTableLogTo";
         public static string MonitoringMissingIndexTableLogTo => "MissingIndexMonitoring";
         public static string MonitoringUsageIndexTableLogTo => "UsageIndexMonitoring";
         public static string MonitoringServerTableLogTo => "ServerMonitoring";
@@ -18,25 +14,9 @@
         private static string MonitoringMissingIndexTableName => "[dbo].[MissingIndexMonitoring]";
         private static string MonitoringUsageIndexTableName => "[dbo].[UsageIndexMonitoring]";
 
-        public static string MonitoringQueryCpuTruncateLogTable =>
-    $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryCpuTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    TRUNCATE TABLE {MonitoringQueryCpuTableLogTo}";
-
-        public static string MonitoringQueryReadsTruncateLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryReadsTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    TRUNCATE TABLE {MonitoringQueryReadsTableLogTo}";
-
-        public static string MonitoringQueryWritesTruncateLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryWritesTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    TRUNCATE TABLE {MonitoringQueryWritesTableLogTo}";
-
-        public static string MonitoringQueryDurationTruncateLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryDurationTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    TRUNCATE TABLE {MonitoringQueryDurationTableLogTo}";
-
-        public static string MonitoringQueryMemoryGrantTruncateLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryMemoryGrantTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    TRUNCATE TABLE {MonitoringQueryMemoryGrantTableLogTo}";
+        public static string MonitoringQueryTruncateLogTable =>
+    $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
+    TRUNCATE TABLE {MonitoringQueryTableLogTo}";
 
         public static string MonitoringMissingIndexTruncateLogTable =>
             $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringMissingIndexTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
@@ -62,25 +42,9 @@
             $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringServerFindingsTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
     TRUNCATE TABLE {MonitoringServerFindingsTableLogTo}";
 
-        public static string MonitoringQueryCpuSelectLogTable =>
-    $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryCpuTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    SELECT * FROM {MonitoringQueryCpuTableLogTo}";
-
-        public static string MonitoringQueryReadsSelectLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryReadsTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    SELECT * FROM {MonitoringQueryReadsTableLogTo}";
-
-        public static string MonitoringQueryWritesSelectLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryWritesTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    SELECT * FROM {MonitoringQueryWritesTableLogTo}";
-
-        public static string MonitoringQueryDurationSelectLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryDurationTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    SELECT * FROM {MonitoringQueryDurationTableLogTo}";
-
-        public static string MonitoringQueryMemoryGrantSelectLogTable =>
-            $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryMemoryGrantTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
-    SELECT * FROM {MonitoringQueryMemoryGrantTableLogTo}";
+        public static string MonitoringQuerySelectLogTable =>
+    $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringQueryTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))
+    SELECT * FROM {MonitoringQueryTableLogTo}";
 
         public static string MonitoringMissingIndexSelectLogTable =>
             $@"IF EXISTS(SELECT * FROM sys.tables WHERE name = N'{MonitoringMissingIndexTableLogTo}' AND schema_id = SCHEMA_ID('dbo'))

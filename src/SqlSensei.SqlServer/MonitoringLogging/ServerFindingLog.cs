@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
-
-using SqlSensei.Core;
+﻿using SqlSensei.Core;
+using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace SqlSensei.SqlServer.InformationGather
 {
@@ -11,15 +11,15 @@ namespace SqlSensei.SqlServer.InformationGather
         public short Priority { get; } = priority;
         public string Details { get; } = details;
 
-        public static List<ServerFindingLog> GetAll(SqlDataReader reader)
+        public static List<ServerFindingLog> GetAll(DataTable dataTable)
         {
-            List<ServerFindingLog> records = [];
+            var records = new List<ServerFindingLog>();
 
-            while (reader.Read())
+            foreach (DataRow row in dataTable.Rows)
             {
-                var checkId = reader.IsDBNull(reader.GetOrdinal("CheckID")) ? -1 : reader.GetInt32(reader.GetOrdinal("CheckID"));
-                var priority = reader.IsDBNull(reader.GetOrdinal("Priority")) ? (short)-1 : reader.GetByte(reader.GetOrdinal("Priority"));
-                var details = reader.IsDBNull(reader.GetOrdinal("Details")) ? string.Empty : reader.GetString(reader.GetOrdinal("Details"));
+                var checkId = row.IsNull("CheckID") ? -1 : Convert.ToInt32(row["CheckID"]);
+                var priority = row.IsNull("Priority") ? (short)-1 : Convert.ToByte(row["Priority"]);
+                var details = row.IsNull("Details") ? string.Empty : Convert.ToString(row["Details"]);
 
                 var record = new ServerFindingLog(checkId, priority, details);
 

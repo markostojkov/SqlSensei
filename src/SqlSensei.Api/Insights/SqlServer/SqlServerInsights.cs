@@ -20,7 +20,7 @@ namespace SqlSensei.Api.Insights
             }
 
             var server = await DbContext.Servers
-                .Include(x => x.Jobs.OrderByDescending(y => y.Id).Take(1))
+                .Include(x => x.Jobs.Where(x => x.Status == JobStatus.Completed).OrderByDescending(y => y.Id).Take(1))
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Id == serverId)
                 .FirstOrDefaultAsync();

@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>Create new server</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="formGroup" (ngSubmit)="submitForm()">
+    <div>
+      <mat-form-field>
+        <mat-label>Server Name</mat-label>
+        <input matInput [formControl]="formGroup.controls.serverName" />
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field>
+        <mat-label>Monitoring Period</mat-label>
+        <mat-select [formControl]="formGroup.controls.monitoringPeriod">
+          <mat-option *ngFor="let period of monitoringPeriodEnum" [value]="period.value">
+            {{ period.key }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field>
+        <mat-label>Maintenance Period</mat-label>
+        <mat-select [formControl]="formGroup.controls.maintenancePeriod">
+          <mat-option *ngFor="let period of maintenancePeriodEnum" [value]="period.value">
+            {{ period.key }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+  <button mat-raised-button color="primary" [disabled]="formGroup.invalid" (click)="submitForm()">Create</button>
+</mat-dialog-actions>

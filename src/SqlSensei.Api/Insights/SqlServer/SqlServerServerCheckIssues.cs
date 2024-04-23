@@ -23,11 +23,14 @@ namespace SqlSensei.Api.Insights
         public IEnumerable<SqlServerInsightsServerIssue> ServerIssues { get; } = serverIssues;
     }
 
-    public class SqlServerInsightsServerIssue(short priority, int checkId, ServerCheckIssueCategory checkCategory)
+    public class SqlServerInsightsServerIssue(short priority, int checkId, ServerCheckIssueCategory checkCategory, string details, string scriptDetails, string? databaseName)
     {
         public short Priority { get; } = priority;
         public int CheckId { get; } = checkId;
         public ServerCheckIssueCategory CheckCategory { get; } = checkCategory;
+        public string Details { get; } = details;
+        public string ScriptDetails { get; } = scriptDetails;
+        public string? DatabaseName { get; } = databaseName;
     }
 
     public class SqlServerInsightsCacheAndWaitStats(
@@ -35,6 +38,7 @@ namespace SqlSensei.Api.Insights
         bool cacheClearedRecently,
         bool noSignificantWaitStats,
         bool poisonWaits,
+        string? poisonWaitType,
         bool poisonWaitsSerializableLocking
         )
     {
@@ -42,6 +46,7 @@ namespace SqlSensei.Api.Insights
         public bool CacheClearedRecently { get; } = cacheClearedRecently;
         public bool NoSignificantWaitStats { get; } = noSignificantWaitStats;
         public bool PoisonWaits { get; } = poisonWaits;
+        public string? PoisonWaitType { get; } = poisonWaitType;
         public bool PoisonWaitsSerializableLocking { get; } = poisonWaitsSerializableLocking;
     }
 
@@ -71,6 +76,26 @@ namespace SqlSensei.Api.Insights
 
     public class SqlServerServerCheckIssues
     {
+        public static string GetInsightsDetails(MonitoringJobServerLog log)
+        {
+            if (dataInDanger.TryGetValue(log.CheckId, out var x))
+            {
+                return x;
+            }
+
+            if (serverInDanger.TryGetValue(log.CheckId, out var y))
+            {
+                return y;
+            }
+
+            if (serverPerformance.TryGetValue(log.CheckId, out var z))
+            {
+                return z;
+            }
+
+            return string.Empty;
+        }
+
         private static readonly Dictionary<int, string> dataInDanger = new()
         {
             {93,  "Backup is on the same storage as the database"},
@@ -91,7 +116,6 @@ namespace SqlSensei.Api.Insights
         private static readonly Dictionary<int, string> serverInDanger = new()
         {
             {51,  "Memory Dangerously Low"},
-            {159, "Memory Dangerously Low in NUMA Nodes"},
             {101, "CPU Schedulers Offline"},
             {198, "CPU with Odd Number of Cores"},
             {110, "Memory Nodes Offline"},
@@ -191,19 +215,20 @@ namespace SqlSensei.Api.Insights
         {
             var serverIssues = logs
                 .Where(x => GetCategory(x.CheckId) != ServerCheckIssueCategory.None)
-                .Select(x => new SqlServerInsightsServerIssue(x.Priority, x.CheckId, GetCategory(x.CheckId)));
+                .Select(x => new SqlServerInsightsServerIssue(x.Priority, x.CheckId, GetCategory(x.CheckId), GetInsightsDetails(x), x.Details, x.DatabaseName));
 
             var waitStatsClearedRecently = logs.Any(x => new List<int>() { 221, 205, 185 }.Contains(x.CheckId));
             var cacheClearedRecently = logs.Any(x => new List<int>() { 207, 208, 125, 221 }.Contains(x.CheckId));
             var noSignificantWaitStats = logs.Any(x => x.CheckId == 153);
-            var poisonWaits = logs.Any(x => x.CheckId == 107);
+            var poisonWaits = logs.FirstOrDefault(x => x.CheckId == 107);
             var poisonWaitsSerializableLocking = logs.Any(x => x.CheckId == 121);
 
             var cacheAndWaitStats = new SqlServerInsightsCacheAndWaitStats(
                 waitStatsClearedRecently,
                 cacheClearedRecently,
                 noSignificantWaitStats,
-                poisonWaits,
+                poisonWaits != null,
+                poisonWaits?.Details,
                 poisonWaitsSerializableLocking);
 
             var is32Bit = logs.Any(x => x.CheckId == 154);

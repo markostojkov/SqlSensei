@@ -69,6 +69,7 @@ namespace SqlSensei.Api.Insights
             return Result.Ok(new InsightsResponse(
                 server.Id,
                 server.Name,
+                server.ApiKey,
                 SqlServerServerCheckIssues.GetSqlServerChecks(serverIssues),
                 SqlServerServerPerformanceCheckIssues.GetSqlServerPerformanceFindings(serverPerformanceIssues, serverWaitStats, queries),
                 SqlServerIndexIssues.GetSqlServerChecks(indexUsage, missingIndex)));
@@ -111,6 +112,46 @@ namespace SqlSensei.Api.Insights
                 .ToListAsync();
 
             return Result.Ok(SqlServerServerPerformanceCheckIssues.GetSqlServerWaitStatsGraph(serverWaitStatsGraph));
+        }
+
+        public async Task<Result<IEnumerable<SqlServerPerformancePerformanceGraph>>> GetPerformanceStats(long serverId, DateTime start, DateTime end)
+        {
+            if (end < start && (end - start).TotalDays > 7)
+            {
+                return Result.Forbidden<IEnumerable<SqlServerPerformancePerformanceGraph>>(ResultCodes.ServerWaitStatsCantBeMoreThan7Days);
+            }
+
+            var companyResult = Company.GetCurrentCompany();
+
+            if (companyResult.IsFailure)
+            {
+                return Result.FromError<IEnumerable<SqlServerPerformancePerformanceGraph>>(companyResult);
+            }
+
+            var server = await DbContext.Servers
+                .Include(x => x.Jobs.OrderByDescending(y => y.Id).Take(1))
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Id == serverId)
+                .FirstOrDefaultAsync();
+
+            if (server is null)
+            {
+                return Result.NotFound<IEnumerable<SqlServerPerformancePerformanceGraph>>(ResultCodes.ServerNotFound);
+            }
+
+            if (server.Jobs.Any() is false)
+            {
+                return Result.NotFound<IEnumerable<SqlServerPerformancePerformanceGraph>>(ResultCodes.JobNotFound);
+            }
+
+            var serverPerformanceGraph = await DbContext.MonitoringJobServerFindingLogs
+                .Include(x => x.Job)
+                .Where(x => x.Job.ServerFk == server.Id)
+                .Where(x => x.Job.CreatedOn < end && x.Job.CreatedOn > start)
+                .Where(x => SqlServerServerPerformanceCheckIssues.PerformanceCheckIds.Contains(x.CheckId))
+                .ToListAsync();
+
+            return Result.Ok(SqlServerServerPerformanceCheckIssues.GetSqlServerPerformanceGraph(serverPerformanceGraph));
         }
     }
 }

@@ -52,6 +52,14 @@ namespace SqlSensei.Api.Controllers
             return OkOrError(result);
         }
 
+        [HttpPost("servers")]
+        public async Task<IActionResult> CreateServer([FromBody]CreateServerRequest req)
+        {
+            var result = await ServersService.CreateServer(req);
+
+            return OkOrError(result);
+        }
+
         [HttpGet("servers/{serverId:long}")]
         public async Task<IActionResult> GetServerInsights(long serverId)
         {
@@ -60,10 +68,26 @@ namespace SqlSensei.Api.Controllers
             return OkOrError(result);
         }
 
+        [HttpDelete("servers/{serverId:long}")]
+        public async Task<IActionResult> DeleteServer(long serverId)
+        {
+            var result = await ServersService.DeleteServer(serverId);
+
+            return OkOrError(result);
+        }
+
         [HttpGet("servers/{serverId:long}/wait-stats")]
         public async Task<IActionResult> GetServerWaitStats(long serverId, [FromQuery]DateTime start, [FromQuery]DateTime end)
         {
             var result = await ServerInsights.GetWaitStats(serverId, start, end);
+
+            return OkOrError(result);
+        }
+
+        [HttpGet("servers/{serverId:long}/performance")]
+        public async Task<IActionResult> GetServerPerformanceStats(long serverId, [FromQuery] DateTime start, [FromQuery] DateTime end)
+        {
+            var result = await ServerInsights.GetPerformanceStats(serverId, start, end);
 
             return OkOrError(result);
         }

@@ -13,13 +13,27 @@ export class ServersApiService {
     return this.baseApi.get<Result<ServerResponse[]>>('/sqlserver/v1/servers').pipe(map((x) => x.value));
   }
 
+  createServer(req: CreateServerRequest): Observable<number> {
+    return this.baseApi.post<Result<number>>('/sqlserver/v1/servers', req).pipe(map((x) => x.value));
+  }
+
   getServer(id: number): Observable<ServerDetailsResponse> {
     return this.baseApi.get<Result<ServerDetailsResponse>>(`/sqlserver/v1/servers/${id}`).pipe(map((x) => x.value));
+  }
+
+  deleteServer(id: number): Observable<void> {
+    return this.baseApi.delete<Result<void>>(`/sqlserver/v1/servers/${id}`).pipe(map((x) => x.value));
   }
 
   getServerWaitStats(id: number, start: Date, end: Date): Observable<SqlServerPerformanceWaitStatGraph[]> {
     return this.baseApi
       .get<Result<SqlServerPerformanceWaitStatGraph[]>>(`/sqlserver/v1/servers/${id}/wait-stats?start=${start.toISOString()}&end=${end.toISOString()}`)
+      .pipe(map((x) => x.value));
+  }
+
+  getServerPerformanceStats(id: number, start: Date, end: Date): Observable<SqlServerPerformancePerformanceGraph[]> {
+    return this.baseApi
+      .get<Result<SqlServerPerformancePerformanceGraph[]>>(`/sqlserver/v1/servers/${id}/performance?start=${start.toISOString()}&end=${end.toISOString()}`)
       .pipe(map((x) => x.value));
   }
 }
@@ -29,7 +43,14 @@ export class ServerResponse {
 }
 
 export class ServerDetailsResponse extends ServerResponse {
-  constructor(id: number, name: string, public sqlServerCheck: SqlServerCheck, public sqlServerPerformanceCheck: SqlServerPerformanceCheck, publicindexCheck: SqlServerIndexCheck) {
+  constructor(
+    id: number,
+    name: string,
+    public apiKey: string,
+    public sqlServerCheck: SqlServerCheck,
+    public sqlServerPerformanceCheck: SqlServerPerformanceCheck,
+    public indexCheck: SqlServerIndexCheck
+  ) {
     super(id, name);
   }
 }
@@ -54,6 +75,13 @@ export enum SqlServerPerformanceWaitType {
   WriteLog,
 }
 
+export enum SqlServerPerformanceType {
+  CpuUtilization,
+  WaitTimePerCorePerSec,
+  ReCompilesPerSecond,
+  BatchRequestsPerSecond,
+}
+
 export interface SqlServerCheck {
   serverInfo: SqlServerInsightsServerInfo;
   cacheAndWaitStats: SqlServerInsightsCacheAndWaitStats;
@@ -75,6 +103,9 @@ export interface SqlServerInsightsServerIssue {
   priority: number;
   checkId: number;
   checkCategory: ServerCheckIssueCategory;
+  details: string;
+  scriptDetails: string;
+  databaseName: string | null;
 }
 
 export interface SqlServerInsightsCacheAndWaitStats {
@@ -82,6 +113,7 @@ export interface SqlServerInsightsCacheAndWaitStats {
   cacheClearedRecently: boolean;
   noSignificantWaitStats: boolean;
   poisonWaits: boolean;
+  poisonWaitType: string;
   poisonWaitsSerializableLocking: boolean;
 }
 
@@ -131,6 +163,12 @@ export interface SqlServerPerformanceWaitStatGraph {
   dateTime: Date;
 }
 
+export interface SqlServerPerformancePerformanceGraph {
+  value: number | null;
+  type: SqlServerPerformanceType;
+  dateTime: Date;
+}
+
 export interface SqlServerBadQuery {
   id: number;
   databaseName?: string;
@@ -148,4 +186,20 @@ export interface SqlServerBadQuery {
   numberOfDistinctPlans?: number;
   lastExecutionTime?: Date;
   queryHash?: Uint8Array;
+}
+
+export enum SqlSenseiRunMonitoringPeriod {
+  Every15Minutes = 0,
+  Every30Minutes = 1,
+  Every60Minutes = 2,
+}
+
+export enum SqlSenseiRunMaintenancePeriod {
+  EveryWeekendSundayAt6AM = 0,
+  EveryOtherWeekendSundayAt6AM = 1,
+  Never = 2,
+}
+
+export class CreateServerRequest {
+  constructor(public name: string, public monitoringPeriod: SqlSenseiRunMonitoringPeriod, public maintenancePeriod: SqlSenseiRunMaintenancePeriod) {}
 }

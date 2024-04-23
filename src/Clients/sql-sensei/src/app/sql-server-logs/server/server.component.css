@@ -1,0 +1,9 @@
+.table-container {
+  margin-top: 10px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.height-full {
+  height: 100%;
+}

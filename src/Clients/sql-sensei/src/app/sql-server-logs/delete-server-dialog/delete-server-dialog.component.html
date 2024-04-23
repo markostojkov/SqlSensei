@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Delete server</h2>
+
+<mat-dialog-content>
+  <p>
+    Are you sure you want to delete server <b>{{ name }}</b> ?
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Close</button>
+  <button mat-raised-button color="warn" (click)="submitForm()">Delete</button>
+</mat-dialog-actions>

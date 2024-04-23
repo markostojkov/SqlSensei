@@ -1,6 +1,15 @@
 import { Component, OnDestroy, OnInit, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ServerDetailsResponse, ServersApiService, SqlServerPerformanceWaitStatGraph, SqlServerPerformanceWaitType } from '../servers-api.service';
+import {
+  ServerCheckIssueCategory,
+  ServerDetailsResponse,
+  ServersApiService,
+  SqlServerInsightsServerIssue,
+  SqlServerPerformancePerformanceGraph,
+  SqlServerPerformanceType,
+  SqlServerPerformanceWaitStatGraph,
+  SqlServerPerformanceWaitType,
+} from '../servers-api.service';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { Subject, switchMap, takeUntil } from 'rxjs';
 import { DatePipe } from '@angular/common';
@@ -15,6 +24,9 @@ export class ServerComponent implements OnInit, OnDestroy {
   id: number;
   server?: ServerDetailsResponse;
   waitStats?: SqlServerPerformanceWaitStatGraph[];
+  performanceStats?: SqlServerPerformancePerformanceGraph[];
+
+  ServerCheckIssueCategory = ServerCheckIssueCategory;
 
   start: Date;
   end: Date;
@@ -90,6 +102,48 @@ export class ServerComponent implements OnInit, OnDestroy {
     ],
   };
 
+  lineChartPerformanceData: ChartConfiguration<'line'>['data'] = {
+    datasets: [
+      {
+        data: [],
+        label: 'Wait Time Per Core Per Second',
+        fill: false,
+        tension: 0.5,
+        borderColor: 'blue',
+        backgroundColor: 'rgba(0,0,255,0.3)',
+      },
+      {
+        data: [],
+        label: 'Re Compiles Per Second',
+        fill: false,
+        tension: 0.5,
+        borderColor: 'green',
+        backgroundColor: 'rgba(0,255,0,0.3)',
+      },
+      {
+        data: [],
+        label: 'Batch Requests Per Second',
+        fill: false,
+        tension: 0.5,
+        borderColor: 'orange',
+        backgroundColor: 'rgba(255,165,0,0.3)',
+      },
+    ],
+  };
+
+  lineChartPerformanceCpuData: ChartConfiguration<'line'>['data'] = {
+    datasets: [
+      {
+        data: [],
+        label: 'CPU Utilization',
+        fill: false,
+        tension: 0.5,
+        borderColor: 'black',
+        backgroundColor: 'rgba(255,0,0,0.3)',
+      },
+    ],
+  };
+
   lineChartOptions: ChartOptions = {
     responsive: true,
     scales: {
@@ -139,6 +193,35 @@ export class ServerComponent implements OnInit, OnDestroy {
         switchMap((server) => {
           this.server = server;
 
+          return this.serversApi.getServerPerformanceStats(this.id, this.start, this.end);
+        }),
+
+        switchMap((performanceStats) => {
+          this.lineChartPerformanceData.datasets.forEach((dataset) => {
+            if (dataset.label === 'Wait Time Per Core Per Second') {
+              dataset.data = performanceStats.filter((x) => x.type === SqlServerPerformanceType.WaitTimePerCorePerSec).map((x) => x.value);
+            } else if (dataset.label === 'Re Compiles Per Second') {
+              dataset.data = performanceStats.filter((x) => x.type === SqlServerPerformanceType.ReCompilesPerSecond).map((x) => x.value);
+            } else if (dataset.label === 'Batch Requests Per Second') {
+              dataset.data = performanceStats.filter((x) => x.type === SqlServerPerformanceType.BatchRequestsPerSecond).map((x) => x.value);
+            }
+          });
+
+          this.lineChartPerformanceCpuData.datasets.forEach((dataset) => {
+            if (dataset.label === 'CPU Utilization') {
+              dataset.data = performanceStats.filter((x) => x.type === SqlServerPerformanceType.CpuUtilization).map((x) => x.value);
+            }
+          });
+
+          this.lineChartPerformanceData.labels = performanceStats
+            .filter((x) => x.type === SqlServerPerformanceType.WaitTimePerCorePerSec)
+            .map((x) => this.datePipe.transform(x.dateTime, 'short'));
+          this.lineChartPerformanceCpuData.labels = performanceStats
+            .filter((x) => x.type === SqlServerPerformanceType.CpuUtilization)
+            .map((x) => this.datePipe.transform(x.dateTime, 'short'));
+
+          this.performanceStats = performanceStats;
+
           return this.serversApi.getServerWaitStats(this.id, this.start, this.end);
         }),
         takeUntil(this.destroy$)
@@ -178,6 +261,10 @@ export class ServerComponent implements OnInit, OnDestroy {
     dateNow.setHours(hoursAgo * -1);
 
     return dateNow;
+  }
+
+  getServerChecksData(data: SqlServerInsightsServerIssue[], filter: ServerCheckIssueCategory): SqlServerInsightsServerIssue[] {
+    return data.filter((x) => x.checkCategory === filter).sort((a, b) => a.priority - b.priority);
   }
 
   ngOnDestroy(): void {

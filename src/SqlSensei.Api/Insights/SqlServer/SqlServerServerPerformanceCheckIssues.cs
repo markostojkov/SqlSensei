@@ -1,5 +1,6 @@
 ﻿using SqlSensei.Api.Storage;
-using System.Linq;
+using System;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -14,6 +15,14 @@ namespace SqlSensei.Api.Insights
         AsyncNetworkIo,
         PageIoLatch,
         WriteLog
+    }
+
+    public enum SqlServerPerformanceType
+    {
+        CpuUtilization,
+        WaitTimePerCorePerSec,
+        ReCompilesPerSecond,
+        BatchRequestsPerSecond
     }
 
     public class SqlServerBadQuery(
@@ -83,6 +92,13 @@ namespace SqlSensei.Api.Insights
         public DateTime? DateTime { get; } = dateTime;
     }
 
+    public class SqlServerPerformancePerformanceGraph(SqlServerPerformanceType type, double? value, DateTime? dateTime)
+    {
+        public SqlServerPerformanceType Type { get; } = type;
+        public double? Value { get; } = value;
+        public DateTime? DateTime { get; } = dateTime;
+    }
+
     public class SqlServerServerPerformanceCheckIssues
     {
         private static readonly Dictionary<string, SqlServerPerformanceWaitType> waitTypeDictionary = new()
@@ -98,6 +114,14 @@ namespace SqlSensei.Api.Insights
             {"SOS_SCHEDULER_YIELD", SqlServerPerformanceWaitType.SosSchedulerYield},
             {"THREADPOOL", SqlServerPerformanceWaitType.Threadpool},
             {"WRITELOG", SqlServerPerformanceWaitType.WriteLog}
+        };
+
+        private static readonly Dictionary<int, SqlServerPerformanceType> performanceDictionary = new()
+        {
+            {23, SqlServerPerformanceType.CpuUtilization},
+            {10, SqlServerPerformanceType.BatchRequestsPerSecond},
+            {26, SqlServerPerformanceType.ReCompilesPerSecond},
+            {20, SqlServerPerformanceType.WaitTimePerCorePerSec},
         };
 
         private static readonly Dictionary<int, string> queryIssues = new()
@@ -130,6 +154,42 @@ namespace SqlSensei.Api.Insights
             {23, "CPU Utilization"},
         };
 
+        public static readonly List<int> PerformanceCheckIds = new() { 19, 26, 20, 23 };
+
+        public static IEnumerable<SqlServerPerformancePerformanceGraph> GetSqlServerPerformanceGraph(IEnumerable<MonitoringJobServerFindingLog> performanceLogs)
+        {
+            return performanceLogs
+                .GroupBy(x => new { CreatedOn = new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0), Type = performanceDictionary.GetValueOrDefault(x.CheckId) })
+                .Select(x => new SqlServerPerformancePerformanceGraph(
+                    x.Key.Type,
+                    x.Select(y =>
+                    {
+                        float val = 0;
+
+                        if (x.Key.Type == SqlServerPerformanceType.CpuUtilization)
+                        {
+                            var percentageRegex = new Regex(@"(\d+)%");
+
+                            var percentageMatch = percentageRegex.Match(y.Details);
+
+                            if (percentageMatch.Success)
+                            {
+                                val = float.Parse(percentageMatch.Groups[1].Value);
+                            }
+                        }
+                        else
+                        {
+                            if (float.TryParse(y.Details, out var x))
+                            {
+                                val = x;
+                            }
+                        }
+
+                        return val;
+                    }).Average(y => y),
+                    x.Key.CreatedOn));
+        }
+
         public static IEnumerable<SqlServerPerformanceWaitStatGraph> GetSqlServerWaitStatsGraph(IEnumerable<MonitoringJobServerWaitStatLog> waitStats)
         {
             return waitStats
@@ -160,12 +220,12 @@ namespace SqlSensei.Api.Insights
 
             if (float.TryParse(logs.FirstOrDefault(x => x.CheckId == 26)?.Details, out var y))
             {
-                reCompilesPerSecond = x;
+                reCompilesPerSecond = y;
             }
 
             if (float.TryParse(logs.FirstOrDefault(x => x.CheckId == 20)?.Details, out var z))
             {
-                waitTimePerCorePerSec = x;
+                waitTimePerCorePerSec = z;
             }
 
             if (cpuLog != null)

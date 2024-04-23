@@ -5,6 +5,7 @@
         private readonly string _script = @"
             EXECUTE dbo.sp_BlitzIndex
             @Mode               = 3,
+            @GetAllDatabases    = 1,
             @OutputDatabaseName = '{0}',
             @OutputSchemaName   = 'dbo',
             @OutputTableName    = '" + SqlServerSql.MonitoringMissingIndexTableLogTo + @"'
@@ -13,6 +14,7 @@
 
             EXECUTE dbo.sp_BlitzIndex
             @Mode               = 2,
+            @GetAllDatabases    = 1,
             @OutputDatabaseName = '{0}',
             @OutputSchemaName   = 'dbo',
             @OutputTableName    = '" + SqlServerSql.MonitoringUsageIndexTableLogTo + @"'

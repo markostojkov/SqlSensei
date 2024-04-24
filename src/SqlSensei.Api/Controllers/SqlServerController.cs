@@ -61,9 +61,17 @@ namespace SqlSensei.Api.Controllers
         }
 
         [HttpGet("servers/{serverId:long}")]
-        public async Task<IActionResult> GetServerInsights(long serverId)
+        public async Task<IActionResult> GetServer(long serverId)
         {
-            var result = await ServerInsights.GetInsights(serverId);
+            var result = await ServerInsights.GetServerInfo(serverId);
+
+            return OkOrError(result);
+        }
+
+        [HttpGet("servers/{serverId:long}/insights")]
+        public async Task<IActionResult> GetServerInsights(long serverId, [FromQuery]DateTime date)
+        {
+            var result = await ServerInsights.GetInsights(serverId, date);
 
             return OkOrError(result);
         }

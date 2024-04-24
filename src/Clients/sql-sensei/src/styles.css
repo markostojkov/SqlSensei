@@ -25,3 +25,7 @@ body {
 .no-data-table-image {
   width: 200px;
 }
+
+.full-width {
+  width: 100%;
+}

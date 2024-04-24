@@ -14,11 +14,9 @@ namespace SqlSensei.Api.Insights
     }
 
     public class SqlServerCheck(
-        SqlServerInsightsServerInfo serverInfo,
         SqlServerInsightsCacheAndWaitStats cacheAndWaitStats,
         IEnumerable<SqlServerInsightsServerIssue> serverIssues)
     {
-        public SqlServerInsightsServerInfo ServerInfo { get; } = serverInfo;
         public SqlServerInsightsCacheAndWaitStats CacheAndWaitStats { get; } = cacheAndWaitStats;
         public IEnumerable<SqlServerInsightsServerIssue> ServerIssues { get; } = serverIssues;
     }
@@ -231,6 +229,15 @@ namespace SqlSensei.Api.Insights
                 poisonWaits?.Details,
                 poisonWaitsSerializableLocking);
 
+            return new SqlServerCheck(cacheAndWaitStats, serverIssues);
+        }
+
+        public static SqlServerInsightsServerInfo GetServerInfo(IEnumerable<MonitoringJobServerLog> logs)
+        {
+            var serverIssues = logs
+                .Where(x => GetCategory(x.CheckId) != ServerCheckIssueCategory.None)
+                .Select(x => new SqlServerInsightsServerIssue(x.Priority, x.CheckId, GetCategory(x.CheckId), GetInsightsDetails(x), x.Details, x.DatabaseName));
+
             var is32Bit = logs.Any(x => x.CheckId == 154);
             var serverName = logs.FirstOrDefault(x => x.CheckId == 130)?.Details;
             var versionDetails = logs.FirstOrDefault(x => x.CheckId == 85)?.Details;
@@ -302,7 +309,7 @@ namespace SqlSensei.Api.Insights
                 }
             }
 
-            var serverInfo = new SqlServerInsightsServerInfo(
+            return new SqlServerInsightsServerInfo(
                 is32Bit,
                 lastServerRestart,
                 lastSqlServerRestart,
@@ -313,8 +320,6 @@ namespace SqlSensei.Api.Insights
                 memoryInGb,
                 serverName,
                 versionDetails);
-
-            return new SqlServerCheck(serverInfo, cacheAndWaitStats, serverIssues);
         }
 
         private static ServerCheckIssueCategory GetCategory(int checkId)

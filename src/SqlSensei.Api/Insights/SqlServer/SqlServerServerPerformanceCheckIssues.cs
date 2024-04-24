@@ -61,13 +61,8 @@ namespace SqlSensei.Api.Insights
         public byte[]? QueryHash { get; } = queryHash;
     }
 
-    public class SqlServerPerformanceCheck(
-        SqlServerPerformanceServerInfo serverInfo,
-        IEnumerable<SqlServerPerformanceWaitStat> waitStats,
-        IEnumerable<SqlServerBadQuery> topBadQueries)
+    public class SqlServerPerformanceCheck(IEnumerable<SqlServerBadQuery> topBadQueries)
     {
-        public SqlServerPerformanceServerInfo ServerInfo { get; } = serverInfo;
-        public IEnumerable<SqlServerPerformanceWaitStat> WaitStats { get; } = waitStats;
         public IEnumerable<SqlServerBadQuery> TopBadQueries { get; } = topBadQueries;
     }
 
@@ -158,96 +153,65 @@ namespace SqlSensei.Api.Insights
 
         public static IEnumerable<SqlServerPerformancePerformanceGraph> GetSqlServerPerformanceGraph(IEnumerable<MonitoringJobServerFindingLog> performanceLogs)
         {
-            return performanceLogs
-                .GroupBy(x => new { CreatedOn = new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0), Type = performanceDictionary.GetValueOrDefault(x.CheckId) })
-                .Select(x => new SqlServerPerformancePerformanceGraph(
-                    x.Key.Type,
-                    x.Select(y =>
-                    {
-                        float val = 0;
+            var hourlyPerformanceLogs = performanceLogs
+                .GroupBy(x => new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0))
+                .ToList();
 
-                        if (x.Key.Type == SqlServerPerformanceType.CpuUtilization)
-                        {
-                            var percentageRegex = new Regex(@"(\d+)%");
+            var allPerformanceTypes = performanceDictionary.Values.Distinct().ToList();
 
-                            var percentageMatch = percentageRegex.Match(y.Details);
+            var result = new List<SqlServerPerformancePerformanceGraph>();
 
-                            if (percentageMatch.Success)
-                            {
-                                val = float.Parse(percentageMatch.Groups[1].Value);
-                            }
-                        }
-                        else
-                        {
-                            if (float.TryParse(y.Details, out var x))
-                            {
-                                val = x;
-                            }
-                        }
+            foreach (var hourGroup in hourlyPerformanceLogs)
+            {
+                var performanceByType = hourGroup
+                    .GroupBy(x => performanceDictionary.GetValueOrDefault(x.CheckId))
+                    .ToDictionary(x => x.Key, x => x.Select(y => ParsePerformanceValue(y.Details)).Average());
 
-                        return val;
-                    }).Average(y => y),
-                    x.Key.CreatedOn));
+                foreach (var performanceType in allPerformanceTypes)
+                {
+                    var value = performanceByType.ContainsKey(performanceType) ? performanceByType[performanceType] : 0;
+                    result.Add(new SqlServerPerformancePerformanceGraph(performanceType, value, hourGroup.Key));
+                }
+            }
+
+            return result;
         }
 
         public static IEnumerable<SqlServerPerformanceWaitStatGraph> GetSqlServerWaitStatsGraph(IEnumerable<MonitoringJobServerWaitStatLog> waitStats)
         {
-            return waitStats
+            var hourlyWaitStats = waitStats
                 .Where(x => waitTypeDictionary.ContainsKey(x.Type))
-                .GroupBy(x => new { CreatedOn = new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0), WaitType = waitTypeDictionary.GetValueOrDefault(x.Type) })
-                .Select(x => new SqlServerPerformanceWaitStatGraph(
-                    (long)Math.Round(x.Average(y => y.TimeInMs)),
-                    x.Key.WaitType,
-                    x.Key.CreatedOn));
-        }
+                .GroupBy(x => new DateTime(x.Job.CreatedOn.Year, x.Job.CreatedOn.Month, x.Job.CreatedOn.Day, x.Job.CreatedOn.Hour, 0, 0))
+                .ToList();
 
-        public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(
-            IEnumerable<MonitoringJobServerFindingLog> logs,
-            IEnumerable<MonitoringJobServerWaitStatLog> logsWaitStats,
-            IEnumerable<MonitoringQueryLog> badQueries)
-        {
-            var cpuLog = logs.FirstOrDefault(x => x.CheckId == 23);
+            var allWaitTypes = waitTypeDictionary.Values.Distinct().ToList();
 
-            float? batchRequestsPerSecond = null;
-            float? reCompilesPerSecond = null;
-            float? waitTimePerCorePerSec = null;
-            float? cpuUtilization = null;
+            var result = new List<SqlServerPerformanceWaitStatGraph>();
 
-            if (float.TryParse(logs.FirstOrDefault(x => x.CheckId == 19)?.Details, out var x))
+            foreach (var hourGroup in hourlyWaitStats)
             {
-                batchRequestsPerSecond = x;
-            }
+                var statsByType = hourGroup
+                    .GroupBy(x => waitTypeDictionary.GetValueOrDefault(x.Type))
+                    .Select(x => new SqlServerPerformanceWaitStatGraph((long)Math.Round(x.Average(y => y.TimeInMs)), x.Key, hourGroup.Key));
 
-            if (float.TryParse(logs.FirstOrDefault(x => x.CheckId == 26)?.Details, out var y))
-            {
-                reCompilesPerSecond = y;
-            }
+                result.AddRange(statsByType);
 
-            if (float.TryParse(logs.FirstOrDefault(x => x.CheckId == 20)?.Details, out var z))
-            {
-                waitTimePerCorePerSec = z;
-            }
-
-            if (cpuLog != null)
-            {
-                var percentageRegex = new Regex(@"(\d+)%");
-
-                var percentageMatch = percentageRegex.Match(cpuLog.Details);
-
-                if (percentageMatch.Success)
+                foreach (var waitType in allWaitTypes)
                 {
-                    cpuUtilization = float.Parse(percentageMatch.Groups[1].Value);
+                    if (!statsByType.Any(x => x.WaitType == waitType))
+                    {
+                        result.Add(new SqlServerPerformanceWaitStatGraph(0, waitType, hourGroup.Key));
+                    }
                 }
             }
 
-            var serverInfo = new SqlServerPerformanceServerInfo(batchRequestsPerSecond, reCompilesPerSecond, waitTimePerCorePerSec, cpuUtilization);
+            return result;
+        }
 
-            var waitStats = logsWaitStats
-                .Where(x => waitTypeDictionary.ContainsKey(x.Type))
-                .Select(x => new SqlServerPerformanceWaitStat(x.TimeInMs, waitTypeDictionary.GetValueOrDefault(x.Type)))
-                .OrderByDescending(stats => stats.TimeInMs);
+        public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(IEnumerable<MonitoringQueryLog> badQueries)
+        {
 
-            return new SqlServerPerformanceCheck(serverInfo, waitStats, badQueries.Select(x => Convert(x)));
+            return new SqlServerPerformanceCheck(badQueries.Where(x => x is not null).Select(x => Convert(x)));
         }
 
         private static SqlServerBadQuery Convert(MonitoringQueryLog x)
@@ -269,6 +233,25 @@ namespace SqlSensei.Api.Insights
                 x.NumberOfDistinctPlans,
                 x.LastExecutionTime,
                 x.QueryHash);
+        }
+
+        private static double ParsePerformanceValue(string value)
+        {
+            if (double.TryParse(value, out var parsedValue))
+            {
+                return parsedValue;
+            }
+            else if (performanceDictionary.ContainsValue(SqlServerPerformanceType.CpuUtilization))
+            {
+                var percentageRegex = new Regex(@"(\d+)%");
+                var percentageMatch = percentageRegex.Match(value);
+                if (percentageMatch.Success)
+                {
+                    return double.Parse(percentageMatch.Groups[1].Value);
+                }
+            }
+
+            return 0;
         }
     }
 }

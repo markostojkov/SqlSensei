@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ServersComponent } from './servers/servers.component';
-import { ServerComponent } from './server/server.component';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -21,6 +20,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { DeleteServerDialogComponent } from './delete-server-dialog/delete-server-dialog.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { ServerComponent } from './server/server.component';
 
 @NgModule({
   declarations: [ServersComponent, ServerComponent, WaitStatsExplanationDialogComponent, CreateNewServerDialogComponent, DeleteServerDialogComponent],
@@ -30,6 +32,7 @@ import { DeleteServerDialogComponent } from './delete-server-dialog/delete-serve
     ReactiveFormsModule,
     MatChipsModule,
     MatSelectModule,
+    MatDatepickerModule,
     MatInputModule,
     MatFormFieldModule,
     MatCardModule,
@@ -42,6 +45,6 @@ import { DeleteServerDialogComponent } from './delete-server-dialog/delete-serve
     MatDialogModule,
     MatTableModule,
   ],
-  providers: [provideCharts(withDefaultRegisterables()), DatePipe],
+  providers: [provideCharts(withDefaultRegisterables()), provideNativeDateAdapter(), DatePipe],
 })
 export class SqlServerLogsModule {}

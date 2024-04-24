@@ -25,6 +25,10 @@ export class ServersApiService {
     return this.baseApi.delete<Result<void>>(`/sqlserver/v1/servers/${id}`).pipe(map((x) => x.value));
   }
 
+  getServerInsights(id: number, date: Date): Observable<InsightsResponse> {
+    return this.baseApi.get<Result<InsightsResponse>>(`/sqlserver/v1/servers/${id}/insights?date=${date.toISOString()}`).pipe(map((x) => x.value));
+  }
+
   getServerWaitStats(id: number, start: Date, end: Date): Observable<SqlServerPerformanceWaitStatGraph[]> {
     return this.baseApi
       .get<Result<SqlServerPerformanceWaitStatGraph[]>>(`/sqlserver/v1/servers/${id}/wait-stats?start=${start.toISOString()}&end=${end.toISOString()}`)
@@ -43,16 +47,13 @@ export class ServerResponse {
 }
 
 export class ServerDetailsResponse extends ServerResponse {
-  constructor(
-    id: number,
-    name: string,
-    public apiKey: string,
-    public sqlServerCheck: SqlServerCheck,
-    public sqlServerPerformanceCheck: SqlServerPerformanceCheck,
-    public indexCheck: SqlServerIndexCheck
-  ) {
+  constructor(id: number, name: string, public apiKey: string, public serverInfo: SqlServerInsightsServerInfo) {
     super(id, name);
   }
+}
+
+export class InsightsResponse {
+  constructor(public sqlServerCheck: SqlServerCheck, public sqlServerPerformanceCheck: SqlServerPerformanceCheck, public indexCheck: SqlServerIndexCheck) {}
 }
 
 export enum ServerCheckIssueCategory {
@@ -83,14 +84,11 @@ export enum SqlServerPerformanceType {
 }
 
 export interface SqlServerCheck {
-  serverInfo: SqlServerInsightsServerInfo;
   cacheAndWaitStats: SqlServerInsightsCacheAndWaitStats;
   serverIssues: SqlServerInsightsServerIssue[];
 }
 
 export interface SqlServerPerformanceCheck {
-  serverInfo: SqlServerPerformanceServerInfo;
-  waitStats: SqlServerPerformanceWaitStat[];
   topBadQueries: SqlServerBadQuery[];
 }
 
@@ -135,6 +133,7 @@ export interface SqlServerRemoveIndex {
   tableName: string;
   index: string;
   message: string;
+  shortMessage: string;
 }
 
 export interface SqlServerAddIndex {
@@ -143,18 +142,6 @@ export interface SqlServerAddIndex {
   magicBenefit: number;
   impact: string;
   indexDetails: string;
-}
-
-export interface SqlServerPerformanceServerInfo {
-  batchRequestsPerSecond?: number;
-  reCompilesPerSecond?: number;
-  waitTimePerCorePerSec?: number;
-  cpuUtilization?: number;
-}
-
-export interface SqlServerPerformanceWaitStat {
-  timeInMs: number;
-  waitType: SqlServerPerformanceWaitType;
 }
 
 export interface SqlServerPerformanceWaitStatGraph {

@@ -2,12 +2,13 @@
 
 namespace SqlSensei.Api.Insights
 {
-    public class SqlServerRemoveIndex(string databaseName, string tableName, string index, string message)
+    public class SqlServerRemoveIndex(string databaseName, string tableName, string index, string message, string shortMessage)
     {
         public string DatabaseName { get; } = databaseName;
         public string TableName { get; } = tableName;
         public string Index { get; } = index;
         public string Message { get; } = message;
+        public string ShortMessage { get; } = shortMessage;
     }
 
     public class SqlServerAddIndex(string databaseName, string tableName, long magicBenefit, string impact, string indexDetails)
@@ -27,10 +28,12 @@ namespace SqlSensei.Api.Insights
 
     public static class SqlServerIndexIssues
     {
-        private const string IndexNotUsedMessage = "This index has 0 reads meaning it only ocuppies space and makes updates more complex, keep in mind that" +
+        public const string IndexNotUsedMessage = "This index has 0 reads meaning it only ocuppies space and makes updates more complex, keep in mind that" +
             "your database might have been restarted recently and the statistics are incorrect, if that's not the case then it can be deleted";
+        public const string IndexNotUsedMessageShort = "0 reads";
 
-        private const string IndexIsSmallerSubset = "This index is a smaller subset of another index in the same table and can be easily deleted";
+        public const string IndexIsSmallerSubset = "This index is a smaller subset of another index in the same table and can be easily deleted";
+        public const string IndexIsSmallerSubsetShort = "Smaller subset";
 
         public static SqlServerIndexCheck GetSqlServerChecks(IEnumerable<MonitoringJobIndexUsageLog> indexUsage, IEnumerable<MonitoringJobIndexMissingLog> missingIndexes)
         {
@@ -39,7 +42,9 @@ namespace SqlSensei.Api.Insights
             var notUsedIndexes = indexUsage
                 .Where(x => x.IsClusteredIndex == false)
                 .Where(x => x.ReadsUsage == 0)
-                .Select(x => new SqlServerRemoveIndex(x.DatabaseName, x.TableName, x.IndexName, IndexNotUsedMessage))
+                .Select(x => new SqlServerRemoveIndex(x.DatabaseName, x.TableName, x.IndexName, IndexNotUsedMessage, IndexNotUsedMessageShort))
+                .GroupBy(x => new {x.DatabaseName, x.TableName, x.Index})
+                .Select(x => x.First())
                 .ToList();
 
             indexesWithIssue.AddRange(notUsedIndexes);
@@ -48,13 +53,12 @@ namespace SqlSensei.Api.Insights
                 .Where(x => x.ReadsUsage > 0)
                 .Select(x =>
                 {
-                    var splitIndexColumsAndIncludeIndexColums = x.IndexDetails.Replace("DESC", string.Empty).Replace("ASC", string.Empty).Split(':');
+                    var splitIndexColumnsAndIncludeIndexColumns = x.IndexDetails.Replace("DESC", string.Empty).Replace("ASC", string.Empty).Split(':');
 
-                    x.IndexColumns = splitIndexColumsAndIncludeIndexColums[0].Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                    x.IndexIncludeColumns = splitIndexColumsAndIncludeIndexColums[1]?.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
+                    x.IndexColumns = splitIndexColumnsAndIncludeIndexColumns[0].Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+                    x.IndexIncludeColumns = splitIndexColumnsAndIncludeIndexColumns[1]?.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).OrderBy(x => x).ToList();
 
                     return x;
-
                 })
                 .GroupBy(x => new { x.DatabaseName, x.TableName });
 
@@ -65,7 +69,8 @@ namespace SqlSensei.Api.Insights
                     var indexThatCovers = string.Empty;
                     var areAllColumnsOfCurrentIndexContainedInAnotherIndex = indexesOnTableInDatabase.WithIndex().Any(indexUsedForCheckingDuplicate =>
                     {
-                        if (!ReferenceEquals(indexUsedForCheckingDuplicate.item, indexBeingCheckedIfDuplicate) && !indexBeingCheckedIfDuplicate.IsClusteredIndex)
+                        if (!ReferenceEquals(indexUsedForCheckingDuplicate.item, indexBeingCheckedIfDuplicate) 
+                            && !indexBeingCheckedIfDuplicate.IsClusteredIndex && indexUsedForCheckingDuplicate.item.IndexName != indexBeingCheckedIfDuplicate.IndexName)
                         {
                             var doesThisIndexContainAllIndexColumnsOfCurrentCheckIndex = false;
                             var doesThisIndexContainAllIndexIncludeColumnsOfCurrentCheckIndex = false;
@@ -97,12 +102,16 @@ namespace SqlSensei.Api.Insights
                             indexBeingCheckedIfDuplicate.DatabaseName,
                             indexBeingCheckedIfDuplicate.TableName,
                             indexBeingCheckedIfDuplicate.IndexName,
-                            $"{IndexIsSmallerSubset} {indexThatCovers} Covers your index"));
+                            $"{IndexIsSmallerSubset} {indexThatCovers} Covers your index",
+                            $"{IndexIsSmallerSubsetShort} {indexThatCovers} Covers your index"));
                     }
                 }
             }
 
-            var missingIndexesLog = missingIndexes.Select(x => new SqlServerAddIndex(x.DatabaseName, x.TableName, x.MagicBenefitNumber, x.Impact, x.IndexDetails));
+            var missingIndexesLog = missingIndexes
+                .Select(x => new SqlServerAddIndex(x.DatabaseName, x.TableName, x.MagicBenefitNumber, x.Impact, x.IndexDetails))
+                .GroupBy(x => new { x.DatabaseName, x.TableName, x.IndexDetails })
+                .Select(x => x.First());
 
             return new SqlServerIndexCheck(indexesWithIssue, missingIndexesLog);
         }

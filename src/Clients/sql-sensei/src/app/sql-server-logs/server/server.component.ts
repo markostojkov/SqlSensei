@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit, Signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import {
+  InsightsResponse,
   ServerCheckIssueCategory,
   ServerDetailsResponse,
   ServersApiService,
@@ -11,9 +12,10 @@ import {
   SqlServerPerformanceWaitType,
 } from '../servers-api.service';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
-import { Subject, switchMap, takeUntil } from 'rxjs';
+import { Subject, debounceTime, startWith, switchMap, takeUntil } from 'rxjs';
 import { DatePipe } from '@angular/common';
 import { DialogService } from '../dialog.service';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-server',
@@ -23,6 +25,8 @@ import { DialogService } from '../dialog.service';
 export class ServerComponent implements OnInit, OnDestroy {
   id: number;
   server?: ServerDetailsResponse;
+  insights?: InsightsResponse;
+
   waitStats?: SqlServerPerformanceWaitStatGraph[];
   performanceStats?: SqlServerPerformancePerformanceGraph[];
 
@@ -30,6 +34,10 @@ export class ServerComponent implements OnInit, OnDestroy {
 
   start: Date;
   end: Date;
+
+  dateMonitoring = new FormGroup({
+    date: new FormControl<Date>(new Date(), { nonNullable: true }),
+  });
 
   destroy$ = new Subject<void>();
 
@@ -250,6 +258,15 @@ export class ServerComponent implements OnInit, OnDestroy {
 
         this.waitStats = waitStats;
       });
+
+    this.dateMonitoring.controls.date.valueChanges
+      .pipe(
+        startWith(new Date()),
+        debounceTime(500),
+        switchMap((date) => this.serversApi.getServerInsights(this.id, date)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((insights) => (this.insights = insights));
   }
 
   getBottleneck(): void {

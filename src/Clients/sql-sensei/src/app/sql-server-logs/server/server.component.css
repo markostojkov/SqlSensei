@@ -7,3 +7,7 @@
 .height-full {
   height: 100%;
 }
+
+.fit-paragraphs p {
+  width: fit-content;
+}

@@ -23,6 +23,7 @@ import { DeleteServerDialogComponent } from './delete-server-dialog/delete-serve
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { ServerComponent } from './server/server.component';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
   declarations: [ServersComponent, ServerComponent, WaitStatsExplanationDialogComponent, CreateNewServerDialogComponent, DeleteServerDialogComponent],
@@ -34,6 +35,7 @@ import { ServerComponent } from './server/server.component';
     MatSelectModule,
     MatDatepickerModule,
     MatInputModule,
+    MatDividerModule,
     MatFormFieldModule,
     MatCardModule,
     MatIconModule,

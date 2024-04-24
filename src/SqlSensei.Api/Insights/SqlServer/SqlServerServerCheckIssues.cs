@@ -37,7 +37,13 @@ namespace SqlSensei.Api.Insights
         bool noSignificantWaitStats,
         bool poisonWaits,
         string? poisonWaitType,
-        bool poisonWaitsSerializableLocking
+        bool poisonWaitsSerializableLocking,
+        bool longRunningQueryBlockingOthers,
+        string? longRunningQueryBlockingOthersDetails,
+        bool lotOfForwardedFetchesExist,
+        bool lotOfCompilationsASec,
+        bool lotOfReCompilationsASec,
+        bool statisticsUpdatedRecently
         )
     {
         public bool WaitsClearedRecently { get; } = waitsClearedRecently;
@@ -46,6 +52,12 @@ namespace SqlSensei.Api.Insights
         public bool PoisonWaits { get; } = poisonWaits;
         public string? PoisonWaitType { get; } = poisonWaitType;
         public bool PoisonWaitsSerializableLocking { get; } = poisonWaitsSerializableLocking;
+        public bool LongRunningQueryBlockingOthers { get; } = longRunningQueryBlockingOthers;
+        public string? LongRunningQueryBlockingOthersDetails { get; } = longRunningQueryBlockingOthersDetails;
+        public bool LotOfForwardedFetchesExist { get; } = lotOfForwardedFetchesExist;
+        public bool LotOfCompilationsASec { get; } = lotOfCompilationsASec;
+        public bool LotOfReCompilationsASec { get; } = lotOfReCompilationsASec;
+        public bool StatisticsUpdatedRecently { get; } = statisticsUpdatedRecently;
     }
 
     public class SqlServerInsightsServerInfo(
@@ -74,26 +86,6 @@ namespace SqlSensei.Api.Insights
 
     public class SqlServerServerCheckIssues
     {
-        public static string GetInsightsDetails(MonitoringJobServerLog log)
-        {
-            if (dataInDanger.TryGetValue(log.CheckId, out var x))
-            {
-                return x;
-            }
-
-            if (serverInDanger.TryGetValue(log.CheckId, out var y))
-            {
-                return y;
-            }
-
-            if (serverPerformance.TryGetValue(log.CheckId, out var z))
-            {
-                return z;
-            }
-
-            return string.Empty;
-        }
-
         private static readonly Dictionary<int, string> dataInDanger = new()
         {
             {93,  "Backup is on the same storage as the database"},
@@ -213,13 +205,20 @@ namespace SqlSensei.Api.Insights
         {
             var serverIssues = logs
                 .Where(x => GetCategory(x.CheckId) != ServerCheckIssueCategory.None)
-                .Select(x => new SqlServerInsightsServerIssue(x.Priority, x.CheckId, GetCategory(x.CheckId), GetInsightsDetails(x), x.Details, x.DatabaseName));
+                .Select(x => new SqlServerInsightsServerIssue(x.Priority, x.CheckId, GetCategory(x.CheckId), GetInsightsDetails(x), x.Details, x.DatabaseName))
+                .GroupBy(x => new { x.CheckId, x.DatabaseName })
+                .Select(x => x.First());
 
             var waitStatsClearedRecently = logs.Any(x => new List<int>() { 221, 205, 185 }.Contains(x.CheckId));
             var cacheClearedRecently = logs.Any(x => new List<int>() { 207, 208, 125, 221 }.Contains(x.CheckId));
             var noSignificantWaitStats = logs.Any(x => x.CheckId == 153);
             var poisonWaits = logs.FirstOrDefault(x => x.CheckId == 107);
             var poisonWaitsSerializableLocking = logs.Any(x => x.CheckId == 121);
+            var longRunningQueryBlockingOthers = logs.FirstOrDefault(x => x.CheckId == 5);
+            var lotOfForwardedFetchesExist = logs.Any(x => x.CheckId == 29);
+            var lotOfCompilationsASec = logs.Any(x => x.CheckId == 15);
+            var lotOfReCompilationsASec = logs.Any(x => x.CheckId == 16);
+            var statisticsUpdatedRecently = logs.Any(x => x.CheckId == 44);
 
             var cacheAndWaitStats = new SqlServerInsightsCacheAndWaitStats(
                 waitStatsClearedRecently,
@@ -227,7 +226,13 @@ namespace SqlSensei.Api.Insights
                 noSignificantWaitStats,
                 poisonWaits != null,
                 poisonWaits?.Details,
-                poisonWaitsSerializableLocking);
+                poisonWaitsSerializableLocking,
+                longRunningQueryBlockingOthers != null,
+                longRunningQueryBlockingOthers?.Details,
+                lotOfForwardedFetchesExist,
+                lotOfCompilationsASec,
+                lotOfReCompilationsASec,
+                statisticsUpdatedRecently);
 
             return new SqlServerCheck(cacheAndWaitStats, serverIssues);
         }
@@ -340,6 +345,26 @@ namespace SqlSensei.Api.Insights
             }
 
             return ServerCheckIssueCategory.None;
+        }
+
+        private static string GetInsightsDetails(MonitoringJobServerLog log)
+        {
+            if (dataInDanger.TryGetValue(log.CheckId, out var x))
+            {
+                return x;
+            }
+
+            if (serverInDanger.TryGetValue(log.CheckId, out var y))
+            {
+                return y;
+            }
+
+            if (serverPerformance.TryGetValue(log.CheckId, out var z))
+            {
+                return z;
+            }
+
+            return string.Empty;
         }
     }
 }

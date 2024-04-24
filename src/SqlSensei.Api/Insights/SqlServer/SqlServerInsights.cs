@@ -84,8 +84,6 @@ namespace SqlSensei.Api.Insights
             var serverIssues = await DbContext.MonitoringJobServerLogs
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
-                .GroupBy(x => new { x.CheckId , x.DatabaseName })
-                .Select(x => x.First())
                 .ToListAsync();
 
             var queries = await DbContext.MonitoringQueryLogs

@@ -111,8 +111,14 @@ export interface SqlServerInsightsCacheAndWaitStats {
   cacheClearedRecently: boolean;
   noSignificantWaitStats: boolean;
   poisonWaits: boolean;
-  poisonWaitType: string;
+  poisonWaitType?: string | null;
   poisonWaitsSerializableLocking: boolean;
+  longRunningQueryBlockingOthers: boolean;
+  longRunningQueryBlockingOthersDetails?: string | null;
+  lotOfForwardedFetchesExist: boolean;
+  lotOfCompilationsASec: boolean;
+  lotOfReCompilationsASec: boolean;
+  statisticsUpdatedRecently: boolean;
 }
 
 export interface SqlServerInsightsServerInfo {

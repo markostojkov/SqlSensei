@@ -19,6 +19,8 @@ https://ola.hallengren.com
 
 */
 
+USE [master] -- Specify the database in which the objects will be created.
+
 SET NOCOUNT ON
 
 DECLARE @CreateJobs nvarchar(max)          = 'Y'         -- Specify whether jobs should be created.
@@ -9098,3 +9100,4 @@ BEGIN
 
 END
 GO
+

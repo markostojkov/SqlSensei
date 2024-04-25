@@ -10,7 +10,3 @@
   position: absolute;
   right: 10px;
 }
-
-.delete:hover {
-  cursor: pointer;
-}

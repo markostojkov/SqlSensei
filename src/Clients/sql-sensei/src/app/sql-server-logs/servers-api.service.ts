@@ -132,6 +132,7 @@ export interface SqlServerInsightsServerInfo {
   memoryInGb?: number;
   serverName?: string;
   versionDetails?: string;
+  edition?: string;
 }
 
 export interface SqlServerRemoveIndex {

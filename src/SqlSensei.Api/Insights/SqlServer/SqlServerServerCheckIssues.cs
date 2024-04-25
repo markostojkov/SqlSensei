@@ -1,4 +1,5 @@
-﻿using SqlSensei.Api.Storage;
+﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
+using SqlSensei.Api.Storage;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -70,7 +71,8 @@ namespace SqlSensei.Api.Insights
         int? logicalCpu,
         int? memoryInGb,
         string? serverName,
-        string? versionDetails)
+        string? versionDetails,
+        string? edition)
     {
         public bool Is32Bit { get; } = is32Bit;
         public DateTime? LastRestartServer { get; } = lastRestartServer;
@@ -82,6 +84,7 @@ namespace SqlSensei.Api.Insights
         public int? MemoryInGb { get; } = memoryInGb;
         public string? ServerName { get; } = serverName;
         public string? VersionDetails { get; } = versionDetails;
+        public string? Edition { get; } = edition;
     }
 
     public class SqlServerServerCheckIssues
@@ -256,6 +259,7 @@ namespace SqlSensei.Api.Insights
             int? defaultTraceContentInHours = null;
             int? logicalCpus = null;
             int? memoryInGb = null;
+            string? versionEdition = null;
 
             if (DateTime.TryParse(logs.FirstOrDefault(x => x.CheckId == 91)?.Details, out var x))
             {
@@ -314,6 +318,18 @@ namespace SqlSensei.Api.Insights
                 }
             }
 
+            if (versionDetails != null)
+            {
+                var regex = new Regex(@"Edition: (\w+ \w+)");
+
+                var match = regex.Match(versionDetails);
+
+                if (match.Success)
+                {
+                    versionEdition = match.Groups[1].Value;
+                }
+            }
+
             return new SqlServerInsightsServerInfo(
                 is32Bit,
                 lastServerRestart,
@@ -324,7 +340,8 @@ namespace SqlSensei.Api.Insights
                 logicalCpus,
                 memoryInGb,
                 serverName,
-                versionDetails);
+                versionDetails,
+                versionEdition);
         }
 
         private static ServerCheckIssueCategory GetCategory(int checkId)

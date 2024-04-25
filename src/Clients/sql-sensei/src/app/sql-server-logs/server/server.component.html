@@ -26,6 +26,7 @@
           <b>Tracing since:</b> {{ convertHoursToDatetime(s.serverInfo.defaultTraceContentInHours) | date : 'short' }}
         </p>
         }
+        <p><b>Edition:</b> {{ s.serverInfo.edition }}</p>
         <p><b>Version:</b> {{ s.serverInfo.versionDetails }}</p>
       </mat-card-content>
     </mat-card>

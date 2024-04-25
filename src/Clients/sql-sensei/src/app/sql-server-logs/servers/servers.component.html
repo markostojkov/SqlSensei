@@ -13,8 +13,18 @@
     <mat-card class="mb-4">
       <mat-card-header>
         <mat-card-title
-          ><span>{{ server.name }}</span> <mat-icon class="delete" color="warn" (click)="deleteServer(server.name, server.id)">delete</mat-icon></mat-card-title
-        >
+          ><span>{{ server.name }}</span>
+
+          <button class="delete" mat-icon-button [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button (click)="deleteServer(server.name, server.id)" mat-menu-item>
+              <mat-icon color="warn">delete</mat-icon>
+              <span>Delete</span>
+            </button>
+          </mat-menu>
+        </mat-card-title>
       </mat-card-header>
       <mat-card-actions>
         <button mat-button class="mr-2" color="primary" [routerLink]="[server.id]">Monitoring</button>

@@ -364,13 +364,39 @@
     <mat-card class="mb-3">
       <mat-card-header>
         <mat-card-title class="tooltip-indicator" matTooltip="Metrics for the whole sql server that indicate the workload">Query Tuning</mat-card-title>
+        <mat-card-subtitle
+          >Today's wait type: <b>{{ insights.sqlServerPerformanceCheck.todayWaitType }}</b></mat-card-subtitle
+        >
       </mat-card-header>
       <mat-card-content>
-        <mat-tab-group>
-          <mat-tab label="7 days">
-            <canvas class="pt-3" baseChart [type]="'line'" [data]="lineChartPerformanceData" [options]="lineChartOptions" [legend]="true"> </canvas>
-          </mat-tab>
-        </mat-tab-group>
+        <div class="table-container">
+          <!-- <table mat-table [dataSource]="insights.sqlServerPerformanceCheck.topBadQueries" class="mat-elevation-z8">
+
+            <ng-container matColumnDef="details">
+              <th mat-header-cell *matHeaderCellDef>Details</th>
+              <td mat-cell *matCellDef="let element">{{ element.details }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="explanation">
+              <th mat-header-cell *matHeaderCellDef>Explanation</th>
+              <td mat-cell *matCellDef="let element">{{ element.scriptDetails }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="database">
+              <th mat-header-cell *matHeaderCellDef>Database Name</th>
+              <td mat-cell *matCellDef="let element">
+                <b>{{ element.databaseName }}</b>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['highPriorityError', 'details', 'explanation', 'database']; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['highPriorityError', 'details', 'explanation', 'database']"></tr>
+
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell text-center" colspan="4"><img class="no-data-table-image" src="assets/empty-table.png" alt="No Data Available" /></td>
+            </tr>
+          </table> -->
+        </div>
       </mat-card-content>
     </mat-card>
     }

@@ -90,6 +90,7 @@ export interface SqlServerCheck {
 
 export interface SqlServerPerformanceCheck {
   topBadQueries: SqlServerBadQuery[];
+  todayWaitType: string;
 }
 
 export interface SqlServerIndexCheck {

@@ -59,9 +59,10 @@ namespace SqlSensei.Api.Insights
         public byte[]? QueryHash { get; } = queryHash;
     }
 
-    public class SqlServerPerformanceCheck(IEnumerable<SqlServerBadQuery> topBadQueries)
+    public class SqlServerPerformanceCheck(IEnumerable<SqlServerBadQuery> topBadQueries, string todayWaitType)
     {
         public IEnumerable<SqlServerBadQuery> TopBadQueries { get; } = topBadQueries;
+        public string TodayWaitType { get; } = todayWaitType;
     }
 
     public class SqlServerPerformanceServerInfo(float? batchRequestsPerSecond, float? reCompilesPerSecond, float? waitTimePerCorePerSec, float? cpuUtilization)
@@ -206,7 +207,7 @@ namespace SqlSensei.Api.Insights
             return result;
         }
 
-        public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(IEnumerable<MonitoringQueryLog> badQueries)
+        public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(IEnumerable<MonitoringQueryLog> badQueries, string topWaitType)
         {
             return new SqlServerPerformanceCheck(badQueries
                 .Where(x => x is not null && x.QueryHash is not null)
@@ -214,7 +215,7 @@ namespace SqlSensei.Api.Insights
                 .Select(x => x.Last())
                 .OrderBy(x => x.TopNo)
                 .Take(10)
-                .Select(Convert));
+                .Select(Convert), topWaitType);
         }
 
         public static string GetTopWaitType(IEnumerable<MonitoringJobServerWaitStatLog> waits)

@@ -112,7 +112,7 @@ namespace SqlSensei.Api.Insights
 
             return Result.Ok(new InsightsResponse(
                 SqlServerServerCheckIssues.GetSqlServerChecks(serverIssues),
-                SqlServerServerPerformanceCheckIssues.GetSqlServerPerformanceFindings(queries, waits),
+                SqlServerServerPerformanceCheckIssues.GetSqlServerPerformanceFindings(queries, topWaitType),
                 SqlServerIndexIssues.GetSqlServerChecks(indexUsage, missingIndex)));
         }
 

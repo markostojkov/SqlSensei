@@ -130,6 +130,8 @@ namespace SqlSensei.Api.Services
             var dbLogs = logs.Select(x => new MonitoringQueryLog(
                 companyId,
                 jobId,
+                x.WaitType,
+                x.TopNo,
                 x.DatabaseName,
                 x.QueryPlanCost,
                 x.QueryText,

@@ -108,12 +108,16 @@ namespace SqlSensei.Api.Insights
                 }
             }
 
+            var cleanupIndexesWithIssues = indexesWithIssue
+                .GroupBy(x => new { x.DatabaseName, x.TableName, x.Index })
+                .Select(x => x.First());
+
             var missingIndexesLog = missingIndexes
                 .Select(x => new SqlServerAddIndex(x.DatabaseName, x.TableName, x.MagicBenefitNumber, x.Impact, x.IndexDetails))
                 .GroupBy(x => new { x.DatabaseName, x.TableName, x.IndexDetails })
                 .Select(x => x.First());
 
-            return new SqlServerIndexCheck(indexesWithIssue, missingIndexesLog);
+            return new SqlServerIndexCheck(cleanupIndexesWithIssues, missingIndexesLog);
         }
 
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) => self.Select((item, index) => (item, index));

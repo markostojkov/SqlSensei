@@ -86,11 +86,18 @@ namespace SqlSensei.Api.Insights
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .ToListAsync();
 
+            var waits = await DbContext.MonitoringJobServerWaitStatLogs
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
+                .ToListAsync();
+
+            var topWaitType = SqlServerServerPerformanceCheckIssues.GetTopWaitType(waits);
+
             var queries = await DbContext.MonitoringQueryLogs
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
-                .GroupBy(x => x.QueryHash)
-                .Select(x => x.First())
+                .Where(x => x.WaitType == topWaitType)
+                .Where(x => x.QueryHash != null)
                 .ToListAsync();
 
             var indexUsage = await DbContext.MonitoringJobIndexUsageLogs

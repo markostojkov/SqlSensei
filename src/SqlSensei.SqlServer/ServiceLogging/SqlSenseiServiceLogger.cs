@@ -143,6 +143,8 @@ namespace SqlSensei.SqlServer
         private static IEnumerable<MonitoringJobQueryLog> MapQueryLogs(IEnumerable<IMonitoringJobQueryLog> queryLogs)
         {
             return queryLogs.Select(log => new MonitoringJobQueryLog(
+                log.WaitType,
+                log.TopNo,
                 log.DatabaseName,
                 log.QueryPlanCost,
                 log.QueryText,

@@ -179,7 +179,7 @@ namespace SqlSensei.SqlServer
                 return;
             }
 
-            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQuerySelectLogTable, (reader) => queryResults = QueryLog.GetAll(reader));
+            result = await ExecuteCommandAsync(SqlServerSql.MonitoringQuerySelectLogTable, (reader) => queryResults = QueryLog.GetAll(reader, ServerWaitStatsLog.WaitType(serverWaitStatsResults)));
 
             if (!result)
             {

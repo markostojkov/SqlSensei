@@ -3,6 +3,8 @@
     public class MonitoringQueryLog(
         long companyFk,
         long jobFk,
+        string waitType,
+        int topNo,
         string databaseName,
         float? queryPlanCost,
         string queryText,
@@ -28,6 +30,8 @@
         byte[]? queryHash)
     {
         public long Id { get; set; }
+        public string WaitType { get; } = waitType;
+        public int TopNo { get; } = topNo;
         public long CompanyFk { get; set; } = companyFk;
         public long JobFk { get; set; } = jobFk;
         public string DatabaseName { get; set; } = databaseName;

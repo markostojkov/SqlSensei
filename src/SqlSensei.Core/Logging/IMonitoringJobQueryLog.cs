@@ -6,6 +6,8 @@ namespace SqlSensei.Core
 {
     public interface IMonitoringJobQueryLog : IDatabaseLog
     {
+        public string WaitType { get; }
+        public int TopNo { get; }
         public float? QueryPlanCost { get; }
         public string QueryText { get; }
         public string Warnings { get; }

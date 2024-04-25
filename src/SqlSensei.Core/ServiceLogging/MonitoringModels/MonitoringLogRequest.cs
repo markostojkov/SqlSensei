@@ -121,6 +121,8 @@ namespace SqlSensei.Core
     }
 
     public class MonitoringJobQueryLog(
+        string waitType,
+        int topNo,
         string databaseName,
         float? queryPlanCost,
         string queryText,
@@ -145,6 +147,12 @@ namespace SqlSensei.Core
         DateTime? lastExecutionTime,
         byte[]? queryHash)
     {
+        [JsonProperty("waitType")]
+        public string WaitType { get; } = waitType;
+
+        [JsonProperty("topNo")]
+        public int TopNo { get; } = topNo;
+
         [JsonProperty("databaseName")]
         public string DatabaseName { get; } = databaseName;
 

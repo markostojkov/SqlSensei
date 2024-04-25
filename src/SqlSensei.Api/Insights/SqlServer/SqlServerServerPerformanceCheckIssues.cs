@@ -1,6 +1,4 @@
 ﻿using SqlSensei.Api.Storage;
-using System;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -149,7 +147,7 @@ namespace SqlSensei.Api.Insights
             {23, "CPU Utilization"},
         };
 
-        public static readonly List<int> PerformanceCheckIds = new() { 19, 26, 20, 23 };
+        public static readonly List<int> PerformanceCheckIds = [19, 26, 20, 23];
 
         public static IEnumerable<SqlServerPerformancePerformanceGraph> GetSqlServerPerformanceGraph(IEnumerable<MonitoringJobServerFindingLog> performanceLogs)
         {
@@ -210,8 +208,32 @@ namespace SqlSensei.Api.Insights
 
         public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(IEnumerable<MonitoringQueryLog> badQueries)
         {
+            return new SqlServerPerformanceCheck(badQueries
+                .Where(x => x is not null && x.QueryHash is not null)
+                .GroupBy(x => x.QueryHash)
+                .Select(x => x.Last())
+                .OrderBy(x => x.TopNo)
+                .Take(10)
+                .Select(Convert));
+        }
 
-            return new SqlServerPerformanceCheck(badQueries.Where(x => x is not null).Select(x => Convert(x)));
+        public static string GetTopWaitType(IEnumerable<MonitoringJobServerWaitStatLog> waits)
+        {
+            var waitType = waits
+                .GroupBy(x => waitTypeDictionary.GetValueOrDefault(x.Type))
+                .Select(group => new { Category = group.Key, TotalAmount = group.Sum(g => g.TimeInMs) })
+                .OrderByDescending(g => g.TotalAmount)
+                .FirstOrDefault();
+
+            return waitType?.Category switch
+            {
+                SqlServerPerformanceWaitType.CxPacket or SqlServerPerformanceWaitType.SosSchedulerYield or SqlServerPerformanceWaitType.Threadpool => "cpu",
+                SqlServerPerformanceWaitType.Lock => "Duration",
+                SqlServerPerformanceWaitType.ResourceSemaphore => "Memory grant",
+                SqlServerPerformanceWaitType.PageIoLatch => "reads",
+                SqlServerPerformanceWaitType.WriteLog => "writes",
+                _ => "cpu",
+            };
         }
 
         private static SqlServerBadQuery Convert(MonitoringQueryLog x)

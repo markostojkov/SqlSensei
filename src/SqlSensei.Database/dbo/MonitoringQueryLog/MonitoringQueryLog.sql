@@ -4,6 +4,8 @@
     [CompanyFk]                 BIGINT                   NOT NULL,
     [JobFk]                     BIGINT                   NOT NULL,
     [DatabaseName]              NVARCHAR(128)            NOT NULL,
+    [WaitType]                  NVARCHAR(128)            NOT NULL DEFAULT 'cpu',
+    [TopNo]                     INT                      NOT NULL DEFAULT 1,
     [QueryPlanCost]             FLOAT                    NULL,
     [QueryText]                 NVARCHAR(MAX)            NULL,
     [Warnings]                  VARCHAR(MAX)             NULL,

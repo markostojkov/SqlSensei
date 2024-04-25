@@ -8,6 +8,8 @@ using System.Collections.Generic;
 namespace SqlSensei.SqlServer.InformationGather
 {
     public class QueryLog(
+        string waitType,
+        int topNo,
         string databaseName,
         float? queryPlanCost,
         string queryText,
@@ -32,6 +34,8 @@ namespace SqlSensei.SqlServer.InformationGather
         DateTime? lastExecutionTime,
         byte[]? queryHash) : IMonitoringJobQueryLog
     {
+        public string WaitType { get; } = waitType;
+        public int TopNo { get; } = topNo;
         public string DatabaseName { get; } = databaseName;
         public float? QueryPlanCost { get; } = queryPlanCost;
         public string QueryText { get; } = queryText;
@@ -56,13 +60,17 @@ namespace SqlSensei.SqlServer.InformationGather
         public DateTime? LastExecutionTime { get; } = lastExecutionTime;
         public byte[]? QueryHash { get; } = queryHash;
 
-        public static List<QueryLog> GetAll(SqlDataReader reader)
+        public static List<QueryLog> GetAll(SqlDataReader reader, string waitType)
         {
             var records = new List<QueryLog>();
+
+            var i = 1;
 
             while (reader.Read())
             {
                 var record = new QueryLog(
+                    waitType,
+                    i++,
                     reader.GetString(reader.GetOrdinal("DatabaseName")),
                     reader.IsDBNull(reader.GetOrdinal("QueryPlanCost")) ? null : (float?)reader.GetDouble(reader.GetOrdinal("QueryPlanCost")),
                     reader.IsDBNull(reader.GetOrdinal("QueryText")) ? string.Empty : reader.GetString(reader.GetOrdinal("QueryText")),

@@ -184,6 +184,8 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.CompanyFk).HasColumnType("bigint").IsRequired();
                 _ = entity.Property(e => e.JobFk).HasColumnType("bigint").IsRequired();
                 _ = entity.Property(e => e.DatabaseName).IsRequired().HasColumnType("nvarchar(128)");
+                _ = entity.Property(e => e.WaitType).IsRequired().HasColumnType("nvarchar(128)");
+                _ = entity.Property(e => e.TopNo).IsRequired().HasColumnType("int");
                 _ = entity.Property(e => e.QueryPlanCost).HasColumnType("float");
                 _ = entity.Property(e => e.QueryText).HasColumnType("nvarchar(max)");
                 _ = entity.Property(e => e.Warnings).HasColumnType("varchar(max)");

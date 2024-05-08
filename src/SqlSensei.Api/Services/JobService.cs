@@ -20,14 +20,14 @@ namespace SqlSensei.Api.Services
             }
 
             var jobsMaintenanceForCompany = await DbContext.Jobs
-                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.CompanyFk == companyResult.Value.Id && x.ServerFk == companyResult.Value.CurrentServer.Id)
                 .Where(x => x.Type == JobType.Maintenance)
                 .OrderByDescending(x => x.CreatedOn)
                 .Take(10)
                 .ToListAsync();
 
             var jobsMonitoringForCompany = await DbContext.Jobs
-                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.CompanyFk == companyResult.Value.Id && x.ServerFk == companyResult.Value.CurrentServer.Id)
                 .Where(x => x.Type == JobType.Monitoring)
                 .OrderByDescending(x => x.CreatedOn)
                 .Take(10)

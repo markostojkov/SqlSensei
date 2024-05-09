@@ -1,0 +1,20 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Query Visualizer</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Query Visualizer">
+        <div id="query"></div>
+      </mat-tab>
+
+      <mat-tab label="SQL Query">
+        <pre>
+          <code>
+            {{plan?.sqlText}}
+          </code>
+        </pre>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

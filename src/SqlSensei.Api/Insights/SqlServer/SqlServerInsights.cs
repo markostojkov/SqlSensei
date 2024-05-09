@@ -53,6 +53,49 @@ namespace SqlSensei.Api.Insights
                 SqlServerServerCheckIssues.GetServerInfo(serverIssues)));
         }
 
+        public async Task<Result<QueryPlanResponse>> GetQueryPlan(long serverId, long queryId)
+        {
+            var companyResult = Company.GetCurrentCompany();
+
+            if (companyResult.IsFailure)
+            {
+                return Result.FromError<QueryPlanResponse>(companyResult);
+            }
+
+            var server = await DbContext.Servers
+                .Include(x => x.Jobs.Where(x => x.Status == JobStatus.Completed).OrderByDescending(y => y.Id).Take(1))
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Id == serverId)
+                .FirstOrDefaultAsync();
+
+            if (server is null)
+            {
+                return Result.NotFound<QueryPlanResponse>(ResultCodes.ServerNotFound);
+            }
+
+            if (server.Jobs.Any() is false)
+            {
+                return Result.NotFound<QueryPlanResponse>(ResultCodes.JobNotFound);
+            }
+
+            var latestJob = await DbContext.Jobs.FirstOrDefaultAsync(x => x.Id == server.Jobs.First().Id);
+
+            if (latestJob == null)
+            {
+                return Result.NotFound<QueryPlanResponse>(ResultCodes.JobNotFound);
+            }
+
+            var queryPlan = await DbContext.MonitoringQueryLogs
+                .FirstOrDefaultAsync(x => x.Id == queryId);
+
+            if (queryPlan == null)
+            {
+                return Result.NotFound<QueryPlanResponse>(ResultCodes.QueryNotFound);
+            }
+
+            return Result.Ok(new QueryPlanResponse(queryPlan.QueryPlan, queryPlan.QueryText));
+        }
+
         public async Task<Result<InsightsResponse>> GetInsights(long serverId, DateTime date)
         {
             var startOfDay = date.Date;

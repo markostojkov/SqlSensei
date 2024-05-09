@@ -9,6 +9,10 @@ import { Result } from '../shared/result.models';
 export class ServersApiService {
   constructor(private baseApi: BaseApiService) {}
 
+  getQueryPlan(serverId?: number, id?: number): Observable<QueryPlanResponse> {
+    return this.baseApi.get<Result<QueryPlanResponse>>(`/sqlserver/v1/servers/${serverId}/plan/${id}`).pipe(map((x) => x.value));
+  }
+
   getServers(): Observable<ServerResponse[]> {
     return this.baseApi.get<Result<ServerResponse[]>>('/sqlserver/v1/servers').pipe(map((x) => x.value));
   }
@@ -201,4 +205,8 @@ export enum SqlSenseiRunMaintenancePeriod {
 
 export class CreateServerRequest {
   constructor(public name: string, public monitoringPeriod: SqlSenseiRunMonitoringPeriod, public maintenancePeriod: SqlSenseiRunMaintenancePeriod) {}
+}
+
+export class QueryPlanResponse {
+  constructor(public xmlPlan: string, public sqlText: string) {}
 }

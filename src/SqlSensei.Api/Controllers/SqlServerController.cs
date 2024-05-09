@@ -76,6 +76,14 @@ namespace SqlSensei.Api.Controllers
             return OkOrError(result);
         }
 
+        [HttpGet("servers/{serverId:long}/plan/{queryId:long}")]
+        public async Task<IActionResult> GetServerInsights(long serverId, long queryId)
+        {
+            var result = await ServerInsights.GetQueryPlan(serverId, queryId);
+
+            return OkOrError(result);
+        }
+
         [HttpDelete("servers/{serverId:long}")]
         public async Task<IActionResult> DeleteServer(long serverId)
         {

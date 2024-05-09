@@ -26,6 +26,7 @@ export class ServerComponent implements OnInit, OnDestroy {
   id: number;
   server?: ServerDetailsResponse;
   insights?: InsightsResponse;
+  queryId?: number;
 
   waitStats?: SqlServerPerformanceWaitStatGraph[];
   performanceStats?: SqlServerPerformancePerformanceGraph[];
@@ -267,6 +268,10 @@ export class ServerComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((insights) => (this.insights = insights));
+  }
+
+  analyzeQuery(queryId: number): void {
+    this.queryId = queryId;
   }
 
   getBottleneck(): void {

@@ -1,4 +1,6 @@
 ﻿using SqlSensei.Api.Storage;
+using System.Collections;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -209,11 +211,12 @@ namespace SqlSensei.Api.Insights
 
         public static SqlServerPerformanceCheck GetSqlServerPerformanceFindings(IEnumerable<MonitoringQueryLog> badQueries, string topWaitType)
         {
+
             return new SqlServerPerformanceCheck(badQueries
                 .Where(x => x is not null && x.QueryHash is not null)
-                .GroupBy(x => x.QueryHash)
+                .GroupBy(x => Encoding.UTF8.GetString(x.QueryHash))
                 .Select(x => x.Last())
-                .OrderBy(x => x.TopNo)
+                .ToList()
                 .Take(10)
                 .Select(Convert), topWaitType);
         }

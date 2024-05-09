@@ -25,9 +25,10 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { ServerComponent } from './server/server.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
+import { PreviewQueryComponent } from './preview-query/preview-query.component';
 
 @NgModule({
-  declarations: [ServersComponent, ServerComponent, WaitStatsExplanationDialogComponent, CreateNewServerDialogComponent, DeleteServerDialogComponent],
+  declarations: [ServersComponent, ServerComponent, WaitStatsExplanationDialogComponent, CreateNewServerDialogComponent, DeleteServerDialogComponent, PreviewQueryComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

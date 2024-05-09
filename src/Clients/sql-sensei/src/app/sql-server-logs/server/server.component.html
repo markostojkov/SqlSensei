@@ -377,32 +377,24 @@
       </mat-card-header>
       <mat-card-content>
         <div class="table-container">
-          <!-- <table mat-table [dataSource]="insights.sqlServerPerformanceCheck.topBadQueries" class="mat-elevation-z8">
-
-            <ng-container matColumnDef="details">
-              <th mat-header-cell *matHeaderCellDef>Details</th>
-              <td mat-cell *matCellDef="let element">{{ element.details }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="explanation">
-              <th mat-header-cell *matHeaderCellDef>Explanation</th>
-              <td mat-cell *matCellDef="let element">{{ element.scriptDetails }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="database">
+          <table mat-table [dataSource]="insights.sqlServerPerformanceCheck.topBadQueries" class="mat-elevation-z8">
+            <ng-container matColumnDef="databaseName">
               <th mat-header-cell *matHeaderCellDef>Database Name</th>
-              <td mat-cell *matCellDef="let element">
-                <b>{{ element.databaseName }}</b>
-              </td>
+              <td mat-cell *matCellDef="let element">{{ element.databaseName }}</td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="['highPriorityError', 'details', 'explanation', 'database']; sticky: true"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['highPriorityError', 'details', 'explanation', 'database']"></tr>
+            <ng-container matColumnDef="preview">
+              <th mat-header-cell *matHeaderCellDef>Preview</th>
+              <td mat-cell *matCellDef="let element"><button class="my-2" mat-button color="primary" (click)="analyzeQuery(element.id)">Analyze query</button></td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['databaseName', 'preview']; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['databaseName', 'preview']"></tr>
 
             <tr class="mat-row" *matNoDataRow>
               <td class="mat-cell text-center" colspan="4"><img class="no-data-table-image" src="assets/empty-table.png" alt="No Data Available" /></td>
             </tr>
-          </table> -->
+          </table>
         </div>
       </mat-card-content>
     </mat-card>
@@ -410,16 +402,10 @@
   </div>
 </div>
 
-}
+<div *ngIf="queryId" class="row mb-2">
+  <div class="col-md-12">
+    <app-preview-query [serverId]="id" [queryId]="queryId"></app-preview-query>
+  </div>
+</div>
 
-<!-- <mat-icon
-matTooltip="Wait stats have been cleared recently so top waiting queries might not be correct"
-*ngIf="s.sqlServerCheck.cacheAndWaitStats.waitsClearedRecently"
-color="warn"
->delete_forever</mat-icon
->
-<mat-icon matTooltip="No significant wait stats in latest monitoring task" *ngIf="s.sqlServerCheck.cacheAndWaitStats.noSignificantWaitStats" color="primary"
->check_circle</mat-icon
->
-<mat-icon matTooltip="{{ s.sqlServerCheck.cacheAndWaitStats.poisonWaitType }}" *ngIf="s.sqlServerCheck.cacheAndWaitStats.poisonWaits" color="warn">hourglass_top</mat-icon>
-<mat-icon matTooltip="SERIALIZABLE isolation level detected" *ngIf="s.sqlServerCheck.cacheAndWaitStats.poisonWaitsSerializableLocking" color="warn">read_more</mat-icon> -->
+}

@@ -108,7 +108,7 @@ namespace SqlSensei.Core
         public long TimeInMs { get; } = timeInMs;
     }
 
-    public class MonitoringJobServerFindingLog(int checkId, short priority, string details)
+    public class MonitoringJobServerFindingLog(int checkId, short priority, string details, string finding)
     {
         [JsonProperty("checkId")]
         public int CheckId { get; } = checkId;
@@ -118,6 +118,9 @@ namespace SqlSensei.Core
 
         [JsonProperty("details")]
         public string Details { get; } = details;
+
+        [JsonProperty("finding")]
+        public string Finding { get; } = finding;
     }
 
     public class MonitoringJobQueryLog(

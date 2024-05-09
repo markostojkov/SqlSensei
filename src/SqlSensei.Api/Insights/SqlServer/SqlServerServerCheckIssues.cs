@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using SqlSensei.Api.Storage;
+﻿using SqlSensei.Api.Storage;
 using System.Text.RegularExpressions;
 
 namespace SqlSensei.Api.Insights
@@ -44,7 +43,11 @@ namespace SqlSensei.Api.Insights
         bool lotOfForwardedFetchesExist,
         bool lotOfCompilationsASec,
         bool lotOfReCompilationsASec,
-        bool statisticsUpdatedRecently
+        bool statisticsUpdatedRecently,
+        bool highWait,
+        int highWaitWaitingFor,
+        int highWaitJobTook,
+        string? highWaitType
         )
     {
         public bool WaitsClearedRecently { get; } = waitsClearedRecently;
@@ -59,6 +62,10 @@ namespace SqlSensei.Api.Insights
         public bool LotOfCompilationsASec { get; } = lotOfCompilationsASec;
         public bool LotOfReCompilationsASec { get; } = lotOfReCompilationsASec;
         public bool StatisticsUpdatedRecently { get; } = statisticsUpdatedRecently;
+        public bool HighWait { get; } = highWait;
+        public int HighWaitWaitingFor { get; } = highWaitWaitingFor;
+        public int HighWaitJobTook { get; } = highWaitJobTook;
+        public string? HighWaitType { get; } = highWaitType;
     }
 
     public class SqlServerInsightsServerInfo(
@@ -204,7 +211,7 @@ namespace SqlSensei.Api.Insights
             {154,   "32-bit SQL Server Installed"},
         };
 
-        public static SqlServerCheck GetSqlServerChecks(IEnumerable<MonitoringJobServerLog> logs)
+        public static SqlServerCheck GetSqlServerChecks(IEnumerable<MonitoringJobServerLog> logs, IEnumerable<MonitoringJobServerFindingLog> findigsLogs)
         {
             var serverIssues = logs
                 .Where(x => GetCategory(x.CheckId) != ServerCheckIssueCategory.None)
@@ -215,13 +222,35 @@ namespace SqlSensei.Api.Insights
             var waitStatsClearedRecently = logs.Any(x => new List<int>() { 221, 205, 185 }.Contains(x.CheckId));
             var cacheClearedRecently = logs.Any(x => new List<int>() { 207, 208, 125, 221 }.Contains(x.CheckId));
             var noSignificantWaitStats = logs.Any(x => x.CheckId == 153);
-            var poisonWaits = logs.FirstOrDefault(x => x.CheckId == 107);
+            var poisonWaits = logs.LastOrDefault(x => x.CheckId == 107);
             var poisonWaitsSerializableLocking = logs.Any(x => x.CheckId == 121);
-            var longRunningQueryBlockingOthers = logs.FirstOrDefault(x => x.CheckId == 5);
+            var longRunningQueryBlockingOthers = logs.LastOrDefault(x => x.CheckId == 5);
             var lotOfForwardedFetchesExist = logs.Any(x => x.CheckId == 29);
             var lotOfCompilationsASec = logs.Any(x => x.CheckId == 15);
             var lotOfReCompilationsASec = logs.Any(x => x.CheckId == 16);
             var statisticsUpdatedRecently = logs.Any(x => x.CheckId == 44);
+            var highWaitType = findigsLogs.LastOrDefault(x => x.CheckId == 6);
+
+            var topWaitType = SqlServerServerPerformanceCheckIssues.waitTypeDictionary.GetValueOrDefault(highWaitType?.Finding ?? "cpu") switch
+            {
+                SqlServerPerformanceWaitType.CxPacket or SqlServerPerformanceWaitType.SosSchedulerYield or SqlServerPerformanceWaitType.Threadpool => "cpu",
+                SqlServerPerformanceWaitType.Lock => "Duration",
+                SqlServerPerformanceWaitType.ResourceSemaphore => "Memory grant",
+                SqlServerPerformanceWaitType.PageIoLatch => "reads",
+                SqlServerPerformanceWaitType.WriteLog => "writes",
+                _ => "cpu",
+            };
+
+            var matches = Regex.Matches(highWaitType?.Details ?? string.Empty, @"\d+");
+
+            var waitingFor = 0;
+            var jobTook = 0;
+
+            if (matches.Count >= 2)
+            {
+                waitingFor = int.Parse(matches[0].Value);
+                jobTook = int.Parse(matches[1].Value);
+            }
 
             var cacheAndWaitStats = new SqlServerInsightsCacheAndWaitStats(
                 waitStatsClearedRecently,
@@ -235,7 +264,11 @@ namespace SqlSensei.Api.Insights
                 lotOfForwardedFetchesExist,
                 lotOfCompilationsASec,
                 lotOfReCompilationsASec,
-                statisticsUpdatedRecently);
+                statisticsUpdatedRecently,
+                highWaitType != null,
+                waitingFor,
+                jobTook,
+                topWaitType);
 
             return new SqlServerCheck(cacheAndWaitStats, serverIssues);
         }

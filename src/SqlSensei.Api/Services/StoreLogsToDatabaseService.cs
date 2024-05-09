@@ -114,7 +114,8 @@ namespace SqlSensei.Api.Services
                 jobId,
                 x.CheckId,
                 x.Priority,
-                x.Details));
+                x.Details,
+                x.Finding));
 
             DbContext.MonitoringJobServerFindingLogs.AddRange(dbLogsFindingsServer);
 

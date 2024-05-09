@@ -95,7 +95,7 @@ namespace SqlSensei.Api.Insights
 
     public class SqlServerServerPerformanceCheckIssues
     {
-        private static readonly Dictionary<string, SqlServerPerformanceWaitType> waitTypeDictionary = new()
+        public static readonly Dictionary<string, SqlServerPerformanceWaitType> waitTypeDictionary = new()
         {
             {"ASYNC_NETWORK_IO", SqlServerPerformanceWaitType.AsyncNetworkIo},
             {"CXCONSUMER", SqlServerPerformanceWaitType.CxPacket},
@@ -113,7 +113,7 @@ namespace SqlSensei.Api.Insights
         private static readonly Dictionary<int, SqlServerPerformanceType> performanceDictionary = new()
         {
             {23, SqlServerPerformanceType.CpuUtilization},
-            {10, SqlServerPerformanceType.BatchRequestsPerSecond},
+            {19, SqlServerPerformanceType.BatchRequestsPerSecond},
             {26, SqlServerPerformanceType.ReCompilesPerSecond},
             {20, SqlServerPerformanceType.WaitTimePerCorePerSec},
         };
@@ -164,7 +164,7 @@ namespace SqlSensei.Api.Insights
             {
                 var performanceByType = hourGroup
                     .GroupBy(x => performanceDictionary.GetValueOrDefault(x.CheckId))
-                    .ToDictionary(x => x.Key, x => x.Select(y => ParsePerformanceValue(y.Details)).Average());
+                    .ToDictionary(x => x.Key, x => x.Select(y => ParsePerformanceValue(y.Details, y.CheckId)).Average());
 
                 foreach (var performanceType in allPerformanceTypes)
                 {
@@ -258,19 +258,15 @@ namespace SqlSensei.Api.Insights
                 x.QueryHash);
         }
 
-        private static double ParsePerformanceValue(string value)
+        private static double ParsePerformanceValue(string? value, int checkId)
         {
-            if (double.TryParse(value, out var parsedValue))
+            if (performanceDictionary.TryGetValue(checkId, out var performanceType))
             {
-                return parsedValue;
-            }
-            else if (performanceDictionary.ContainsValue(SqlServerPerformanceType.CpuUtilization))
-            {
-                var percentageRegex = new Regex(@"(\d+)%");
-                var percentageMatch = percentageRegex.Match(value);
-                if (percentageMatch.Success)
+                var match = Regex.Match(value, @"[\d\.]+");
+
+                if (match.Success)
                 {
-                    return double.Parse(percentageMatch.Groups[1].Value);
+                    return double.Parse(match.Value);
                 }
             }
 

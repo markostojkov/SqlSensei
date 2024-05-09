@@ -127,6 +127,7 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.Priority).HasColumnType("tinyint");
                 _ = entity.Property(e => e.CheckId).HasColumnType("int").IsRequired();
                 _ = entity.Property(e => e.Details).HasColumnType("nvarchar(max)");
+                _ = entity.Property(e => e.Finding).HasColumnType("nvarchar(max)");
 
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
                 _ = entity.HasOne(e => e.Job).WithMany().HasForeignKey(e => e.JobFk).OnDelete(DeleteBehavior.Cascade);

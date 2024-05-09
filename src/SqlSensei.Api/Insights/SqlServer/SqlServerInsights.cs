@@ -82,11 +82,19 @@ namespace SqlSensei.Api.Insights
             }
 
             var serverIssues = await DbContext.MonitoringJobServerLogs
+                .Where(x => x.Job.ServerFk == serverId)
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
+                .ToListAsync();
+
+            var serverFindings = await DbContext.MonitoringJobServerFindingLogs
+                .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .ToListAsync();
 
             var waits = await DbContext.MonitoringJobServerWaitStatLogs
+                .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .ToListAsync();
@@ -94,6 +102,7 @@ namespace SqlSensei.Api.Insights
             var topWaitType = SqlServerServerPerformanceCheckIssues.GetTopWaitType(waits);
 
             var queries = await DbContext.MonitoringQueryLogs
+                .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .Where(x => x.WaitType == topWaitType)
@@ -101,17 +110,19 @@ namespace SqlSensei.Api.Insights
                 .ToListAsync();
 
             var indexUsage = await DbContext.MonitoringJobIndexUsageLogs
+                .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .ToListAsync();
 
             var missingIndex = await DbContext.MonitoringJobIndexMissingLogs
+                .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
                 .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
                 .ToListAsync();
 
             return Result.Ok(new InsightsResponse(
-                SqlServerServerCheckIssues.GetSqlServerChecks(serverIssues),
+                SqlServerServerCheckIssues.GetSqlServerChecks(serverIssues, serverFindings),
                 SqlServerServerPerformanceCheckIssues.GetSqlServerPerformanceFindings(queries, topWaitType),
                 SqlServerIndexIssues.GetSqlServerChecks(indexUsage, missingIndex)));
         }

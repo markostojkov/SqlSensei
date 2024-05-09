@@ -120,6 +120,10 @@ export interface SqlServerInsightsCacheAndWaitStats {
   lotOfCompilationsASec: boolean;
   lotOfReCompilationsASec: boolean;
   statisticsUpdatedRecently: boolean;
+  highWait: boolean;
+  highWaitWaitingFor: number;
+  highWaitJobTook: number;
+  highWaitType?: string | null;
 }
 
 export interface SqlServerInsightsServerInfo {

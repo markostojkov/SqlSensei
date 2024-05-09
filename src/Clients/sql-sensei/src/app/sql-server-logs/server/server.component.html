@@ -115,6 +115,7 @@
           class="success"
           *ngIf="
             insights.sqlServerCheck.cacheAndWaitStats.noSignificantWaitStats &&
+            !insights.sqlServerCheck.cacheAndWaitStats.highWait &&
             !insights.sqlServerCheck.cacheAndWaitStats.poisonWaits &&
             !insights.sqlServerCheck.cacheAndWaitStats.poisonWaitsSerializableLocking
           "
@@ -123,6 +124,12 @@
         >
           <b>No significant wait stats found.</b>
         </p>
+        <p *ngIf="insights.sqlServerCheck.cacheAndWaitStats.highWait">
+          High wait detected <b>{{ insights.sqlServerCheck.cacheAndWaitStats.highWaitType }}</b
+          >. The last monitoring job took <b>{{ insights.sqlServerCheck.cacheAndWaitStats.highWaitJobTook }}</b> seconds and in that period it waited
+          <b>{{ insights.sqlServerCheck.cacheAndWaitStats.highWaitWaitingFor }}</b> seconds
+        </p>
+
         <p *ngIf="insights.sqlServerCheck.cacheAndWaitStats.poisonWaits" class="tooltip-indicator" matTooltip="">
           Poison waits detected. <b>{{ insights.sqlServerCheck.cacheAndWaitStats.poisonWaitType }}</b>
 

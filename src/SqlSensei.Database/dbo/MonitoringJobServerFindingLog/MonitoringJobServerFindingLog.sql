@@ -6,6 +6,7 @@
     [Priority]                  TINYINT                 NULL,
     [CheckId]                   INT                     NOT NULL,
     [Details]                   NVARCHAR(MAX)           NULL,
+    [Finding]                   NVARCHAR(MAX)           NULL, 
     CONSTRAINT [PK_MonitoringJobServerFindingLog] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_MonitoringJobServerFindingLog_JobExecution] FOREIGN KEY ([JobFk]) REFERENCES [dbo].[JobExecution]([Id]),
     CONSTRAINT [FK_MonitoringJobServerFindingLog_Company] FOREIGN KEY ([CompanyFk]) REFERENCES [dbo].[Company]([Id])

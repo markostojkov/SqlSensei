@@ -119,7 +119,8 @@ namespace SqlSensei.SqlServer
                     logsFindingsServer.Select(x => new MonitoringJobServerFindingLog(
                         x.CheckId,
                         x.Priority,
-                        x.Details)),
+                        x.Details,
+                        x.Finding)),
                     MapQueryLogs(queryLogs));
 
                 var jsonContent = JsonConvert.SerializeObject(request);

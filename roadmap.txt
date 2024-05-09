@@ -1,0 +1,2 @@
+performarnace all are 0 left col
+no significant wait stats found is incorrect

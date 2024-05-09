@@ -262,7 +262,7 @@ namespace SqlSensei.Api.Insights
         {
             if (performanceDictionary.TryGetValue(checkId, out var performanceType))
             {
-                var match = Regex.Match(value, @"[\d\.]+");
+                var match = Regex.Match(value ?? string.Empty, @"[\d\.]+");
 
                 if (match.Success)
                 {

@@ -41,7 +41,7 @@ namespace SqlSensei.Api.Insights
         int? numberOfPlans,
         int? numberOfDistinctPlans,
         DateTime? lastExecutionTime,
-        byte[]? queryHash)
+        string? queryHash)
     {
         public long Id { get; } = id;
         public string? DatabaseName { get; } = databaseName;
@@ -58,7 +58,7 @@ namespace SqlSensei.Api.Insights
         public int? NumberOfPlans { get; } = numberOfPlans;
         public int? NumberOfDistinctPlans { get; } = numberOfDistinctPlans;
         public DateTime? LastExecutionTime { get; } = lastExecutionTime;
-        public byte[]? QueryHash { get; } = queryHash;
+        public string? QueryHash { get; } = queryHash;
     }
 
     public class SqlServerPerformanceCheck(IEnumerable<SqlServerBadQuery> topBadQueries, string todayWaitType)
@@ -258,7 +258,7 @@ namespace SqlSensei.Api.Insights
                 x.NumberOfPlans,
                 x.NumberOfDistinctPlans,
                 x.LastExecutionTime,
-                x.QueryHash);
+                "0x" + BitConverter.ToString(x.QueryHash ?? new byte[] { }).Replace("-", ""));
         }
 
         private static double ParsePerformanceValue(string? value, int checkId)

@@ -188,7 +188,7 @@ export interface SqlServerBadQuery {
   numberOfPlans?: number;
   numberOfDistinctPlans?: number;
   lastExecutionTime?: Date;
-  queryHash?: Uint8Array;
+  queryHash?: string;
 }
 
 export enum SqlSenseiRunMonitoringPeriod {

@@ -5,6 +5,7 @@ import {
   ServerCheckIssueCategory,
   ServerDetailsResponse,
   ServersApiService,
+  SqlServerBadQuery,
   SqlServerInsightsServerIssue,
   SqlServerPerformancePerformanceGraph,
   SqlServerPerformanceType,
@@ -26,7 +27,7 @@ export class ServerComponent implements OnInit, OnDestroy {
   id: number;
   server?: ServerDetailsResponse;
   insights?: InsightsResponse;
-  queryId?: number;
+  query?: SqlServerBadQuery;
 
   waitStats?: SqlServerPerformanceWaitStatGraph[];
   performanceStats?: SqlServerPerformancePerformanceGraph[];
@@ -270,8 +271,8 @@ export class ServerComponent implements OnInit, OnDestroy {
       .subscribe((insights) => (this.insights = insights));
   }
 
-  analyzeQuery(queryId: number): void {
-    this.queryId = queryId;
+  analyzeQuery(query: SqlServerBadQuery): void {
+    this.query = query;
   }
 
   getBottleneck(): void {

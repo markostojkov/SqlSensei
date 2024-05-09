@@ -1,19 +1,36 @@
 <mat-card>
-  <mat-card-header>
-    <mat-card-title>Query Visualizer</mat-card-title>
-  </mat-card-header>
   <mat-card-content>
     <mat-tab-group>
       <mat-tab label="Query Visualizer">
         <div id="query"></div>
       </mat-tab>
-
       <mat-tab label="SQL Query">
-        <pre>
-          <code>
-            {{plan?.sqlText}}
-          </code>
-        </pre>
+        <div class="row">
+          <div class="col-md-6">
+            <code>
+              <pre>
+                {{ plan?.sqlText }}
+              </pre>
+            </code>
+          </div>
+          <div class="col-md-6">
+            <p><b>Database Name:</b> {{ query?.databaseName }}</p>
+            <p><b>Executions Count:</b> {{ query?.executionsCount }}</p>
+            <p><b>Executions Per Minute Count:</b> {{ query?.executionsPerMinuteCount }}</p>
+            <p><b>Total CPU:</b> {{ query?.totalCpu }}</p>
+            <p><b>Average CPU:</b> {{ query?.averageCpu }}</p>
+            <p><b>Total Duration in MS:</b> {{ query?.totalDuration }}</p>
+            <p><b>Average Duration in MS:</b> {{ query?.averageDuration }}</p>
+            <p><b>Total Reads:</b> {{ query?.totalReads }}</p>
+            <p><b>Average Reads:</b> {{ query?.averageReads }}</p>
+            <p><b>Total Returned Rows:</b> {{ query?.totalReturnedRows }}</p>
+            <p><b>Average Returned Rows:</b> {{ query?.averageReturnedRows }}</p>
+            <p><b>Number of Plans:</b> {{ query?.numberOfPlans }}</p>
+            <p><b>Number of Distinct Plans:</b> {{ query?.numberOfDistinctPlans }}</p>
+            <p><b>Last Execution Time:</b> {{ query?.lastExecutionTime | date : 'short' }}</p>
+            <p><b>Query Hash:</b> {{ query?.queryHash }}</p>
+          </div>
+        </div>
       </mat-tab>
     </mat-tab-group>
   </mat-card-content>

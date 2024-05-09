@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, OnChanges, SimpleChanges } from '@angular/core';
-import { QueryPlanResponse, ServersApiService } from '../servers-api.service';
+import { QueryPlanResponse, ServersApiService, SqlServerBadQuery } from '../servers-api.service';
 import { Subject } from 'rxjs';
 import { takeUntil, switchMap } from 'rxjs/operators';
 import { format } from 'sql-formatter';
@@ -13,7 +13,7 @@ declare var QP: any;
 })
 export class PreviewQueryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() serverId?: number;
-  @Input() queryId?: number;
+  @Input() query?: SqlServerBadQuery;
 
   private ngUnsubscribe: Subject<void> = new Subject<void>();
   plan?: QueryPlanResponse;
@@ -45,14 +45,13 @@ export class PreviewQueryComponent implements OnInit, OnChanges, OnDestroy {
       )
       .subscribe((plan) => {
         this.plan = plan;
-
-        this.plan.sqlText = format(this.plan.sqlText, { language: 'transactsql' });
+        this.plan.sqlText = format(this.plan.sqlText, { language: 'transactsql', keywordCase: 'upper', indentStyle: 'tabularLeft' });
 
         QP.showPlan(document.getElementById('query'), this.plan.xmlPlan, { jsTooltips: false });
       });
 
-    if (this.queryId) {
-      queryIdChanges$.next(this.queryId);
+    if (this.query?.id) {
+      queryIdChanges$.next(this.query.id);
     }
   }
 }

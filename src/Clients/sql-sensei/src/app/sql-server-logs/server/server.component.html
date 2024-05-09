@@ -385,7 +385,7 @@
 
             <ng-container matColumnDef="preview">
               <th mat-header-cell *matHeaderCellDef>Preview</th>
-              <td mat-cell *matCellDef="let element"><button class="my-2" mat-button color="primary" (click)="analyzeQuery(element.id)">Analyze query</button></td>
+              <td mat-cell *matCellDef="let element"><button class="my-2" mat-button color="primary" (click)="analyzeQuery(element)">Analyze query</button></td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="['databaseName', 'preview']; sticky: true"></tr>
@@ -402,9 +402,9 @@
   </div>
 </div>
 
-<div *ngIf="queryId" class="row mb-2">
+<div *ngIf="query" class="row mb-2">
   <div class="col-md-12">
-    <app-preview-query [serverId]="id" [queryId]="queryId"></app-preview-query>
+    <app-preview-query [serverId]="id" [query]="query"></app-preview-query>
   </div>
 </div>
 

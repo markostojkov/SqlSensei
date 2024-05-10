@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SqlSensei.Api.CurrentCompany;
+using SqlSensei.Api.Insights;
 using SqlSensei.Api.Storage;
 using SqlSensei.Core;
 
@@ -29,6 +30,8 @@ namespace SqlSensei.Api.Services
 
             job.Status = JobStatus.Completed;
             job.CompletedOn = DateTime.UtcNow;
+
+            job.MaintenanceErrorLast = logs.Logs.Any(x => x.IsError);
 
             var dbLogs = logs.Logs.Select(x => new Storage.MaintenanceLog(
                 companyResult.Value.Id,
@@ -120,6 +123,8 @@ namespace SqlSensei.Api.Services
             DbContext.MonitoringJobServerFindingLogs.AddRange(dbLogsFindingsServer);
 
             StoreQueryLogs(companyResult.Value.Id, jobId, logs.QueryLogs);
+
+            job.MonitoringErrorLast = SqlServerWholeServerIssue.HasIssue(dbLogsFindingsServer, dbLogsServer, dbLogsMissingIndex, dbLogsUsageIndex);
 
             _ = await DbContext.SaveChangesAsync();
 

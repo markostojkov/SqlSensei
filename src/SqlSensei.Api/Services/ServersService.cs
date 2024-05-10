@@ -2,6 +2,7 @@
 using SqlSensei.Api.CurrentCompany;
 using SqlSensei.Api.Storage;
 using SqlSensei.Core;
+using System.Linq;
 
 namespace SqlSensei.Api.Services
 {
@@ -21,9 +22,10 @@ namespace SqlSensei.Api.Services
 
             var servers = await DbContext.Servers
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Include(x => x.Jobs.OrderByDescending(j => j.CompletedOn).Take(1))
                 .ToListAsync();
 
-            return Result.Ok(servers.Select(x => new ServerResponse(x.Id, x.Name)));
+            return Result.Ok(servers.Select(x => new ServerResponse(x.Id, x.Name, x.Jobs.FirstOrDefault()?.MaintenanceErrorLast ?? false, x.Jobs.FirstOrDefault()?.MonitoringErrorLast ?? false)));
         }
 
         public async Task<Result> DeleteServer(long serverId)
@@ -83,10 +85,12 @@ namespace SqlSensei.Api.Services
         }
     }
 
-    public class ServerResponse(long id, string name)
+    public class ServerResponse(long id, string name, bool maintenanceIssue, bool monitoringIssueToday)
     {
         public long Id { get; } = id;
         public string Name { get; } = name;
+        public bool MaintenanceIssue { get; set; } = maintenanceIssue;
+        public bool MonitoringIssueToday { get; set; } = monitoringIssueToday;
     }
 
     public class CreateServerRequest(string name, SqlSenseiRunMonitoringPeriod monitoringPeriod, SqlSenseiRunMaintenancePeriod maintenancePeriod)

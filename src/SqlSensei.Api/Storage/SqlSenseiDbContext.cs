@@ -65,6 +65,8 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.Status).HasColumnType("smallint").IsRequired();
                 _ = entity.Property(e => e.CreatedOn).HasColumnType("smalldatetime").IsRequired();
                 _ = entity.Property(e => e.CompletedOn).HasColumnType("smalldatetime");
+                _ = entity.Property(e => e.MaintenanceErrorLast).HasColumnType("bit");
+                _ = entity.Property(e => e.MonitoringErrorLast).HasColumnType("bit");
                 _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
                 _ = entity.HasOne(e => e.Server).WithMany(e => e.Jobs).HasForeignKey(e => e.ServerFk).OnDelete(DeleteBehavior.Cascade);
             });

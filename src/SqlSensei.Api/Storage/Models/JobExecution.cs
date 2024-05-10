@@ -9,6 +9,8 @@
         public JobStatus Status { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? CompletedOn { get; set; }
+        public bool MaintenanceErrorLast { get; set; }
+        public bool MonitoringErrorLast { get; set; }
         public virtual Company Company { get; set; }
         public virtual Server Server { get; set; }
     }

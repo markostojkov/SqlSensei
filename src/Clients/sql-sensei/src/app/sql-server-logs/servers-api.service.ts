@@ -51,13 +51,11 @@ export class ServersApiService {
 }
 
 export class ServerResponse {
-  constructor(public id: number, public name: string) {}
+  constructor(public id: number, public name: string, public maintenanceIssue: boolean, public monitoringIssueToday: boolean) {}
 }
 
-export class ServerDetailsResponse extends ServerResponse {
-  constructor(id: number, name: string, public apiKey: string, public serverInfo: SqlServerInsightsServerInfo) {
-    super(id, name);
-  }
+export class ServerDetailsResponse {
+  constructor(public id: number, public name: string, public apiKey: string, public serverInfo: SqlServerInsightsServerInfo) {}
 }
 
 export class InsightsResponse {

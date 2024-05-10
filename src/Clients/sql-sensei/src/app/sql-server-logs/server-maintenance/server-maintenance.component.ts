@@ -33,8 +33,6 @@ export class ServerMaintenanceComponent implements OnInit {
       )
       .subscribe((maintenance) => {
         this.maintenance = maintenance;
-
-        console.log(this.maintenance);
       });
   }
 }

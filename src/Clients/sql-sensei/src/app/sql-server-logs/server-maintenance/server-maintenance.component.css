@@ -1,0 +1,13 @@
+.table-container {
+  margin-top: 10px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.height-full {
+  height: 100%;
+}
+
+.fit-paragraphs p {
+  width: fit-content;
+}

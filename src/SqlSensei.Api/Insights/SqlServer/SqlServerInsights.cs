@@ -2,6 +2,7 @@
 using SqlSensei.Api.CurrentCompany;
 using SqlSensei.Api.Storage;
 using SqlSensei.Core;
+using System.Collections.Generic;
 
 namespace SqlSensei.Api.Insights
 {
@@ -94,6 +95,46 @@ namespace SqlSensei.Api.Insights
             }
 
             return Result.Ok(new QueryPlanResponse(queryPlan.QueryPlan, queryPlan.QueryText));
+        }
+
+        public async Task<Result<IEnumerable<MaintenanceResponse>>> GetServerMaintenance(long serverId, DateTime date)
+        {
+            var startOfDay = date.Date;
+            var endOfDay = date.Date.AddDays(1).AddSeconds(-1);
+
+            var companyResult = Company.GetCurrentCompany();
+
+            if (companyResult.IsFailure)
+            {
+                return Result.FromError<IEnumerable<MaintenanceResponse>>(companyResult);
+            }
+
+            var server = await DbContext.Servers
+                .Include(x => x.Jobs.Where(x => x.Status == JobStatus.Completed).OrderByDescending(y => y.Id).Take(1))
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Id == serverId)
+                .FirstOrDefaultAsync();
+
+            if (server is null)
+            {
+                return Result.NotFound<IEnumerable<MaintenanceResponse>>(ResultCodes.ServerNotFound);
+            }
+
+            if (server.Jobs.Any() is false)
+            {
+                return Result.NotFound<IEnumerable<MaintenanceResponse>>(ResultCodes.JobNotFound);
+            }
+
+            var maintenanceLogs = await DbContext.MaintenanceLogs
+                .Where(x => x.Job.ServerFk == serverId)
+                .Where(x => x.CompanyFk == companyResult.Value.Id)
+                .Where(x => x.Job.CompletedOn >= startOfDay && x.Job.CompletedOn <= endOfDay)
+                .ToListAsync();
+
+            var response = maintenanceLogs
+                .Select(x => new MaintenanceResponse(x.DatabaseName, x.Index, x.Statistic, x.IsError, x.ErrorMessage));
+
+            return Result.Ok(response);
         }
 
         public async Task<Result<InsightsResponse>> GetInsights(long serverId, DateTime date)

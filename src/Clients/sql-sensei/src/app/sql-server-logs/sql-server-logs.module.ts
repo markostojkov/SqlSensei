@@ -26,9 +26,18 @@ import { ServerComponent } from './server/server.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { PreviewQueryComponent } from './preview-query/preview-query.component';
+import { ServerMaintenanceComponent } from './server-maintenance/server-maintenance.component';
 
 @NgModule({
-  declarations: [ServersComponent, ServerComponent, WaitStatsExplanationDialogComponent, CreateNewServerDialogComponent, DeleteServerDialogComponent, PreviewQueryComponent],
+  declarations: [
+    ServersComponent,
+    ServerMaintenanceComponent,
+    ServerComponent,
+    WaitStatsExplanationDialogComponent,
+    CreateNewServerDialogComponent,
+    DeleteServerDialogComponent,
+    PreviewQueryComponent,
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

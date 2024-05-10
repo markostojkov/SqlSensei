@@ -76,6 +76,14 @@ namespace SqlSensei.Api.Controllers
             return OkOrError(result);
         }
 
+        [HttpGet("servers/{serverId:long}/maintenance")]
+        public async Task<IActionResult> GetServerMaintenance(long serverId, [FromQuery] DateTime date)
+        {
+            var result = await ServerInsights.GetServerMaintenance(serverId, date);
+
+            return OkOrError(result);
+        }
+
         [HttpGet("servers/{serverId:long}/plan/{queryId:long}")]
         public async Task<IActionResult> GetServerInsights(long serverId, long queryId)
         {

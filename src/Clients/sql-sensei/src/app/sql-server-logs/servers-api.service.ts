@@ -33,6 +33,10 @@ export class ServersApiService {
     return this.baseApi.get<Result<InsightsResponse>>(`/sqlserver/v1/servers/${id}/insights?date=${date.toISOString()}`).pipe(map((x) => x.value));
   }
 
+  getServerMaintenance(id: number, date: Date): Observable<MaintenanceResponse[]> {
+    return this.baseApi.get<Result<MaintenanceResponse[]>>(`/sqlserver/v1/servers/${id}/maintenance?date=${date.toISOString()}`).pipe(map((x) => x.value));
+  }
+
   getServerWaitStats(id: number, start: Date, end: Date): Observable<SqlServerPerformanceWaitStatGraph[]> {
     return this.baseApi
       .get<Result<SqlServerPerformanceWaitStatGraph[]>>(`/sqlserver/v1/servers/${id}/wait-stats?start=${start.toISOString()}&end=${end.toISOString()}`)
@@ -189,6 +193,14 @@ export interface SqlServerBadQuery {
   numberOfDistinctPlans?: number;
   lastExecutionTime?: Date;
   queryHash?: string;
+}
+
+export interface MaintenanceResponse {
+  databaseName: string;
+  index?: string | null;
+  statistic?: string | null;
+  isError: boolean;
+  errorMessage?: string | null;
 }
 
 export enum SqlSenseiRunMonitoringPeriod {

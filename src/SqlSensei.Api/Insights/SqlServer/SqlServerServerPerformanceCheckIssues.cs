@@ -215,6 +215,7 @@ namespace SqlSensei.Api.Insights
             return new SqlServerPerformanceCheck(badQueries
                 .Where(x => x is not null && x.QueryHash is not null)
                 .GroupBy(x => Encoding.UTF8.GetString(x.QueryHash))
+                .OrderByDescending(g => g.Count())
                 .Select(x => x.Last())
                 .ToList()
                 .Take(10)

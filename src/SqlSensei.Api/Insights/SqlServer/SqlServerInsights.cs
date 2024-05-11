@@ -2,7 +2,6 @@
 using SqlSensei.Api.CurrentCompany;
 using SqlSensei.Api.Storage;
 using SqlSensei.Core;
-using System.Collections.Generic;
 
 namespace SqlSensei.Api.Insights
 {
@@ -31,21 +30,19 @@ namespace SqlSensei.Api.Insights
                 return Result.NotFound<ServerResponse>(ResultCodes.ServerNotFound);
             }
 
-            if (server.Jobs.Any() is false)
+            var serverIssues = new List<Storage.MonitoringJobServerLog>();
+            
+            if (server.Jobs.Any())
             {
-                return Result.NotFound<ServerResponse>(ResultCodes.JobNotFound);
+                var latestJob = await DbContext.Jobs.FirstOrDefaultAsync(x => x.Id == server.Jobs.First().Id);
+
+                if (latestJob != null)
+                {
+                    serverIssues = await DbContext.MonitoringJobServerLogs
+                        .Where(x => x.JobFk == latestJob.Id)
+                        .ToListAsync();
+                }
             }
-
-            var latestJob = await DbContext.Jobs.FirstOrDefaultAsync(x => x.Id == server.Jobs.First().Id);
-
-            if (latestJob == null)
-            {
-                return Result.NotFound<ServerResponse>(ResultCodes.JobNotFound);
-            }
-
-            var serverIssues = await DbContext.MonitoringJobServerLogs
-                .Where(x => x.JobFk == latestJob.Id)
-                .ToListAsync();
 
             return Result.Ok(new ServerResponse(
                 server.Id,
@@ -72,18 +69,6 @@ namespace SqlSensei.Api.Insights
             if (server is null)
             {
                 return Result.NotFound<QueryPlanResponse>(ResultCodes.ServerNotFound);
-            }
-
-            if (server.Jobs.Any() is false)
-            {
-                return Result.NotFound<QueryPlanResponse>(ResultCodes.JobNotFound);
-            }
-
-            var latestJob = await DbContext.Jobs.FirstOrDefaultAsync(x => x.Id == server.Jobs.First().Id);
-
-            if (latestJob == null)
-            {
-                return Result.NotFound<QueryPlanResponse>(ResultCodes.JobNotFound);
             }
 
             var queryPlan = await DbContext.MonitoringQueryLogs
@@ -120,11 +105,6 @@ namespace SqlSensei.Api.Insights
                 return Result.NotFound<IEnumerable<MaintenanceResponse>>(ResultCodes.ServerNotFound);
             }
 
-            if (server.Jobs.Any() is false)
-            {
-                return Result.NotFound<IEnumerable<MaintenanceResponse>>(ResultCodes.JobNotFound);
-            }
-
             var maintenanceLogs = await DbContext.MaintenanceLogs
                 .Where(x => x.Job.ServerFk == serverId)
                 .Where(x => x.CompanyFk == companyResult.Value.Id)
@@ -158,11 +138,6 @@ namespace SqlSensei.Api.Insights
             if (server is null)
             {
                 return Result.NotFound<InsightsResponse>(ResultCodes.ServerNotFound);
-            }
-
-            if (server.Jobs.Any() is false)
-            {
-                return Result.NotFound<InsightsResponse>(ResultCodes.JobNotFound);
             }
 
             var serverIssues = await DbContext.MonitoringJobServerLogs
@@ -236,11 +211,6 @@ namespace SqlSensei.Api.Insights
                 return Result.NotFound<IEnumerable<SqlServerPerformanceWaitStatGraph>>(ResultCodes.ServerNotFound);
             }
 
-            if (server.Jobs.Any() is false)
-            {
-                return Result.NotFound<IEnumerable<SqlServerPerformanceWaitStatGraph>>(ResultCodes.JobNotFound);
-            }
-
             var serverWaitStatsGraph = await DbContext.MonitoringJobServerWaitStatLogs
                 .Include(x => x.Job)
                 .Where(x => x.Job.ServerFk == server.Id)
@@ -273,11 +243,6 @@ namespace SqlSensei.Api.Insights
             if (server is null)
             {
                 return Result.NotFound<IEnumerable<SqlServerPerformancePerformanceGraph>>(ResultCodes.ServerNotFound);
-            }
-
-            if (server.Jobs.Any() is false)
-            {
-                return Result.NotFound<IEnumerable<SqlServerPerformancePerformanceGraph>>(ResultCodes.JobNotFound);
             }
 
             var serverPerformanceGraph = await DbContext.MonitoringJobServerFindingLogs

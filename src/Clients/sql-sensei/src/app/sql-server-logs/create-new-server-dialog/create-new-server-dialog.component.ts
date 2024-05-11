@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SqlSenseiRunMonitoringPeriod, SqlSenseiRunMaintenancePeriod, ServersApiService, CreateServerRequest } from '../servers-api.service';
 import { Router } from '@angular/router';
+import { MatDialogRef } from '@angular/material/dialog';
 
 class PeriodKeyValue<T> {
   constructor(public key: string, public value: T) {}
@@ -30,7 +31,7 @@ export class CreateNewServerDialogComponent {
     new PeriodKeyValue('Never', SqlSenseiRunMaintenancePeriod.Never),
   ];
 
-  constructor(private apiService: ServersApiService, private router: Router) {}
+  constructor(private apiService: ServersApiService, private router: Router, private dialog: MatDialogRef<CreateNewServerDialogComponent>) {}
 
   submitForm(): void {
     const req = new CreateServerRequest(this.formGroup.controls.serverName.value, this.formGroup.controls.monitoringPeriod.value, this.formGroup.controls.maintenancePeriod.value);
@@ -39,6 +40,8 @@ export class CreateNewServerDialogComponent {
       const currentUrl = this.router.url;
       const serverUrl = `${currentUrl}/${serverId}`;
       this.router.navigateByUrl(serverUrl);
+
+      this.dialog.close();
     });
   }
 }

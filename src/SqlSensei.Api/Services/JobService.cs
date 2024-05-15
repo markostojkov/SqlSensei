@@ -19,6 +19,11 @@ namespace SqlSensei.Api.Services
                 return Result.FromError<CanExecuteJobsResponse>(companyResult);
             }
 
+            if (companyResult.Value.CurrentServer is null)
+            {
+                return Result.NotFound<CanExecuteJobsResponse>(ResultCodes.ServerNotFound);
+            }
+
             var jobsMaintenanceForCompany = await DbContext.Jobs
                 .Where(x => x.CompanyFk == companyResult.Value.Id && x.ServerFk == companyResult.Value.CurrentServer.Id)
                 .Where(x => x.Type == JobType.Maintenance)

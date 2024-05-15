@@ -19,7 +19,7 @@ namespace SqlSensei.Api
 
             _ = builder.Services.AddControllers();
 
-            _ = builder.Services.AddDbContext<SqlSenseiDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("SqlSenseiDb")));
+            _ = builder.Services.AddDbContext<SqlSenseiDbContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("SqlSenseiDb"), opt => opt.EnableRetryOnFailure()));
             _ = builder.Services.AddScoped<CurrentCompanyService>();
             _ = builder.Services.AddScoped<StoreLogsToDatabaseService>();
             _ = builder.Services.AddScoped<JobService>();

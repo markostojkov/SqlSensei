@@ -4,6 +4,11 @@ import { MsalGuard, MsalRedirectComponent } from '@azure/msal-angular';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: 'sql-server/servers',
+    pathMatch: 'full',
+  },
+  {
     path: 'auth',
     component: MsalRedirectComponent,
   },
@@ -17,5 +22,9 @@ export const routes: Routes = [
         loadChildren: async () => (await import('./sql-server-logs/sql-server-logs.module')).SqlServerLogsModule,
       },
     ],
+  },
+  {
+    path: '**',
+    redirectTo: 'sql-server/servers',
   },
 ];

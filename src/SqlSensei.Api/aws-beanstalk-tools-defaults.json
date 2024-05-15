@@ -1,0 +1,13 @@
+
+{
+    "region" : "eu-north-1",
+    "configuration" : "Release",
+    "framework"     : "net8.0",
+    "self-contained" : true,
+    "application"    : "sqlsensei-prod",
+    "environment"    : "sqlsensei-prod-api-2024",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "",
+    "proxy-server"         : "nginx"
+}

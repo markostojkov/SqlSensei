@@ -5,6 +5,7 @@
         public long Id { get; set; }
         public string Name { get; set; }
 
+        public virtual ICollection<Server> Servers { get; set; }
         public Company(string name)
         {
             Name = name;

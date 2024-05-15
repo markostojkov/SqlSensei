@@ -51,7 +51,7 @@ namespace SqlSensei.Api.Storage
                 _ = entity.Property(e => e.DoMaintenancePeriod).HasColumnType("smallint").IsRequired();
                 _ = entity.Property(e => e.DoMonitoringPeriod).HasColumnType("smallint").IsRequired();
 
-                _ = entity.HasOne(e => e.Company).WithMany().HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
+                _ = entity.HasOne(e => e.Company).WithMany(e => e.Servers).HasForeignKey(e => e.CompanyFk).OnDelete(DeleteBehavior.Cascade);
             });
 
             _ = modelBuilder.Entity<JobExecution>(entity =>

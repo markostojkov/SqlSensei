@@ -40,29 +40,24 @@ namespace SqlSensei.Api.CurrentCompany
 
         public async Task SetCurrentCompany(long id)
         {
-            var company = await DbContext.Servers
-                .Include(x => x.Company)
-                .Where(c => c.Id == id)
+            var company = await DbContext.Companies
+                .Include(x => x.Servers)
+                .Where(x => x.Id == id)
                 .Select(c => new CurrentCompany(
-                    c.Company.Id,
-                    c.Company.Name,
-                    new CurrentServer(
-                        c.Id,
-                        c.Name,
-                        c.ApiKey,
-                        c.DoMaintenancePeriod,
-                        c.DoMonitoringPeriod)))
+                    c.Id,
+                    c.Name,
+                    null))
                 .SingleOrDefaultAsync();
 
             CurrentCompany = company;
         }
     }
 
-    public class CurrentCompany(long id, string name, CurrentServer currentServer)
+    public class CurrentCompany(long id, string name, CurrentServer? currentServer)
     {
         public long Id { get; } = id;
         public string Name { get; } = name;
-        public CurrentServer CurrentServer { get; } = currentServer;
+        public CurrentServer? CurrentServer { get; } = currentServer;
     }
 
     public class CurrentServer(

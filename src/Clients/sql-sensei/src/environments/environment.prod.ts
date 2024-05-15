@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseApiUrl: 'http://localhost:4000',
+  baseApiUrl: 'https://api.sqlsensei.net',
 };

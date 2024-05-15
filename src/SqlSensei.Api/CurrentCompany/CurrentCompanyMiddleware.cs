@@ -23,6 +23,24 @@ namespace SqlSensei.Api.CurrentCompany
 
             var dbUser = await dbContext.Users.FirstOrDefaultAsync(x => x.Identifier == currentUser.Identity);
 
+            if (dbUser is null && currentUser.Identity is not null)
+            {
+                var dbCompany = new Company(currentUser.Identity ?? Guid.NewGuid().ToString());
+
+                dbContext.Companies.Add(dbCompany);
+
+                dbUser = new Storage.User()
+                {
+                    Company = dbCompany,
+                    AuthProvider = AuthProvider.Google,
+                    Identifier = currentUser.Identity
+                };
+
+                dbContext.Users.Add(dbUser);
+
+                await dbContext.SaveChangesAsync();
+            }
+
             if (dbUser is not null)
             {
                 await currentCompanyService.SetCurrentCompany(dbUser.CompanyFk);

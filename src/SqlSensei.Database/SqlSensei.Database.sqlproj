@@ -84,5 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Local.publish.xml" />
+    <None Include="Production.publish.xml" />
   </ItemGroup>
 </Project>

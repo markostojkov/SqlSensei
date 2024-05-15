@@ -2,8 +2,8 @@
 {
     public enum SqlSenseiRunMonitoringPeriod
     {
-        Every15Minutes,
-        Every30Minutes,
-        Every60Minutes,
+        Every2Hours,
+        Every4Hours,
+        Every6Hours,
     }
 }

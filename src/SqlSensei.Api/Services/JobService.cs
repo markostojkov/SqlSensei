@@ -78,14 +78,14 @@ namespace SqlSensei.Api.Services
 
                 switch (companyResult.Value.CurrentServer.DoMonitoringPeriod)
                 {
-                    case SqlSenseiRunMonitoringPeriod.Every15Minutes:
-                        canExecuteMonitoring = minutesSinceLastJob >= 15;
+                    case SqlSenseiRunMonitoringPeriod.Every2Hours:
+                        canExecuteMonitoring = minutesSinceLastJob >= 120;
                         break;
-                    case SqlSenseiRunMonitoringPeriod.Every30Minutes:
-                        canExecuteMonitoring = minutesSinceLastJob >= 30;
+                    case SqlSenseiRunMonitoringPeriod.Every4Hours:
+                        canExecuteMonitoring = minutesSinceLastJob >= 240;
                         break;
-                    case SqlSenseiRunMonitoringPeriod.Every60Minutes:
-                        canExecuteMonitoring = minutesSinceLastJob >= 60;
+                    case SqlSenseiRunMonitoringPeriod.Every6Hours:
+                        canExecuteMonitoring = minutesSinceLastJob >= 360;
                         break;
                 }
             }

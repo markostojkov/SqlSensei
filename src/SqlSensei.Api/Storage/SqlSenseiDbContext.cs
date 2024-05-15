@@ -236,7 +236,7 @@ namespace SqlSensei.Api.Storage
                     ApiKey = Guid.Parse("fd2639d8-11cb-4e12-b93e-580975ee5531"),
                     CompanyFk = 1,
                     DoMaintenancePeriod = Core.SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM,
-                    DoMonitoringPeriod = Core.SqlSenseiRunMonitoringPeriod.Every15Minutes
+                    DoMonitoringPeriod = Core.SqlSenseiRunMonitoringPeriod.Every2Hours
                 });
             }
 

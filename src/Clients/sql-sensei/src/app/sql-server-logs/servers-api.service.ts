@@ -202,9 +202,9 @@ export interface MaintenanceResponse {
 }
 
 export enum SqlSenseiRunMonitoringPeriod {
-  Every15Minutes = 0,
-  Every30Minutes = 1,
-  Every60Minutes = 2,
+  Every2Hours = 0,
+  Every4Hours = 1,
+  Every6Hours = 2,
 }
 
 export enum SqlSenseiRunMaintenancePeriod {

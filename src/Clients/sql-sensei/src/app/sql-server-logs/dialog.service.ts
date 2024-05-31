@@ -5,6 +5,7 @@ import { SqlServerPerformanceWaitStatGraph } from './servers-api.service';
 import { CreateNewServerDialogComponent } from './create-new-server-dialog/create-new-server-dialog.component';
 import { DeleteServerDialogComponent } from './delete-server-dialog/delete-server-dialog.component';
 import { Observable, map } from 'rxjs';
+import { HowToImplementDialogComponent } from './how-to-implement-dialog/how-to-implement-dialog.component';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,10 @@ export class DialogService {
 
   createNewServer(): void {
     const ref = this.dialog.open(CreateNewServerDialogComponent);
+  }
+
+  howToImplement(): void {
+    const ref = this.dialog.open(HowToImplementDialogComponent);
   }
 
   deleteServer(name: string, id: number): Observable<boolean> {

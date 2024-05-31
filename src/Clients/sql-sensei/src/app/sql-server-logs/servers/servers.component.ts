@@ -17,6 +17,10 @@ export class ServersComponent {
 
   constructor(private serversApi: ServersApiService, private dialog: DialogService) {}
 
+  howToImplement(): void {
+    this.dialog.howToImplement();
+  }
+
   createNewServer(): void {
     this.dialog.createNewServer();
   }

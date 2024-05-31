@@ -16,14 +16,14 @@ class PeriodKeyValue<T> {
 export class CreateNewServerDialogComponent {
   formGroup = new FormGroup({
     serverName: new FormControl('', { validators: [Validators.required, Validators.maxLength(64)], nonNullable: true }),
-    monitoringPeriod: new FormControl(SqlSenseiRunMonitoringPeriod.Every2Hours, { validators: [Validators.required], nonNullable: true }),
+    monitoringPeriod: new FormControl(SqlSenseiRunMonitoringPeriod.Every15Minutes, { validators: [Validators.required], nonNullable: true }),
     maintenancePeriod: new FormControl(SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM, { validators: [Validators.required], nonNullable: true }),
   });
 
   monitoringPeriodEnum = [
-    new PeriodKeyValue('Every 2 Hours', SqlSenseiRunMonitoringPeriod.Every2Hours),
-    new PeriodKeyValue('Every 4 Hours', SqlSenseiRunMonitoringPeriod.Every4Hours),
-    new PeriodKeyValue('Every 6 Hours', SqlSenseiRunMonitoringPeriod.Every6Hours),
+    new PeriodKeyValue('Every 15 Minutes', SqlSenseiRunMonitoringPeriod.Every15Minutes),
+    new PeriodKeyValue('Every 30 Minutes', SqlSenseiRunMonitoringPeriod.Every30Minutes),
+    new PeriodKeyValue('Every 60 Minutes', SqlSenseiRunMonitoringPeriod.Every60Minutes),
   ];
   maintenancePeriodEnum = [
     new PeriodKeyValue('Every Weekend Sunday At 6AM', SqlSenseiRunMaintenancePeriod.EveryWeekendSundayAt6AM),

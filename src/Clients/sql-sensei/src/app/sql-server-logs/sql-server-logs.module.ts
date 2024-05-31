@@ -27,6 +27,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { PreviewQueryComponent } from './preview-query/preview-query.component';
 import { ServerMaintenanceComponent } from './server-maintenance/server-maintenance.component';
+import { HowToImplementDialogComponent } from './how-to-implement-dialog/how-to-implement-dialog.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { ServerMaintenanceComponent } from './server-maintenance/server-maintena
     CreateNewServerDialogComponent,
     DeleteServerDialogComponent,
     PreviewQueryComponent,
+    HowToImplementDialogComponent,
   ],
   imports: [
     CommonModule,

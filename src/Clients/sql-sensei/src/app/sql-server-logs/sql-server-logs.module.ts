@@ -28,6 +28,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { PreviewQueryComponent } from './preview-query/preview-query.component';
 import { ServerMaintenanceComponent } from './server-maintenance/server-maintenance.component';
 import { HowToImplementDialogComponent } from './how-to-implement-dialog/how-to-implement-dialog.component';
+import { HighlightModule } from 'ngx-highlightjs';
 
 @NgModule({
   declarations: [
@@ -60,6 +61,7 @@ import { HowToImplementDialogComponent } from './how-to-implement-dialog/how-to-
     MatTabsModule,
     MatDialogModule,
     MatTableModule,
+    HighlightModule,
   ],
   providers: [provideCharts(withDefaultRegisterables()), provideNativeDateAdapter(), DatePipe],
 })

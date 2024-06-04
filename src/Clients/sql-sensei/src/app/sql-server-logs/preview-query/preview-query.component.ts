@@ -25,7 +25,7 @@ export class PreviewQueryComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['queryId'] && !changes['queryId'].firstChange) {
+    if (changes['query'] && !changes['query'].firstChange) {
       this.listenToQueryIdChanges();
     }
   }

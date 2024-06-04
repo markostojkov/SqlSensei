@@ -1,2 +1,11 @@
-performarnace all are 0 left col
-no significant wait stats found is incorrect
+core.mjs:6531 ERROR ClientConfigurationError: authority_mismatch: Authority mismatch error. Authority provided in login request or PublicClientApplication config does not match the environment of the provided account. Please use a matching account or make an interactive request to login to this authority.
+    at createClientConfigurationError (ClientConfigurationError.mjs:141:12)
+    at RedirectClient.<anonymous> (BaseInteractionClient.mjs:110:19)
+    at Generator.next (<anonymous>)
+    at fulfilled (chunk-Y6Q6HMFU.js?v=f95a9019:65:24)
+    at _ZoneDelegate.invoke (zone.js:368:26)
+    at Object.onInvoke (core.mjs:14882:33)
+    at _ZoneDelegate.invoke (zone.js:367:52)
+    at _Zone.run (zone.js:130:43)
+    at zone.js:1260:36
+    at _ZoneDelegate.invokeTask (zone.js:403:31)

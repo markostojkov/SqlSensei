@@ -1,12 +1,17 @@
 import { Routes } from '@angular/router';
 import { NavigationComponent } from './navigation/navigation.component';
 import { MsalGuard, MsalRedirectComponent } from '@azure/msal-angular';
+import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'sql-server/servers',
+    redirectTo: 'landing',
     pathMatch: 'full',
+  },
+  {
+    path: 'landing',
+    component: LandingComponent,
   },
   {
     path: 'auth',
@@ -25,6 +30,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'sql-server/servers',
+    redirectTo: 'landing',
   },
 ];

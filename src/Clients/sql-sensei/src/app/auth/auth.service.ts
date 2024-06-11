@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
 import { InteractionStatus, AuthenticationResult, SilentRequest } from '@azure/msal-browser';
-import { Subject, filter, takeUntil } from 'rxjs';
+import { Observable, Subject, filter, takeUntil } from 'rxjs';
 import { loginRequest } from './b2c-config';
 
 @Injectable({
@@ -11,6 +11,12 @@ export class AuthService {
   private readonly destroying$ = new Subject<void>();
 
   public constructor(private authService: MsalService, private msalBroadcastService: MsalBroadcastService) {}
+
+  public isLoggedIn(): boolean {
+    const acc = this.authService.instance.getActiveAccount();
+
+    return acc !== null;
+  }
 
   public initializeAuth(): void {
     this.msalBroadcastService.msalSubject$.subscribe((response) => {
